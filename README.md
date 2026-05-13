@@ -4,4 +4,4 @@ A generator for specific Joomla plugins. Part of my [Extension Generator](https:
 Plugins of a specific type will be added. Until now: nothing added. Working on:
 * Task plugins (com_scheduler)
 
-Hewrman Peeren, 13-5-2026
+Herman Peeren, 13-5-2026
