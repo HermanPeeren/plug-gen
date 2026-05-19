@@ -1,7 +1,7 @@
 # plug-gen
 A generator for specific Joomla plugins. Part of my [Extension Generator](https://extengen.yepr.nl/). Boilerplate code is generated. Add your custom code where needed.
 
-#### Work in progress! To be released soon!
+## Work in progress! To be released soon!
 
 Plugins of a specific type will be added. Until now, **still working on this!**: 
 * Task plugins (com_scheduler)
