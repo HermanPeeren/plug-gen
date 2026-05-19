@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset
+		addruleprefix="Yepr\Component\Pluggen\Administrator\Rule"
+		addfieldprefix="Yepr\Component\Pluggen\Administrator\Field"
+	>
+		<field
+			name="entity_name"
+			type="text"
+			label="Entity name"
+			size="40"
+			onchange="updateConceptReferencesList('Entity');"
+			class="entityName"
+		 />
+		<!--required="true"-->
+
+		<field
+			name="isvalueobject"
+			type="checkbox"
+				label="COM_PLUGGEN_ATTRIBUTE_FIELD_EMBEDDABLE_LABEL"
+			description="COM_PLUGGEN_ATTRIBUTE_FIELD_EMBEDDABLE_DESC"
+	/>
+
+		<field
+			name="field"
+			type="subform"
+			formsource="administrator/components/com_pluggen/forms/field.xml"
+			multiple="true"
+			label="Fields"
+			buttons="add,remove"
+			id="field"
+			layout="joomla.form.field.subform.repeatable"
+		/>
+
+		<field
+			name="entity_id"
+			type="hidden"
+		/>
+	</fieldset>
+</form>

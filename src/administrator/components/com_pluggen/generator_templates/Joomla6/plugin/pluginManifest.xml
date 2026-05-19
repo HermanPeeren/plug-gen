@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<extension type="plugin" group="{{ pluginType|lower }}" method="upgrade">
+	<name>PLG_{{ pluginType|upper }}_{{ pluginName|upper }}</name>
+	<creationDate>{{ creation_date }}</creationDate>
+	<author>{{ author_name }}</author>
+	<authorEmail>{{ author_email }}</authorEmail>
+	<authorUrl>{{ author_url }}</authorUrl>
+	<copyright>{{ copyright }}</copyright>
+	<license>{{ license }}</license>
+	<version>{{ version }}</version>
+	<description>PLG_{{ pluginType|upper }}_{{ pluginName|upper }}_XML_DESCRIPTION</description>
+	<namespace path="src">{{ company_namespace }}\Plugin\{{ pluginType }}\{{ pluginName }}</namespace>
+	<files>
+		<folder plugin="{{ pluginName|lower }}">services</folder>
+		<folder>src</folder>
+	</files>
+	<languages>
+		<language tag="en-GB">language/en-GB/plg_{{ pluginType|lower }}_{{ pluginName|lower }}.ini</language>
+		<language tag="en-GB">language/en-GB/plg_{{ pluginType|lower }}_{{ pluginName|lower }}.sys.ini</language>
+	</languages>
+	<!-- For Task Plugins can leave out config, for parameters are added via form to task parameters -->
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+			</fieldset>
+		</fields>
+	</config>
+
+	<!-- Update servers -->
+	<!--<updateservers>
+		<server type="extension" priority="1" name="{{ projectName }}">{{ updateServerURL }}/{{ pluginType|lower }}_{{ pluginName|lower }}</server>
+	</updateservers>-->
+</extension>
