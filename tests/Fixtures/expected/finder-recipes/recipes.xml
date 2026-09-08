@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="plugin" group="finder" method="upgrade">
+	<name>plg_finder_recipes</name>
+	<author>Herman Peeren</author>
+	<authorEmail>herman@yepr.nl</authorEmail>
+	<authorUrl>https://yepr.nl</authorUrl>
+	<copyright>(C) 2026 Acme</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>1.0.0</version>
+	<description>PLG_FINDER_RECIPES_XML_DESCRIPTION</description>
+	<namespace path="src">Acme\Plugin\Finder\Recipes</namespace>
+	<files>
+		<folder plugin="recipes">services</folder>
+		<folder>src</folder>
+	</files>
+	<languages>
+		<language tag="en-GB">language/en-GB/plg_finder_recipes.ini</language>
+		<language tag="en-GB">language/en-GB/plg_finder_recipes.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field
+					name="search_archived"
+					type="radio"
+					label="PLG_FINDER_RECIPES_FIELD_SEARCH_ARCHIVED_LABEL"
+					default="1"
+					filter="integer"
+					>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+			</fieldset>
+		</fields>
+	</config>
+</extension>

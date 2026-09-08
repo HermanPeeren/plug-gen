@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	The type-specific fieldset for finder plugins.
+
+	Every field carries showon="type_id:finder", so the component can load all
+	registered type forms into one form and let Joomla show only the fieldset
+	belonging to the selected type. No page reload, no custom JavaScript.
+
+	Field names map onto type.config.<name> in the model.
+-->
+<form>
+	<fields name="config_finder">
+		<fieldset name="type_finder" label="COM_PLUGGEN_TYPE_FINDER_FIELDSET">
+			<field
+				name="context"
+				type="text"
+				label="COM_PLUGGEN_FINDER_FIELD_CONTEXT_LABEL"
+				description="COM_PLUGGEN_FINDER_FIELD_CONTEXT_DESC"
+				showon="type_id:finder"
+				required="true"
+				/>
+
+			<field
+				name="extension"
+				type="text"
+				label="COM_PLUGGEN_FINDER_FIELD_EXTENSION_LABEL"
+				description="COM_PLUGGEN_FINDER_FIELD_EXTENSION_DESC"
+				hint="com_recipes"
+				showon="type_id:finder"
+				required="true"
+				/>
+
+			<field
+				name="itemName"
+				type="text"
+				label="COM_PLUGGEN_FINDER_FIELD_ITEMNAME_LABEL"
+				description="COM_PLUGGEN_FINDER_FIELD_ITEMNAME_DESC"
+				hint="recipe"
+				showon="type_id:finder"
+				required="true"
+				/>
+
+			<field
+				name="table"
+				type="text"
+				label="COM_PLUGGEN_FINDER_FIELD_TABLE_LABEL"
+				hint="#__recipes"
+				showon="type_id:finder"
+				required="true"
+				/>
+
+			<field
+				name="stateField"
+				type="text"
+				label="COM_PLUGGEN_FINDER_FIELD_STATEFIELD_LABEL"
+				description="COM_PLUGGEN_FINDER_FIELD_STATEFIELD_DESC"
+				default="state"
+				showon="type_id:finder"
+				/>
+
+			<field
+				name="layout"
+				type="text"
+				label="COM_PLUGGEN_FINDER_FIELD_LAYOUT_LABEL"
+				description="COM_PLUGGEN_FINDER_FIELD_LAYOUT_DESC"
+				showon="type_id:finder"
+				/>
+
+			<field
+				name="typeTitle"
+				type="text"
+				label="COM_PLUGGEN_FINDER_FIELD_TYPETITLE_LABEL"
+				showon="type_id:finder"
+				/>
+
+			<field
+				name="hasCategories"
+				type="radio"
+				layout="joomla.form.field.radio.switcher"
+				label="COM_PLUGGEN_FINDER_FIELD_HASCATEGORIES_LABEL"
+				description="COM_PLUGGEN_FINDER_FIELD_HASCATEGORIES_DESC"
+				default="0"
+				filter="integer"
+				showon="type_id:finder"
+				>
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+
+			<field
+				name="taxonomies"
+				type="list"
+				label="COM_PLUGGEN_FINDER_FIELD_TAXONOMIES_LABEL"
+				multiple="true"
+				default="Type,Language"
+				showon="type_id:finder"
+				>
+				<option value="Type">COM_PLUGGEN_FINDER_TAXONOMY_TYPE</option>
+				<option value="Language">COM_PLUGGEN_FINDER_TAXONOMY_LANGUAGE</option>
+				<option value="Author">COM_PLUGGEN_FINDER_TAXONOMY_AUTHOR</option>
+				<option value="Category">COM_PLUGGEN_FINDER_TAXONOMY_CATEGORY</option>
+			</field>
+
+			<field
+				name="columns"
+				type="subform"
+				label="COM_PLUGGEN_FINDER_FIELD_COLUMNS_LABEL"
+				description="COM_PLUGGEN_FINDER_FIELD_COLUMNS_DESC"
+				multiple="true"
+				layout="joomla.form.field.subform.repeatable-table"
+				showon="type_id:finder"
+				>
+				<form>
+					<field
+						name="column"
+						type="text"
+						label="COM_PLUGGEN_FINDER_FIELD_COLUMN_LABEL"
+						hint="a.description"
+						/>
+					<field
+						name="alias"
+						type="text"
+						label="COM_PLUGGEN_FINDER_FIELD_ALIAS_LABEL"
+						hint="summary"
+						/>
+				</form>
+			</field>
+		</fieldset>
+	</fields>
+
+	<!--
+		The open spots. One textarea per slot declared in type.json; the field
+		name is the slot id with dots replaced by underscores. Code typed here is
+		stored in the model and injected into the matching protected region, so it
+		survives regeneration either way.
+	-->
+	<fields name="slots_finder">
+		<fieldset name="slots_finder" label="COM_PLUGGEN_SLOTS_FIELDSET">
+			<field
+				name="finder_setup"
+				type="textarea"
+				label="COM_PLUGGEN_FINDER_SLOT_SETUP_LABEL"
+				rows="4"
+				class="code"
+				showon="type_id:finder"
+				/>
+			<field
+				name="finder_index_before"
+				type="textarea"
+				label="COM_PLUGGEN_FINDER_SLOT_INDEX_BEFORE_LABEL"
+				rows="4"
+				class="code"
+				showon="type_id:finder"
+				/>
+			<field
+				name="finder_index_elements"
+				type="textarea"
+				label="COM_PLUGGEN_FINDER_SLOT_INDEX_ELEMENTS_LABEL"
+				description="COM_PLUGGEN_FINDER_SLOT_INDEX_ELEMENTS_DESC"
+				rows="6"
+				class="code"
+				showon="type_id:finder"
+				/>
+			<field
+				name="finder_index_taxonomies"
+				type="textarea"
+				label="COM_PLUGGEN_FINDER_SLOT_INDEX_TAXONOMIES_LABEL"
+				rows="4"
+				class="code"
+				showon="type_id:finder"
+				/>
+			<field
+				name="finder_listquery"
+				type="textarea"
+				label="COM_PLUGGEN_FINDER_SLOT_LISTQUERY_LABEL"
+				rows="4"
+				class="code"
+				showon="type_id:finder"
+				/>
+		</fieldset>
+	</fields>
+</form>

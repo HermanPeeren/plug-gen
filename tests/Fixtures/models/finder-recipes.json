@@ -1,0 +1,76 @@
+{
+	"modelVersion": "1.0",
+	"target": "joomla-6.0",
+	"plugin": {
+		"group": "finder",
+		"element": "recipes",
+		"namespace": "Acme\\Plugin\\Finder\\Recipes",
+		"className": "Recipes",
+		"version": "1.0.0",
+		"description": "Smart Search adapter that indexes com_recipes recipes.",
+		"copyright": "(C) 2026 Acme",
+		"author": {
+			"name": "Herman Peeren",
+			"email": "herman@yepr.nl",
+			"url": "https://yepr.nl"
+		},
+		"autoloadLanguage": true,
+		"services": {
+			"application": true,
+			"database": true
+		},
+		"params": [
+			{
+				"name": "search_archived",
+				"type": "radio",
+				"label": "Search Archived",
+				"default": "1",
+				"filter": "integer",
+				"options": {
+					"0": "JNO",
+					"1": "JYES"
+				}
+			}
+		]
+	},
+	"type": {
+		"id": "finder",
+		"config": {
+			"context": "Recipes",
+			"extension": "com_recipes",
+			"itemName": "recipe",
+			"table": "#__recipes",
+			"layout": "recipe",
+			"typeTitle": "Recipe",
+			"stateField": "published",
+			"hasCategories": false,
+			"taxonomies": ["Type", "Language"],
+			"columns": [
+				{ "column": "a.id", "alias": "" },
+				{ "column": "a.title", "alias": "" },
+				{ "column": "a.alias", "alias": "" },
+				{ "column": "a.description", "alias": "summary" },
+				{ "column": "a.instructions", "alias": "body" },
+				{ "column": "a.published", "alias": "state" },
+				{ "column": "a.access", "alias": "" },
+				{ "column": "a.language", "alias": "" },
+				{ "column": "a.params", "alias": "" },
+				{ "column": "a.metadata", "alias": "" },
+				{ "column": "a.metakey", "alias": "" },
+				{ "column": "a.metadesc", "alias": "" },
+				{ "column": "a.created", "alias": "start_date" },
+				{ "column": "a.modified", "alias": "" },
+				{ "column": "a.image", "alias": "" },
+				{ "column": "a.prep_time", "alias": "" },
+				{ "column": "a.servings", "alias": "" },
+				{ "column": "a.difficulty", "alias": "" }
+			]
+		}
+	},
+	"slots": {
+		"finder.index.elements": {
+			"language": "php",
+			"code": "$item->imageUrl   = $item->image ?: '';\n$item->imageAlt   = $item->title;\n$item->prep_time  = (int) $item->prep_time;\n$item->servings   = (int) $item->servings;\n$item->difficulty = $item->difficulty;"
+		}
+	}
+}

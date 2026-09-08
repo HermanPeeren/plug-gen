@@ -1,0 +1,15 @@
+{
+	"id": "finder",
+	"group": "finder",
+	"label": "Finder (Smart Search adapter)",
+	"description": "Indexes the content of a component so it can be found by Smart Search.",
+	"targets": ["joomla-5.0", "joomla-6.0"],
+	"requiredServices": ["application", "database"],
+	"slots": {
+		"finder.setup": "Extra work before an indexing run (setup)",
+		"finder.index.before": "Runs at the start of index(), before the standard fields are filled",
+		"finder.index.elements": "Assign extra fields to the Result, to reach the search result layout",
+		"finder.index.taxonomies": "Add extra taxonomies (facets)",
+		"finder.listquery": "Extend the list query, for example with a join"
+	}
+}

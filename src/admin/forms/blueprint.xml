@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	The general form: everything that is the same for every plugin type.
+
+	The type-specific fieldsets are appended at runtime by BlueprintModel::getForm()
+	from the registered type bundles, and shown with showon="type_id:<id>".
+-->
+<form>
+	<field name="id" type="number" label="JGLOBAL_FIELD_ID_LABEL" default="0" class="readonly" readonly="true"/>
+
+	<field
+		name="title"
+		type="text"
+		label="COM_PLUGGEN_FIELD_TITLE_LABEL"
+		description="COM_PLUGGEN_FIELD_TITLE_DESC"
+		size="40"
+		required="true"
+		/>
+
+	<!-- Replaced at runtime with the registered types; this is the fallback. -->
+	<field
+		name="type_id"
+		type="list"
+		label="COM_PLUGGEN_FIELD_TYPE_LABEL"
+		required="true"
+		validate="options"
+		>
+		<option value="finder">Finder (Smart Search adapter)</option>
+	</field>
+
+	<field
+		name="target"
+		type="list"
+		label="COM_PLUGGEN_FIELD_TARGET_LABEL"
+		description="COM_PLUGGEN_FIELD_TARGET_DESC"
+		default="joomla-6.0"
+		validate="options"
+		>
+		<option value="joomla-6.0">Joomla 6</option>
+		<option value="joomla-5.0">Joomla 5</option>
+	</field>
+
+	<field
+		name="group"
+		type="list"
+		label="COM_PLUGGEN_FIELD_GROUP_LABEL"
+		description="COM_PLUGGEN_FIELD_GROUP_DESC"
+		required="true"
+		validate="options"
+		>
+		<option value="actionlog">actionlog</option>
+		<option value="api-authentication">api-authentication</option>
+		<option value="authentication">authentication</option>
+		<option value="behaviour">behaviour</option>
+		<option value="captcha">captcha</option>
+		<option value="content">content</option>
+		<option value="editors">editors</option>
+		<option value="editors-xtd">editors-xtd</option>
+		<option value="extension">extension</option>
+		<option value="fields">fields</option>
+		<option value="filesystem">filesystem</option>
+		<option value="finder">finder</option>
+		<option value="installer">installer</option>
+		<option value="media-action">media-action</option>
+		<option value="multifactorauth">multifactorauth</option>
+		<option value="privacy">privacy</option>
+		<option value="quickicon">quickicon</option>
+		<option value="sampledata">sampledata</option>
+		<option value="schemaorg">schemaorg</option>
+		<option value="system">system</option>
+		<option value="task">task</option>
+		<option value="user">user</option>
+		<option value="webservices">webservices</option>
+		<option value="workflow">workflow</option>
+	</field>
+
+	<field
+		name="element"
+		type="text"
+		label="COM_PLUGGEN_FIELD_ELEMENT_LABEL"
+		description="COM_PLUGGEN_FIELD_ELEMENT_DESC"
+		hint="recipes"
+		required="true"
+		/>
+
+	<field
+		name="namespace"
+		type="text"
+		label="COM_PLUGGEN_FIELD_NAMESPACE_LABEL"
+		description="COM_PLUGGEN_FIELD_NAMESPACE_DESC"
+		hint="Acme\Plugin\Finder\Recipes"
+		required="true"
+		/>
+
+	<field
+		name="className"
+		type="text"
+		label="COM_PLUGGEN_FIELD_CLASSNAME_LABEL"
+		description="COM_PLUGGEN_FIELD_CLASSNAME_DESC"
+		hint="Recipes"
+		required="true"
+		/>
+
+	<field
+		name="version"
+		type="text"
+		label="COM_PLUGGEN_FIELD_VERSION_LABEL"
+		default="1.0.0"
+		required="true"
+		/>
+
+	<field
+		name="description"
+		type="textarea"
+		label="COM_PLUGGEN_FIELD_DESCRIPTION_LABEL"
+		rows="3"
+		/>
+
+	<field
+		name="author_name"
+		type="text"
+		label="COM_PLUGGEN_FIELD_AUTHOR_NAME_LABEL"
+		/>
+
+	<field
+		name="author_email"
+		type="email"
+		label="COM_PLUGGEN_FIELD_AUTHOR_EMAIL_LABEL"
+		validate="email"
+		/>
+
+	<field
+		name="author_url"
+		type="url"
+		label="COM_PLUGGEN_FIELD_AUTHOR_URL_LABEL"
+		validate="url"
+		relative="false"
+		/>
+
+	<field
+		name="copyright"
+		type="text"
+		label="COM_PLUGGEN_FIELD_COPYRIGHT_LABEL"
+		/>
+
+	<field
+		name="autoloadLanguage"
+		type="radio"
+		layout="joomla.form.field.radio.switcher"
+		label="COM_PLUGGEN_FIELD_AUTOLOADLANGUAGE_LABEL"
+		description="COM_PLUGGEN_FIELD_AUTOLOADLANGUAGE_DESC"
+		default="1"
+		filter="integer"
+		>
+		<option value="0">JNO</option>
+		<option value="1">JYES</option>
+	</field>
+
+	<field
+		name="services"
+		type="checkboxes"
+		label="COM_PLUGGEN_FIELD_SERVICES_LABEL"
+		description="COM_PLUGGEN_FIELD_SERVICES_DESC"
+		default="application,database"
+		>
+		<option value="application">COM_PLUGGEN_SERVICE_APPLICATION</option>
+		<option value="database">COM_PLUGGEN_SERVICE_DATABASE</option>
+		<option value="dispatcher">COM_PLUGGEN_SERVICE_DISPATCHER</option>
+		<option value="mailerFactory">COM_PLUGGEN_SERVICE_MAILERFACTORY</option>
+		<option value="userFactory">COM_PLUGGEN_SERVICE_USERFACTORY</option>
+	</field>
+
+	<field
+		name="params"
+		type="subform"
+		label="COM_PLUGGEN_FIELD_PARAMS_LABEL"
+		description="COM_PLUGGEN_FIELD_PARAMS_DESC"
+		multiple="true"
+		layout="joomla.form.field.subform.repeatable-table"
+		>
+		<form>
+			<field name="name" type="text" label="COM_PLUGGEN_FIELD_PARAM_NAME_LABEL" hint="search_archived"/>
+			<field name="type" type="text" label="COM_PLUGGEN_FIELD_PARAM_TYPE_LABEL" default="text"/>
+			<field name="label" type="text" label="COM_PLUGGEN_FIELD_PARAM_LABEL_LABEL"/>
+			<field name="default" type="text" label="COM_PLUGGEN_FIELD_PARAM_DEFAULT_LABEL"/>
+		</form>
+	</field>
+
+	<field name="model" type="hidden" filter="raw"/>
+	<field name="published" type="hidden" filter="integer" default="1"/>
+	<field name="created" type="hidden" filter="unset"/>
+	<field name="created_by" type="hidden" filter="unset"/>
+	<field name="modified" type="hidden" filter="unset"/>
+	<field name="modified_by" type="hidden" filter="unset"/>
+	<field name="checked_out" type="hidden" filter="unset"/>
+	<field name="checked_out_time" type="hidden" filter="unset"/>
+</form>
