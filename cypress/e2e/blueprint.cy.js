@@ -41,11 +41,11 @@ describe('Plug-gen blueprint editing', () => {
 
     cy.get('#jform_plugin_type option').should('have.length.greaterThan', 20);
 
-    ['finder', 'task'].forEach((group) => {
+    ['finder', 'task', 'workflow'].forEach((group) => {
       cy.get(`#jform_plugin_type option[value="${group}"]`).should('not.be.disabled');
     });
 
-    ['workflow', 'content', 'system'].forEach((group) => {
+    ['content', 'system', 'user'].forEach((group) => {
       cy.get(`#jform_plugin_type option[value="${group}"]`).should('be.disabled');
     });
   });

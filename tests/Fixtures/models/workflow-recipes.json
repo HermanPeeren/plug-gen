@@ -1,0 +1,63 @@
+{
+	"modelVersion": "1.0",
+	"target": "joomla-6.0",
+	"plugin": {
+		"group": "workflow",
+		"element": "recipes",
+		"namespace": "Acme\\Plugin\\Workflow\\Recipes",
+		"className": "Recipes",
+		"version": "1.0.0",
+		"description": "Moves a recipe to another category when it changes workflow stage.",
+		"copyright": "(C) 2026 Acme",
+		"author": {
+			"name": "Herman Peeren",
+			"email": "herman@yepr.nl",
+			"url": "https://yepr.nl"
+		},
+		"autoloadLanguage": true,
+		"services": {
+			"application": true,
+			"database": true
+		},
+		"params": []
+	},
+	"type": {
+		"id": "workflow",
+		"config": {
+			"contexts": ["com_recipes.recipe"],
+			"supportFunctionality": "core.state",
+			"fieldsetName": "actions",
+			"fieldsetLabel": "COM_WORKFLOW_TRANSITION_ACTIONS_LABEL",
+			"handleBeforeTransition": true,
+			"actions": [
+				{
+					"name": "target_category",
+					"type": "text",
+					"label": "Move to category",
+					"description": "The id of the category a recipe is moved to at this transition.",
+					"default": ""
+				},
+				{
+					"name": "notify_author",
+					"type": "radio",
+					"label": "Notify the author",
+					"default": "0",
+					"options": {
+						"0": "JNO",
+						"1": "JYES"
+					}
+				}
+			]
+		}
+	},
+	"slots": {
+		"workflow.before": {
+			"language": "php",
+			"code": "// A recipe that is checked out by somebody else must not be moved.\nforeach ($pks as $pk) {\n    if ($this->isCheckedOut((int) $pk)) {\n        $event->setStopTransition();\n\n        return;\n    }\n}"
+		},
+		"workflow.after": {
+			"language": "php",
+			"code": "if (is_numeric($target_category)) {\n    $this->moveToCategory($pks, (int) $target_category);\n}\n\nif ($notify_author) {\n    $this->notifyAuthors($pks);\n}"
+		}
+	}
+}

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	The type-specific fieldset for workflow plugins.
+
+	Every field carries showon="plugin_type:workflow", so the component can load
+	all registered type forms into one form and let Joomla show only the fieldset
+	belonging to the selected type.
+
+	Field names map onto type.config.<name> in the model.
+-->
+<form>
+	<fields name="config_workflow">
+		<fieldset name="type_workflow" label="COM_PLUGGEN_TYPE_WORKFLOW_FIELDSET">
+			<field
+				name="contexts"
+				type="textarea"
+				label="COM_PLUGGEN_WORKFLOW_FIELD_CONTEXTS_LABEL"
+				description="COM_PLUGGEN_WORKFLOW_FIELD_CONTEXTS_DESC"
+				hint="com_content.article"
+				rows="3"
+				required="true"
+				showon="plugin_type:workflow"
+				/>
+
+			<field
+				name="supportFunctionality"
+				type="text"
+				label="COM_PLUGGEN_WORKFLOW_FIELD_FUNCTIONALITY_LABEL"
+				description="COM_PLUGGEN_WORKFLOW_FIELD_FUNCTIONALITY_DESC"
+				hint="core.state"
+				showon="plugin_type:workflow"
+				/>
+
+			<field
+				name="fieldsetName"
+				type="text"
+				label="COM_PLUGGEN_WORKFLOW_FIELD_FIELDSETNAME_LABEL"
+				description="COM_PLUGGEN_WORKFLOW_FIELD_FIELDSETNAME_DESC"
+				default="actions"
+				showon="plugin_type:workflow"
+				/>
+
+			<field
+				name="fieldsetLabel"
+				type="text"
+				label="COM_PLUGGEN_WORKFLOW_FIELD_FIELDSETLABEL_LABEL"
+				default="COM_WORKFLOW_TRANSITION_ACTIONS_LABEL"
+				showon="plugin_type:workflow"
+				/>
+
+			<field
+				name="handleBeforeTransition"
+				type="radio"
+				layout="joomla.form.field.radio.switcher"
+				label="COM_PLUGGEN_WORKFLOW_FIELD_HANDLEBEFORE_LABEL"
+				description="COM_PLUGGEN_WORKFLOW_FIELD_HANDLEBEFORE_DESC"
+				default="0"
+				filter="integer"
+				showon="plugin_type:workflow"
+				>
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+
+			<field
+				name="actions"
+				type="subform"
+				label="COM_PLUGGEN_WORKFLOW_FIELD_ACTIONS_LABEL"
+				description="COM_PLUGGEN_WORKFLOW_FIELD_ACTIONS_DESC"
+				multiple="true"
+				layout="joomla.form.field.subform.repeatable-table"
+				showon="plugin_type:workflow"
+				>
+				<form>
+					<field
+						name="name"
+						type="text"
+						label="COM_PLUGGEN_WORKFLOW_FIELD_ACTION_NAME_LABEL"
+						hint="notify_author"
+						/>
+					<field
+						name="type"
+						type="text"
+						label="COM_PLUGGEN_WORKFLOW_FIELD_ACTION_TYPE_LABEL"
+						default="text"
+						/>
+					<field
+						name="label"
+						type="text"
+						label="COM_PLUGGEN_WORKFLOW_FIELD_ACTION_LABEL_LABEL"
+						/>
+					<field
+						name="description"
+						type="text"
+						label="COM_PLUGGEN_WORKFLOW_FIELD_ACTION_DESCRIPTION_LABEL"
+						/>
+					<field
+						name="default"
+						type="text"
+						label="COM_PLUGGEN_WORKFLOW_FIELD_ACTION_DEFAULT_LABEL"
+						/>
+				</form>
+			</field>
+		</fieldset>
+	</fields>
+
+	<fields name="slots_workflow">
+		<fieldset name="slots_workflow" label="COM_PLUGGEN_SLOTS_FIELDSET">
+			<field
+				name="workflow_class_members"
+				type="textarea"
+				label="COM_PLUGGEN_WORKFLOW_SLOT_CLASS_MEMBERS_LABEL"
+				rows="4"
+				class="code"
+				showon="plugin_type:workflow"
+				/>
+			<field
+				name="workflow_issupported"
+				type="textarea"
+				label="COM_PLUGGEN_WORKFLOW_SLOT_ISSUPPORTED_LABEL"
+				description="COM_PLUGGEN_WORKFLOW_SLOT_ISSUPPORTED_DESC"
+				rows="4"
+				class="code"
+				showon="plugin_type:workflow"
+				/>
+			<field
+				name="workflow_before"
+				type="textarea"
+				label="COM_PLUGGEN_WORKFLOW_SLOT_BEFORE_LABEL"
+				description="COM_PLUGGEN_WORKFLOW_SLOT_BEFORE_DESC"
+				rows="6"
+				class="code"
+				showon="plugin_type:workflow"
+				/>
+			<field
+				name="workflow_after"
+				type="textarea"
+				label="COM_PLUGGEN_WORKFLOW_SLOT_AFTER_LABEL"
+				description="COM_PLUGGEN_WORKFLOW_SLOT_AFTER_DESC"
+				rows="8"
+				class="code"
+				showon="plugin_type:workflow"
+				/>
+		</fieldset>
+	</fields>
+</form>

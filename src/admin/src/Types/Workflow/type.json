@@ -1,0 +1,14 @@
+{
+	"id": "workflow",
+	"group": "workflow",
+	"label": "Workflow (transition actions)",
+	"description": "Actions that run when an item moves from one workflow stage to the next.",
+	"targets": ["joomla-5.0", "joomla-6.0"],
+	"requiredServices": ["application"],
+	"slots": {
+		"workflow.class.members": "Extra properties or helper methods on the plugin class",
+		"workflow.issupported": "Extra checks in isSupported(), after the standard ones",
+		"workflow.before": "Runs before the transition. Call $event->setStopTransition() to prevent it",
+		"workflow.after": "Runs after the transition: the actions themselves"
+	}
+}

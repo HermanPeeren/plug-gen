@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Transition actions for plg_workflow_recipes. -->
+<form>
+	<fields name="options">
+		<fieldset name="actions" label="COM_WORKFLOW_TRANSITION_ACTIONS_LABEL">
+			<field
+				name="target_category"
+				type="text"
+				label="PLG_WORKFLOW_RECIPES_TRANSITION_ACTIONS_TARGET_CATEGORY_LABEL"
+				description="PLG_WORKFLOW_RECIPES_TRANSITION_ACTIONS_TARGET_CATEGORY_DESC"
+				default=""
+				/>
+			<field
+				name="notify_author"
+				type="radio"
+				label="PLG_WORKFLOW_RECIPES_TRANSITION_ACTIONS_NOTIFY_AUTHOR_LABEL"
+				layout="joomla.form.field.radio.switcher"
+				default="0"
+				>
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+		</fieldset>
+	</fields>
+</form>

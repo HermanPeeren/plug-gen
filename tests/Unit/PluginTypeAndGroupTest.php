@@ -76,7 +76,7 @@ final class PluginTypeAndGroupTest extends TestCase
 
         $this->assertNotEmpty($availability['finder'], 'Finder should be selectable.');
         $this->assertNotEmpty($availability['task'], 'Task should be selectable.');
-        $this->assertSame(null, $availability['workflow'], 'Workflow has no bundle yet, so it must be disabled.');
+        $this->assertNotEmpty($availability['workflow'], 'Workflow should be selectable.');
         $this->assertSame(null, $availability['content'], 'Content has no bundle yet, so it must be disabled.');
     }
 
@@ -89,7 +89,7 @@ final class PluginTypeAndGroupTest extends TestCase
     {
         $selectable = array_keys(array_filter(TypeRegistry::default()->availability()));
 
-        $this->assertSame(['finder', 'task'], $selectable);
+        $this->assertSame(['finder', 'task', 'workflow'], $selectable);
     }
 
     public function testGroupListAndValidatorAgree(): void

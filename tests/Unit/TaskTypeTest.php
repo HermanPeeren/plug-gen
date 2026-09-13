@@ -24,7 +24,7 @@ final class TaskTypeTest extends TestCase
 
         $this->assertTrue($registry->has('task'));
         $this->assertTrue($registry->hasGroup('task'));
-        $this->assertSame(['finder', 'task'], array_keys(array_filter($registry->availability())));
+        $this->assertTrue(\in_array('task', array_keys(array_filter($registry->availability())), true));
     }
 
     public function testGeneratesAClassAndAFormPerRoutineWithParameters(): void
