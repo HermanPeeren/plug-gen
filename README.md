@@ -167,6 +167,26 @@ registers an autoloader. Once an autoloader is present PHPStan resolves classes
 through it instead of through the scanned files, and every Joomla base class
 turns into "class not found" even though `/joomla` is scanned.
 
+### Releasing
+
+The version lives in one place: `<version>` in `src/pluggen.xml`. The build reads
+it, names the package after it, and the release workflow refuses a tag that
+disagrees with it.
+
+1. Edit `<version>` in `src/pluggen.xml` (and `package.json`, which is cosmetic
+   but easier to keep in step than to explain later).
+2. Commit.
+3. Create the tag `v<version>` and push it with the tag included. In PhpStorm:
+   **Git > New Tag...**, then **Git > Push...** with *Push Tags* ticked.
+
+Pushing the tag runs `.github/workflows/release.yml`, which checks the tag
+against the manifest, runs the unit suite, builds `com_pluggen-<version>.zip`
+and publishes it as a GitHub release with generated notes. Nothing is uploaded
+by hand.
+
+To build locally without releasing: `composer build`, or run `build/build.php`
+from the Composer tool window in PhpStorm.
+
 ## Security
 
 Generation writes arbitrary PHP. Plug-gen therefore:

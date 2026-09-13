@@ -1,0 +1,52 @@
+name: Release
+
+# Pushing a tag is the whole release procedure. PhpStorm can create and push a
+# tag from the Git menu, so nothing here needs a terminal.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # PHP is preinstalled on the runner, but the zip extension the build needs
+      # is not guaranteed. Installing it from apt keeps this workflow to a single
+      # third-party dependency - the checkout action - which is worth something
+      # for a repository whose product is generated code.
+      - name: Install PHP with zip
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq php-cli php-zip
+
+      - name: The tag must match the manifest
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          MANIFEST=$(php -r 'echo trim((string) simplexml_load_file("src/pluggen.xml")->version);')
+          echo "tag: $TAG   manifest: $MANIFEST"
+          if [ "$TAG" != "$MANIFEST" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match the manifest version $MANIFEST. Bump src/pluggen.xml, or tag the version it already carries."
+            exit 1
+          fi
+
+      # The unit suite runs with no dependencies at all, so there is no reason
+      # not to gate a release on it.
+      - name: Unit tests
+        run: php tests/run.php
+
+      - name: Build the package
+        run: php build/build.php
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            build/com_pluggen-*.zip \
+            --title "Plug-gen $GITHUB_REF_NAME" \
+            --generate-notes
