@@ -15,14 +15,35 @@ use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
 
 /**
  * The en-GB language files, with a key for every parameter in the model.
+ *
+ * @since  0.1.0
  */
 final class LanguageGenerator implements GeneratorInterface
 {
+    /**
+     * Every plugin needs language files.
+     *
+     * @param   PluginModel  $model  The plugin model.
+     *
+     * @return  boolean  Always true.
+     *
+     * @since   0.1.0
+     */
     public function supports(PluginModel $model): bool
     {
         return true;
     }
 
+    /**
+     * Write the .ini and .sys.ini files.
+     *
+     * @param   PluginModel     $model  The plugin model.
+     * @param   FileCollection  $files  The collection to add to.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
     public function generate(PluginModel $model, FileCollection $files): void
     {
         $prefix      = $model->languagePrefix();
@@ -59,6 +80,15 @@ final class LanguageGenerator implements GeneratorInterface
         $files->add('language/en-GB/' . $name . '.sys.ini', implode("\n", $sys) . "\n");
     }
 
+    /**
+     * The human readable plugin title, in Joomla's "Group - Name" convention.
+     *
+     * @param   PluginModel  $model  The plugin model.
+     *
+     * @return  string  The title.
+     *
+     * @since   0.1.0
+     */
     private function title(PluginModel $model): string
     {
         return ucfirst($model->group) . ' - ' . ucfirst(str_replace('_', ' ', $model->element));

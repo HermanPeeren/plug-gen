@@ -15,6 +15,7 @@ use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
 use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
 use Yepr\Component\Pluggen\Administrator\Generator\Output\ProtectedRegionMerger;
 use Yepr\Component\Pluggen\Administrator\Generator\Template\Renderer;
+use Yepr\Component\Pluggen\Administrator\Generator\Template\RendererAwareInterface;
 
 /**
  * Smart Search adapter plugins.
@@ -23,34 +24,103 @@ use Yepr\Component\Pluggen\Administrator\Generator\Template\Renderer;
  * abstract Adapter and is configured almost entirely by class properties. That
  * makes it unusually well suited to generation - the properties, the four event
  * handlers and the list query follow mechanically from the model.
+ *
+ * @since  0.1.0
  */
-final class Definition implements PluginTypeInterface
+final class Definition implements PluginTypeInterface, RendererAwareInterface
 {
+    /**
+     * The renderer for this bundle's templates.
+     *
+     * @var    Renderer
+     * @since  0.1.0
+     */
+    private Renderer $renderer;
+
+    /**
+     * Set the template renderer.
+     *
+     * @param   Renderer  $renderer  The renderer for template files.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
+    public function setRenderer(Renderer $renderer): void
+    {
+        $this->renderer = $renderer;
+    }
+
+    /**
+     * The stable type id.
+     *
+     * @return  string  The id used in the model and in showon attributes.
+     *
+     * @since   0.1.0
+     */
     public function id(): string
     {
         return 'finder';
     }
 
+    /**
+     * The Joomla plugin group this type generates into.
+     *
+     * @return  string  The plugin group.
+     *
+     * @since   0.1.0
+     */
     public function group(): string
     {
         return 'finder';
     }
 
+    /**
+     * The untranslated label, used when no language string is available.
+     *
+     * @return  string  The label.
+     *
+     * @since   0.1.0
+     */
     public function label(): string
     {
         return 'Finder (Smart Search adapter)';
     }
 
+    /**
+     * The absolute path of this bundle.
+     *
+     * @return  string  The bundle folder.
+     *
+     * @since   0.1.0
+     */
     public function path(): string
     {
         return __DIR__;
     }
 
+    /**
+     * The absolute path of the type-specific form.
+     *
+     * @return  ?string  The form file, or null when the type has no extra fields.
+     *
+     * @since   0.1.0
+     */
     public function formPath(): ?string
     {
         return __DIR__ . \DIRECTORY_SEPARATOR . 'form.xml';
     }
 
+    /**
+     * The insertion points this type offers.
+     *
+     * Read from type.json so that the form fields, the protected regions and the
+     * documentation cannot drift apart.
+     *
+     * @return  array<string, string>  Slot id => description.
+     *
+     * @since   0.1.0
+     */
     public function slots(): array
     {
         $meta = json_decode((string) file_get_contents(__DIR__ . '/type.json'), true);
@@ -58,6 +128,15 @@ final class Definition implements PluginTypeInterface
         return \is_array($meta['slots'] ?? null) ? $meta['slots'] : [];
     }
 
+    /**
+     * Type-specific validation, on top of the generic model validation.
+     *
+     * @param   PluginModel  $model  The model to check.
+     *
+     * @return  string[]  The problems found.
+     *
+     * @since   0.1.0
+     */
     public function validate(PluginModel $model): array
     {
         $errors = [];
@@ -113,16 +192,24 @@ final class Definition implements PluginTypeInterface
         return $errors;
     }
 
+    /**
+     * Contribute the adapter class for this plugin.
+     *
+     * @param   PluginModel     $model  The plugin model.
+     * @param   FileCollection  $files  The collection to add to.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
     public function generate(PluginModel $model, FileCollection $files): void
     {
-        $renderer = new Renderer();
-
         $path = 'src/Extension/' . Php::identifier($model->className) . '.php';
 
         // Templates get closures rather than class references: a template file has
         // no namespace of its own, and every value it interpolates must go through
         // an emitter anyway.
-        $files->add($path, $renderer->render(__DIR__ . '/templates/Extension.php.tpl', [
+        $files->add($path, $this->renderer->render(__DIR__ . '/templates/Extension.php.tpl', [
             'm'      => $model,
             'str'    => static fn(mixed $value): string => Php::string($value),
             'arr'    => static fn(array $value, int $indent = 0): string => Php::arrayLiteral($value, $indent),

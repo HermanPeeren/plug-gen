@@ -18,12 +18,32 @@ namespace Yepr\Component\Pluggen\Administrator\Generator\Output;
  *
  * Path containment is enforced on the way in rather than on the way out, so that
  * an invalid path fails at the generator that produced it.
+ *
+ * @since  0.1.0
  */
 final class FileCollection implements \IteratorAggregate, \Countable
 {
-    /** @var array<string, string> */
+    /**
+     * The generated files, path => contents.
+     *
+     * @var    array<string, string>
+     * @since  0.1.0
+     */
     private array $files = [];
 
+    /**
+     * Add a generated file.
+     *
+     * @param   string  $path      The path inside the package.
+     * @param   string  $contents  The file contents.
+     *
+     * @return  void
+     *
+     * @throws  \LogicException             When two generators claim the same path.
+     * @throws  \InvalidArgumentException   When the path is not safe or not relative.
+     *
+     * @since   0.1.0
+     */
     public function add(string $path, string $contents): void
     {
         $path = self::normalise($path);
@@ -35,16 +55,49 @@ final class FileCollection implements \IteratorAggregate, \Countable
         $this->files[$path] = $contents;
     }
 
+    /**
+     * Add or overwrite a generated file.
+     *
+     * Used when a later step deliberately rewrites an earlier file, such as a
+     * merge of protected regions.
+     *
+     * @param   string  $path      The path inside the package.
+     * @param   string  $contents  The file contents.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
     public function replace(string $path, string $contents): void
     {
         $this->files[self::normalise($path)] = $contents;
     }
 
+    /**
+     * Whether a file was generated at this path.
+     *
+     * @param   string  $path  The path inside the package.
+     *
+     * @return  boolean  True when the file exists in the collection.
+     *
+     * @since   0.1.0
+     */
     public function has(string $path): bool
     {
         return isset($this->files[self::normalise($path)]);
     }
 
+    /**
+     * Get the contents of one generated file.
+     *
+     * @param   string  $path  The path inside the package.
+     *
+     * @return  string  The file contents.
+     *
+     * @throws  \OutOfBoundsException  When no file was generated at that path.
+     *
+     * @since   0.1.0
+     */
     public function get(string $path): string
     {
         $path = self::normalise($path);
@@ -56,7 +109,13 @@ final class FileCollection implements \IteratorAggregate, \Countable
         return $this->files[$path];
     }
 
-    /** @return array<string, string> Sorted by path, so output is deterministic. */
+    /**
+     * All generated files, sorted by path so that output is deterministic.
+     *
+     * @return  array<string, string>  Path => contents.
+     *
+     * @since   0.1.0
+     */
     public function all(): array
     {
         $files = $this->files;
@@ -65,17 +124,37 @@ final class FileCollection implements \IteratorAggregate, \Countable
         return $files;
     }
 
-    /** @return string[] */
+    /**
+     * The paths of all generated files, sorted.
+     *
+     * @return  string[]  The paths.
+     *
+     * @since   0.1.0
+     */
     public function paths(): array
     {
         return array_keys($this->all());
     }
 
+    /**
+     * Iterate the generated files in path order.
+     *
+     * @return  \ArrayIterator  An iterator over path => contents.
+     *
+     * @since   0.1.0
+     */
     public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->all());
     }
 
+    /**
+     * How many files were generated.
+     *
+     * @return  integer  The number of files.
+     *
+     * @since   0.1.0
+     */
     public function count(): int
     {
         return \count($this->files);
@@ -87,6 +166,14 @@ final class FileCollection implements \IteratorAggregate, \Countable
      * Rejects absolute paths, drive letters, traversal and control characters.
      * Note that traversal is rejected, not resolved: a path that tries to climb
      * out is a bug in a generator, and silently rewriting it would hide that.
+     *
+     * @param   string  $path  The path to check.
+     *
+     * @return  string  The normalised, forward-slashed relative path.
+     *
+     * @throws  \InvalidArgumentException  When the path is empty, absolute, or escapes.
+     *
+     * @since   0.1.0
      */
     public static function normalise(string $path): string
     {

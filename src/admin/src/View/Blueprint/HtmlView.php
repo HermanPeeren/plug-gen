@@ -17,12 +17,48 @@ use Joomla\CMS\Toolbar\ToolbarHelper;
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
+/**
+ * The edit form for one blueprint.
+ *
+ * @since  0.1.0
+ */
 class HtmlView extends BaseHtmlView
 {
+    /**
+     * The edit form.
+     *
+     * @var    \Joomla\CMS\Form\Form
+     * @since  0.1.0
+     */
     protected $form;
+
+    /**
+     * The blueprint being edited.
+     *
+     * @var    object
+     * @since  0.1.0
+     */
     protected $item;
+
+    /**
+     * The model state.
+     *
+     * @var    \Joomla\Registry\Registry
+     * @since  0.1.0
+     */
     protected $state;
 
+    /**
+     * Display the edit form.
+     *
+     * @param   ?string  $tpl  The name of the template file to parse.
+     *
+     * @return  void
+     *
+     * @throws  \Exception  When the model reports errors.
+     *
+     * @since   0.1.0
+     */
     public function display($tpl = null): void
     {
         $this->form  = $this->get('Form');
@@ -38,6 +74,13 @@ class HtmlView extends BaseHtmlView
         parent::display($tpl);
     }
 
+    /**
+     * Add the page title and toolbar.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
     protected function addToolbar(): void
     {
         $this->getDocument()->getWebAssetManager()->useScript('keepalive')->useScript('form.validate');

@@ -12,24 +12,65 @@ namespace Yepr\Component\Pluggen\Administrator\Controller;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\Session\Session;
+use Yepr\Component\Pluggen\Administrator\Contract\ZipWriterAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\ValidationException;
 use Yepr\Component\Pluggen\Administrator\Generator\Output\ZipWriter;
+use Yepr\Component\Pluggen\Administrator\Model\BlueprintModel;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
-class BlueprintController extends FormController
+/**
+ * Controller for a single blueprint.
+ *
+ * The application is already a constructor dependency of Joomla's BaseController
+ * ($this->app), so this class needs no Factory call either.
+ *
+ * @since  0.1.0
+ */
+class BlueprintController extends FormController implements ZipWriterAwareInterface
 {
+    /**
+     * The list view for this controller.
+     *
+     * @var    string
+     * @since  0.1.0
+     */
     protected $view_list = 'blueprints';
+
+    /**
+     * The writer that turns a generated file set into an archive.
+     *
+     * @var    ZipWriter
+     * @since  0.1.0
+     */
+    private ZipWriter $zipWriter;
+
+    /**
+     * Set the zip writer.
+     *
+     * @param   ZipWriter  $zipWriter  The writer that persists a FileCollection.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
+    public function setZipWriter(ZipWriter $zipWriter): void
+    {
+        $this->zipWriter = $zipWriter;
+    }
 
     /**
      * Generate the plugin and send it as a zip.
      *
-     * Deliberately a download and not a write into the plugins folder: the
+     * Deliberately a download rather than a write into the plugins folder: the
      * generated code is executable, so installing it stays a separate, explicit
      * act through Joomla's installer, with its own permission check.
+     *
+     * @return  boolean  True when the archive was sent.
+     *
+     * @since   0.1.0
      */
     public function generate()
     {
@@ -56,7 +97,7 @@ class BlueprintController extends FormController
             return false;
         }
 
-        /** @var \Yepr\Component\Pluggen\Administrator\Model\BlueprintModel $model */
+        /** @var BlueprintModel $model */
         $model = $this->getModel('Blueprint');
 
         try {
@@ -86,15 +127,24 @@ class BlueprintController extends FormController
 
         $directory = rtrim($app->get('tmp_path'), '/\\') . \DIRECTORY_SEPARATOR . 'pluggen'
             . \DIRECTORY_SEPARATOR . bin2hex(random_bytes(8));
-        $zipPath   = $directory . \DIRECTORY_SEPARATOR . $name . '.zip';
 
-        (new ZipWriter())->write($files, $zipPath);
+        $zipPath = $this->zipWriter->write($files, $directory . \DIRECTORY_SEPARATOR . $name . '.zip');
 
         $this->sendZip($zipPath, $name . '.zip');
 
         return true;
     }
 
+    /**
+     * Stream an archive to the browser and close the application.
+     *
+     * @param   string  $zipPath   Absolute path of the archive to send.
+     * @param   string  $filename  The name the browser should save it under.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
     private function sendZip(string $zipPath, string $filename): void
     {
         $app = $this->app;

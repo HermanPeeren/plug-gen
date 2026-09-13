@@ -16,14 +16,37 @@ namespace Yepr\Component\Pluggen\Administrator\Generator\Emitter;
  * a double quoted string. A raw quote or newline in a translation therefore
  * breaks the whole file - and a broken language file fails silently, showing raw
  * keys in the interface, which is a miserable thing to debug.
+ *
+ * @since  0.1.0
  */
 final class IniEmitter
 {
+    /**
+     * Render one KEY="value" line.
+     *
+     * @param   string  $key    The language key.
+     * @param   string  $value  The translation.
+     *
+     * @return  string  The escaped line, without a trailing newline.
+     *
+     * @since   0.1.0
+     */
     public static function line(string $key, string $value): string
     {
         return self::key($key) . '="' . self::value($value) . '"';
     }
 
+    /**
+     * Normalise and check a language key.
+     *
+     * @param   string  $key  The language key, in any case.
+     *
+     * @return  string  The upper case key.
+     *
+     * @throws  \InvalidArgumentException  When the key is not a valid language key.
+     *
+     * @since   0.1.0
+     */
     public static function key(string $key): string
     {
         $key = strtoupper($key);
@@ -35,6 +58,15 @@ final class IniEmitter
         return $key;
     }
 
+    /**
+     * Escape a translation so it cannot break out of its quoted value.
+     *
+     * @param   string  $value  The raw translation.
+     *
+     * @return  string  The escaped value, without the surrounding quotes.
+     *
+     * @since   0.1.0
+     */
     public static function value(string $value): string
     {
         // Collapse newlines: an ini value is a single line.
@@ -47,6 +79,15 @@ final class IniEmitter
         return preg_replace('/[\x00-\x1F\x7F]/u', '', $value) ?? '';
     }
 
+    /**
+     * Render a comment line.
+     *
+     * @param   string  $text  The comment text.
+     *
+     * @return  string  The comment, collapsed onto one line.
+     *
+     * @since   0.1.0
+     */
     public static function comment(string $text): string
     {
         return '; ' . (preg_replace('/\R+/', ' ', $text) ?? '');

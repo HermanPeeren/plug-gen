@@ -9,6 +9,7 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Model;
 
+use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 
@@ -16,8 +17,21 @@ use Joomla\Database\ParameterType;
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
+/**
+ * The list of stored blueprints.
+ *
+ * @since  0.1.0
+ */
 class BlueprintsModel extends ListModel
 {
+    /**
+     * Constructor.
+     *
+     * @param   array                 $config   An array of configuration options.
+     * @param   ?MVCFactoryInterface  $factory  The factory that created this model.
+     *
+     * @since   0.1.0
+     */
     public function __construct($config = [], $factory = null)
     {
         if (empty($config['filter_fields'])) {
@@ -33,6 +47,16 @@ class BlueprintsModel extends ListModel
         parent::__construct($config, $factory);
     }
 
+    /**
+     * Read the filter and list state from the request.
+     *
+     * @param   string  $ordering   The default ordering column.
+     * @param   string  $direction  The default ordering direction.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
     protected function populateState($ordering = 'a.title', $direction = 'asc')
     {
         $this->setState('filter.search', $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search', ''));
@@ -42,6 +66,15 @@ class BlueprintsModel extends ListModel
         parent::populateState($ordering, $direction);
     }
 
+    /**
+     * Build a cache id that varies with the active filters.
+     *
+     * @param   string  $id  A prefix for the store id.
+     *
+     * @return  string  The store id.
+     *
+     * @since   0.1.0
+     */
     protected function getStoreId($id = '')
     {
         $id .= ':' . $this->getState('filter.search');
@@ -51,6 +84,13 @@ class BlueprintsModel extends ListModel
         return parent::getStoreId($id);
     }
 
+    /**
+     * Build the query for the blueprint list.
+     *
+     * @return  \Joomla\Database\QueryInterface  The query.
+     *
+     * @since   0.1.0
+     */
     protected function getListQuery()
     {
         $db    = $this->getDatabase();

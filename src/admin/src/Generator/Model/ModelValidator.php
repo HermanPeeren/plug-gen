@@ -18,10 +18,17 @@ use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
  * allowlist. This is the boundary that keeps a model from writing outside its
  * own output directory, so the patterns are deliberately narrow: anything not
  * explicitly permitted is rejected, rather than sanitised and accepted.
+ *
+ * @since  0.1.0
  */
 final class ModelValidator
 {
-    /** Plugin groups shipped by Joomla 6.1. */
+    /**
+     * The plugin groups shipped by Joomla 6.1.
+     *
+     * @var    string[]
+     * @since  0.1.0
+     */
     public const KNOWN_GROUPS = [
         'actionlog', 'api-authentication', 'authentication', 'behaviour', 'captcha',
         'content', 'editors', 'editors-xtd', 'extension', 'fields', 'filesystem',
@@ -35,12 +42,29 @@ final class ModelValidator
     private const NAMESPACE_PATTERN = '/^[A-Za-z_][A-Za-z0-9_]*(\\\\[A-Za-z_][A-Za-z0-9_]*)+$/';
     private const VERSION_PATTERN   = '/^[0-9]+(\.[0-9]+){0,3}(-[A-Za-z0-9.]+)?$/';
 
+    /**
+     * Constructor.
+     *
+     * @param   ?TypeRegistry  $types  The registry used to validate the chosen type;
+     *                                 omit it to check only the generic parts.
+     *
+     * @since   0.1.0
+     */
     public function __construct(private readonly ?TypeRegistry $types = null)
     {
     }
 
     /**
-     * @return string[]  The problems found; an empty array means the model is usable.
+     * Check a model and collect everything that is wrong with it.
+     *
+     * All problems are reported at once rather than failing on the first, so the
+     * user can fix a form in one pass.
+     *
+     * @param   PluginModel  $model  The model to check.
+     *
+     * @return  string[]  The problems found; an empty array means the model is usable.
+     *
+     * @since   0.1.0
      */
     public function validate(PluginModel $model): array
     {
@@ -93,6 +117,17 @@ final class ModelValidator
         return $errors;
     }
 
+    /**
+     * Check a model and throw when it cannot be generated from.
+     *
+     * @param   PluginModel  $model  The model to check.
+     *
+     * @return  void
+     *
+     * @throws  ValidationException  When the model has any problem.
+     *
+     * @since   0.1.0
+     */
     public function assertValid(PluginModel $model): void
     {
         $errors = $this->validate($model);
@@ -102,6 +137,15 @@ final class ModelValidator
         }
     }
 
+    /**
+     * Check the chosen plugin type, and hand over to the type's own validation.
+     *
+     * @param   PluginModel  $model  The model to check.
+     *
+     * @return  string[]  The problems found.
+     *
+     * @since   0.1.0
+     */
     private function validateType(PluginModel $model): array
     {
         if ($model->typeId === '') {
@@ -130,6 +174,18 @@ final class ModelValidator
         return $definition->validate($model);
     }
 
+    /**
+     * Whether a URL is one we are willing to write into a manifest.
+     *
+     * Only http and https: a javascript: or data: URL in an author field would
+     * end up in generated markup.
+     *
+     * @param   string  $url  The URL to check.
+     *
+     * @return  boolean  True when the scheme is acceptable.
+     *
+     * @since   0.1.0
+     */
     private function isSafeUrl(string $url): bool
     {
         $scheme = parse_url($url, PHP_URL_SCHEME);

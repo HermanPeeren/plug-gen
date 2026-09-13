@@ -6,3 +6,5 @@
 /cypress/videos/
 /.phpunit.result.cache
 /tests/tmp/
+/.idea/
+/.vscode/

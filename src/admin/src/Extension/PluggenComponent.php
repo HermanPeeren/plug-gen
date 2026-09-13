@@ -18,10 +18,27 @@ use Psr\Container\ContainerInterface;
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
+/**
+ * The com_pluggen component.
+ *
+ * @since  0.1.0
+ */
 class PluggenComponent extends MVCComponent implements BootableExtensionInterface
 {
     use HTMLRegistryAwareTrait;
 
+    /**
+     * Boot the extension.
+     *
+     * Nothing to set up: the component registers its services in the service
+     * provider, which runs before this.
+     *
+     * @param   ContainerInterface  $container  The container.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
     public function boot(ContainerInterface $container)
     {
     }

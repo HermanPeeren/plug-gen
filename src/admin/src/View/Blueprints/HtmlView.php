@@ -17,14 +17,64 @@ use Joomla\CMS\Toolbar\ToolbarHelper;
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
+/**
+ * The list of blueprints.
+ *
+ * @since  0.1.0
+ */
 class HtmlView extends BaseHtmlView
 {
+    /**
+     * The blueprints to show.
+     *
+     * @var    object[]
+     * @since  0.1.0
+     */
     protected $items;
+
+    /**
+     * The pagination object.
+     *
+     * @var    \Joomla\CMS\Pagination\Pagination
+     * @since  0.1.0
+     */
     protected $pagination;
+
+    /**
+     * The model state.
+     *
+     * @var    \Joomla\Registry\Registry
+     * @since  0.1.0
+     */
     protected $state;
+
+    /**
+     * The search tools form.
+     *
+     * @var    \Joomla\CMS\Form\Form
+     * @since  0.1.0
+     */
     public $filterForm;
+
+    /**
+     * The active search filters.
+     *
+     * @var    array
+     * @since  0.1.0
+     */
     public $activeFilters;
 
+    /**
+     * Display the list.
+     *
+     * @param   ?string  $tpl  The name of the template file to parse.
+     *
+     * @return  void
+     *
+     * @throws  \Exception  When the model reports errors.
+     *
+     * @since   0.1.0
+     */
     public function display($tpl = null): void
     {
         $this->items         = $this->get('Items');
@@ -46,6 +96,13 @@ class HtmlView extends BaseHtmlView
         parent::display($tpl);
     }
 
+    /**
+     * Add the page title and toolbar.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
     protected function addToolbar(): void
     {
         $user    = $this->getCurrentUser();

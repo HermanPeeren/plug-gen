@@ -2,10 +2,11 @@
 
 A Joomla 6 component that generates Joomla plugins from a saved model.
 
-Forms collect everything needed to describe a plugin — general information shared by
-all plugin types, plus a fieldset per plugin type — and the result is stored as JSON.
-That JSON model is the single input to generation: generators turn it into a complete,
-installable plugin package.
+Forms collect everything needed to describe a plugin 
+- general information shared by all plugin types, 
+- plus a fieldset per plugin type
+
+The result is stored as JSON. That JSON model is the single input to generation: generators turn it into a complete, installable plugin package.
 
 ## Layers
 

@@ -15,7 +15,18 @@ use Joomla\CMS\MVC\Controller\BaseController;
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
+/**
+ * The component's default controller.
+ *
+ * @since  0.1.0
+ */
 class DisplayController extends BaseController
 {
+    /**
+     * The default view.
+     *
+     * @var    string
+     * @since  0.1.0
+     */
     protected $default_view = 'blueprints';
 }

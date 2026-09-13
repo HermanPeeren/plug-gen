@@ -16,9 +16,23 @@ namespace Yepr\Component\Pluggen\Administrator\Generator\Output;
  * will happily write backslashes, and Joomla's unpacker then creates files with
  * literal backslashes in their names on a Linux host, where the extension simply
  * fails to load.
+ *
+ * @since  0.1.0
  */
 final class ZipWriter
 {
+    /**
+     * Write a generated file set to an archive.
+     *
+     * @param   FileCollection  $files    The generated files.
+     * @param   string          $zipPath  Absolute path of the archive to create.
+     *
+     * @return  string  The path of the archive that was written.
+     *
+     * @throws  \RuntimeException  When the directory or the archive cannot be created.
+     *
+     * @since   0.1.0
+     */
     public function write(FileCollection $files, string $zipPath): string
     {
         $directory = \dirname($zipPath);
@@ -47,8 +61,19 @@ final class ZipWriter
     }
 
     /**
-     * Write to a directory. Only used for regeneration in place, and only under a
-     * root the caller controls: every target is re-checked against that root.
+     * Write a generated file set into a directory.
+     *
+     * Only used for regeneration in place, and only under a root the caller
+     * controls: every target is re-checked against that root before writing.
+     *
+     * @param   FileCollection  $files  The generated files.
+     * @param   string          $root   Absolute path of the output directory.
+     *
+     * @return  string[]  The relative paths that were written.
+     *
+     * @throws  \RuntimeException  When the root is missing or a target escapes it.
+     *
+     * @since   0.1.0
      */
     public function writeToDirectory(FileCollection $files, string $root): array
     {

@@ -18,9 +18,26 @@ namespace Yepr\Component\Pluggen\Administrator\Generator\Template;
  * value they interpolate.
  *
  * A template is included in an isolated scope with no access to $this.
+ *
+ * @since  0.1.0
  */
 final class Renderer
 {
+    /**
+     * Render a template file.
+     *
+     * Output is normalised to LF with exactly one trailing newline, so that
+     * regenerating on another platform does not produce a diff.
+     *
+     * @param   string  $templateFile  Absolute path of the template.
+     * @param   array   $variables     Variables made available to the template.
+     *
+     * @return  string  The rendered file contents.
+     *
+     * @throws  \RuntimeException  When the template does not exist.
+     *
+     * @since   0.1.0
+     */
     public function render(string $templateFile, array $variables = []): string
     {
         if (!is_file($templateFile)) {

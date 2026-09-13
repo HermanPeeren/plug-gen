@@ -9,41 +9,186 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Model;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
+use Yepr\Component\Pluggen\Administrator\Contract\ModelMapperAwareInterface;
+use Yepr\Component\Pluggen\Administrator\Contract\ModelValidatorAwareInterface;
+use Yepr\Component\Pluggen\Administrator\Contract\PipelineAwareInterface;
+use Yepr\Component\Pluggen\Administrator\Contract\TypeRegistryAwareInterface;
+use Yepr\Component\Pluggen\Administrator\Contract\UserStateAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\ModelValidator;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
 use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
 use Yepr\Component\Pluggen\Administrator\Generator\Pipeline;
 use Yepr\Component\Pluggen\Administrator\Service\ModelMapper;
+use Yepr\Component\Pluggen\Administrator\Service\UserStateInterface;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Editing one blueprint.
+ * Editing one blueprint: the stored description of a plugin.
+ *
+ * Every collaborator arrives through PluggenMVCFactory. The class therefore has
+ * no new keyword and no call to Joomla's Factory, which also means its behaviour
+ * can be exercised by handing it doubles.
+ *
+ * @since  0.1.0
  */
-class BlueprintModel extends AdminModel
+class BlueprintModel extends AdminModel implements
+    TypeRegistryAwareInterface,
+    ModelMapperAwareInterface,
+    PipelineAwareInterface,
+    ModelValidatorAwareInterface,
+    UserStateAwareInterface
 {
+    /**
+     * The prefix to use with controller messages.
+     *
+     * @var    string
+     * @since  0.1.0
+     */
     protected $text_prefix = 'COM_PLUGGEN';
 
-    private ?TypeRegistry $types = null;
+    /**
+     * The registry of available plugin types.
+     *
+     * @var    TypeRegistry
+     * @since  0.1.0
+     */
+    private TypeRegistry $types;
 
-    public function getTypes(): TypeRegistry
+    /**
+     * The mapper between form data and the stored model.
+     *
+     * @var    ModelMapper
+     * @since  0.1.0
+     */
+    private ModelMapper $mapper;
+
+    /**
+     * The generation pipeline.
+     *
+     * @var    Pipeline
+     * @since  0.1.0
+     */
+    private Pipeline $pipeline;
+
+    /**
+     * The model validator.
+     *
+     * @var    ModelValidator
+     * @since  0.1.0
+     */
+    private ModelValidator $validator;
+
+    /**
+     * The per-user state store.
+     *
+     * @var    UserStateInterface
+     * @since  0.1.0
+     */
+    private UserStateInterface $userState;
+
+    /**
+     * Set the plugin type registry.
+     *
+     * @param   TypeRegistry  $types  The registry of available plugin types.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
+    public function setTypeRegistry(TypeRegistry $types): void
     {
-        return $this->types ??= TypeRegistry::default();
+        $this->types = $types;
     }
 
     /**
-     * The general form, with every registered type's fieldsets appended.
+     * Set the form/model mapper.
      *
-     * All type forms are loaded at once and their fields carry
-     * showon="type_id:<id>", so Joomla shows only the fieldset belonging to the
-     * selected type. No reload, no custom JavaScript.
+     * @param   ModelMapper  $mapper  The mapper between form data and the stored model.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
+    public function setModelMapper(ModelMapper $mapper): void
+    {
+        $this->mapper = $mapper;
+    }
+
+    /**
+     * Set the generation pipeline.
+     *
+     * @param   Pipeline  $pipeline  The pipeline that turns a model into a file set.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
+    public function setPipeline(Pipeline $pipeline): void
+    {
+        $this->pipeline = $pipeline;
+    }
+
+    /**
+     * Set the model validator.
+     *
+     * @param   ModelValidator  $validator  The validator for plugin models.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
+    public function setModelValidator(ModelValidator $validator): void
+    {
+        $this->validator = $validator;
+    }
+
+    /**
+     * Set the user state store.
+     *
+     * @param   UserStateInterface  $userState  The per-user state store.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
+    public function setUserState(UserStateInterface $userState): void
+    {
+        $this->userState = $userState;
+    }
+
+    /**
+     * Get the registry of plugin types.
+     *
+     * @return  TypeRegistry  The injected registry.
+     *
+     * @since   0.1.0
+     */
+    public function getTypes(): TypeRegistry
+    {
+        return $this->types;
+    }
+
+    /**
+     * Build the edit form.
+     *
+     * The general fields come from forms/blueprint.xml; every registered type
+     * then appends its own fieldsets. Their fields carry showon="type_id:<id>",
+     * so Joomla shows only the fieldset belonging to the selected type - no
+     * reload task and no custom JavaScript.
+     *
+     * @param   array    $data      Data for the form.
+     * @param   boolean  $loadData  True to load the data from the model state.
+     *
+     * @return  Form|false  The form object, or false on failure.
+     *
+     * @since   0.1.0
      */
     public function getForm($data = [], $loadData = true)
     {
@@ -53,7 +198,7 @@ class BlueprintModel extends AdminModel
             return false;
         }
 
-        foreach ($this->getTypes()->all() as $type) {
+        foreach ($this->types->all() as $type) {
             $formPath = $type->formPath();
 
             if ($formPath !== null && is_file($formPath)) {
@@ -64,18 +209,27 @@ class BlueprintModel extends AdminModel
         return $form;
     }
 
+    /**
+     * Get the data for the edit form.
+     *
+     * After a failed save Joomla keeps the submitted data in the user state, so
+     * that is tried first; otherwise the stored model is unfolded back into the
+     * flat shape the form binds to.
+     *
+     * @return  array|object  The data for the form.
+     *
+     * @since   0.1.0
+     */
     protected function loadFormData()
     {
-        $data = Factory::getApplication()->getUserState('com_pluggen.edit.blueprint.data', []);
+        $data = $this->userState->get('com_pluggen.edit.blueprint.data', []);
 
         if (empty($data)) {
             $item = $this->getItem();
             $data = $item;
 
             if (!empty($item->model)) {
-                $mapper = new ModelMapper($this->getTypes());
-                $flat   = $mapper->toForm((array) json_decode((string) $item->model, true));
-
+                $flat = $this->mapper->toForm((array) json_decode((string) $item->model, true));
                 $data = array_merge((array) $item, $flat);
             }
         }
@@ -86,13 +240,20 @@ class BlueprintModel extends AdminModel
     }
 
     /**
-     * Store the form as a model. The JSON is the record; the individual columns
-     * exist only so the list view has something to show and filter on.
+     * Save a blueprint.
+     *
+     * The JSON model is the record; the separate columns exist only so the list
+     * view has something to show and filter on.
+     *
+     * @param   array  $data  The form data.
+     *
+     * @return  boolean  True on success.
+     *
+     * @since   0.1.0
      */
     public function save($data)
     {
-        $mapper = new ModelMapper($this->getTypes());
-        $model  = $mapper->toModel($data);
+        $model = $this->mapper->toModel($data);
 
         $data['type_id'] = (string) ($model['type']['id'] ?? '');
         $data['model']   = json_encode($model, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -101,10 +262,16 @@ class BlueprintModel extends AdminModel
     }
 
     /**
-     * Validate a stored blueprint with the generator's own validator, so the user
-     * sees the same problems the pipeline would refuse on.
+     * Validate a stored blueprint with the generator's own validator.
      *
-     * @return string[]
+     * Uses the same validator the pipeline uses, so the user never sees a
+     * blueprint pass here and fail there.
+     *
+     * @param   integer  $id  The blueprint id.
+     *
+     * @return  string[]  The problems found; empty when the blueprint is usable.
+     *
+     * @since   0.1.0
      */
     public function validateBlueprint(int $id): array
     {
@@ -114,16 +281,23 @@ class BlueprintModel extends AdminModel
             return [Text::_('COM_PLUGGEN_ERR_NO_MODEL')];
         }
 
-        $types = $this->getTypes();
-
-        return (new ModelValidator($types))->validate(PluginModel::fromJson((string) $item->model));
+        return $this->validator->validate(PluginModel::fromJson((string) $item->model));
     }
 
     /**
-     * Run the pipeline for a stored blueprint.
+     * Run the generation pipeline for a stored blueprint.
      *
-     * Returns the generated files in memory; writing them anywhere is the
-     * controller's decision, and it never writes into the live plugins folder.
+     * Returns the files in memory. Writing them anywhere is the controller's
+     * decision, and it never writes into the live plugins folder.
+     *
+     * @param   integer  $id  The blueprint id.
+     *
+     * @return  FileCollection  The generated files.
+     *
+     * @throws  \RuntimeException  When the blueprint has no model yet.
+     * @throws  \Yepr\Component\Pluggen\Administrator\Generator\Model\ValidationException  When the model is not valid.
+     *
+     * @since   0.1.0
      */
     public function generate(int $id): FileCollection
     {
@@ -133,19 +307,26 @@ class BlueprintModel extends AdminModel
             throw new \RuntimeException(Text::_('COM_PLUGGEN_ERR_NO_MODEL'));
         }
 
-        $types    = $this->getTypes();
-        $pipeline = new Pipeline($types, new ModelValidator($types));
-
-        return $pipeline->run(PluginModel::fromJson((string) $item->model));
+        return $this->pipeline->run(PluginModel::fromJson((string) $item->model));
     }
 
     /**
-     * The type list is built from the registry rather than hard-coded, so adding
-     * a type folder is enough to make it selectable.
+     * Add the registered plugin types to the type field.
+     *
+     * Built from the registry rather than hard-coded, so adding a type bundle is
+     * enough to make it selectable.
+     *
+     * @param   Form    $form   The form to be altered.
+     * @param   mixed   $data   The associated data for the form.
+     * @param   string  $group  The plugin group to be executed.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
      */
     protected function preprocessForm(Form $form, $data, $group = 'content')
     {
-        $options = $this->getTypes()->options();
+        $options = $this->types->options();
 
         if ($options !== []) {
             $field = new \SimpleXMLElement(

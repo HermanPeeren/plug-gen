@@ -15,14 +15,35 @@ use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
 
 /**
  * The plugin manifest: <element>.xml at the root of the package.
+ *
+ * @since  0.1.0
  */
 final class ManifestGenerator implements GeneratorInterface
 {
+    /**
+     * Every plugin needs a manifest.
+     *
+     * @param   PluginModel  $model  The plugin model.
+     *
+     * @return  boolean  Always true.
+     *
+     * @since   0.1.0
+     */
     public function supports(PluginModel $model): bool
     {
         return true;
     }
 
+    /**
+     * Write the manifest.
+     *
+     * @param   PluginModel     $model  The plugin model.
+     * @param   FileCollection  $files  The collection to add to.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
     public function generate(PluginModel $model, FileCollection $files): void
     {
         $prefix = $model->languagePrefix();
@@ -70,7 +91,15 @@ final class ManifestGenerator implements GeneratorInterface
         $files->add($model->element . '.xml', implode("\n", $lines) . "\n");
     }
 
-    /** @return string[] */
+    /**
+     * Render the <config> block holding the plugin's own parameters.
+     *
+     * @param   PluginModel  $model  The plugin model.
+     *
+     * @return  string[]  The lines of the config block.
+     *
+     * @since   0.1.0
+     */
     private function config(PluginModel $model): array
     {
         $prefix = $model->languagePrefix();

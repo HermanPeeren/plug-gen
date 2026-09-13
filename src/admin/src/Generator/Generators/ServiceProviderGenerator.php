@@ -19,10 +19,17 @@ use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
  * Which setters are emitted depends on the services the model asks for. The
  * database setter is not optional for every type: a finder adapter dies in its
  * own constructor without it, so a type definition can force it on.
+ *
+ * @since  0.1.0
  */
 final class ServiceProviderGenerator implements GeneratorInterface
 {
-    /** service key => [use statement, setter line] */
+    /**
+     * The services that can be injected, as key => [use statement, setter line].
+     *
+     * @var    array<string, array{0: ?string, 1: string}>
+     * @since  0.1.0
+     */
     private const SERVICES = [
         'application'   => [null, '$plugin->setApplication(Factory::getApplication());'],
         'database'      => ['Joomla\\Database\\DatabaseInterface', '$plugin->setDatabase($container->get(DatabaseInterface::class));'],
@@ -31,11 +38,30 @@ final class ServiceProviderGenerator implements GeneratorInterface
         'userFactory'   => ['Joomla\\CMS\\User\\UserFactoryInterface', '$plugin->setUserFactory($container->get(UserFactoryInterface::class));'],
     ];
 
+    /**
+     * Every plugin needs a service provider.
+     *
+     * @param   PluginModel  $model  The plugin model.
+     *
+     * @return  boolean  Always true.
+     *
+     * @since   0.1.0
+     */
     public function supports(PluginModel $model): bool
     {
         return true;
     }
 
+    /**
+     * Write services/provider.php.
+     *
+     * @param   PluginModel     $model  The plugin model.
+     * @param   FileCollection  $files  The collection to add to.
+     *
+     * @return  void
+     *
+     * @since   0.1.0
+     */
     public function generate(PluginModel $model, FileCollection $files): void
     {
         $class     = Php::identifier($model->className);

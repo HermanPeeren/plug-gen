@@ -23,12 +23,28 @@ use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
  *
  * The shared generators run first, then the plugin type contributes its own
  * files. The result is held in memory; persisting it is somebody else's job.
+ *
+ * @since  0.1.0
  */
 final class Pipeline
 {
-    /** @var GeneratorInterface[] */
+    /**
+     * The generators that run for every plugin type.
+     *
+     * @var    GeneratorInterface[]
+     * @since  0.1.0
+     */
     private array $generators;
 
+    /**
+     * Constructor.
+     *
+     * @param   TypeRegistry       $types       The registry of plugin types.
+     * @param   ?ModelValidator    $validator   The validator to run first; built from the registry when omitted.
+     * @param   ?GeneratorInterface[]  $generators  The shared generators; the standard set when omitted.
+     *
+     * @since   0.1.0
+     */
     public function __construct(
         private readonly TypeRegistry $types,
         private readonly ?ModelValidator $validator = null,
@@ -41,6 +57,16 @@ final class Pipeline
         ];
     }
 
+    /**
+     * A pipeline over the bundled types, for callers that have no container.
+     *
+     * Used by the fixture tool and the tests. Inside the component the pipeline
+     * comes from the container instead, so no MVC class ever calls this.
+     *
+     * @return  self  A ready to use pipeline.
+     *
+     * @since   0.1.0
+     */
     public static function default(): self
     {
         $types = TypeRegistry::default();
@@ -49,7 +75,15 @@ final class Pipeline
     }
 
     /**
-     * @throws Model\ValidationException when the model cannot be generated from.
+     * Validate a model and run every applicable generator over it.
+     *
+     * @param   PluginModel  $model  The plugin model.
+     *
+     * @return  FileCollection  The generated files, in memory.
+     *
+     * @throws  Model\ValidationException  When the model cannot be generated from.
+     *
+     * @since   0.1.0
      */
     public function run(PluginModel $model): FileCollection
     {

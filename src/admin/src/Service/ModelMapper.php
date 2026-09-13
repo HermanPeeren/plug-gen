@@ -27,14 +27,31 @@ use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
  * Convention: a type bundle declares its fields in the groups "config_<id>" and
  * "slots_<id>", so two types can both have a field called "context" without
  * colliding in the shared form.
+ *
+ * @since  0.1.0
  */
 final class ModelMapper
 {
+    /**
+     * Constructor.
+     *
+     * @param   TypeRegistry  $types  The registry of available plugin types.
+     *
+     * @since   0.1.0
+     */
     public function __construct(private readonly TypeRegistry $types)
     {
     }
 
-    /** Form data (jform) -> the model array that is stored as JSON. */
+    /**
+     * Turn form data into the model array that is stored as JSON.
+     *
+     * @param   array  $data  The submitted jform data.
+     *
+     * @return  array  The model, ready to be encoded.
+     *
+     * @since   0.1.0
+     */
     public function toModel(array $data): array
     {
         $typeId = (string) ($data['type_id'] ?? '');
@@ -67,7 +84,15 @@ final class ModelMapper
         ];
     }
 
-    /** The stored model -> the flat structure the form binds to. */
+    /**
+     * Unfold a stored model into the flat structure the form binds to.
+     *
+     * @param   array  $model  The decoded model.
+     *
+     * @return  array  Data for the edit form.
+     *
+     * @since   0.1.0
+     */
     public function toForm(array $model): array
     {
         $plugin = (array) ($model['plugin'] ?? []);
@@ -101,7 +126,15 @@ final class ModelMapper
         return $data;
     }
 
-    /** @return array<string, bool> */
+    /**
+     * Turn the selected service names into the model's name => bool map.
+     *
+     * @param   array  $selected  The checkbox values from the form.
+     *
+     * @return  array<string, boolean>  The services to inject.
+     *
+     * @since   0.1.0
+     */
     private function services(array $selected): array
     {
         $services = [];
@@ -115,6 +148,16 @@ final class ModelMapper
         return $services;
     }
 
+    /**
+     * Collect the type-specific configuration from its own form group.
+     *
+     * @param   string  $typeId  The selected plugin type.
+     * @param   array   $data    The submitted jform data.
+     *
+     * @return  array  The type configuration.
+     *
+     * @since   0.1.0
+     */
     private function config(string $typeId, array $data): array
     {
         if ($typeId === '' || !$this->types->has($typeId)) {
@@ -133,6 +176,19 @@ final class ModelMapper
         return $config;
     }
 
+    /**
+     * Collect the custom code per slot.
+     *
+     * Only slots the type actually declares are stored: a field that is not a
+     * known slot is dropped rather than written into the model.
+     *
+     * @param   string  $typeId  The selected plugin type.
+     * @param   array   $data    The submitted jform data.
+     *
+     * @return  array  The slots, keyed by slot id.
+     *
+     * @since   0.1.0
+     */
     private function slots(string $typeId, array $data): array
     {
         if ($typeId === '' || !$this->types->has($typeId)) {
@@ -155,6 +211,19 @@ final class ModelMapper
         return $slots;
     }
 
+    /**
+     * Unfold stored slots into form field names.
+     *
+     * Field names cannot contain dots, so a slot id such as
+     * "finder.index.elements" becomes the field "finder_index_elements".
+     *
+     * @param   string  $typeId  The selected plugin type.
+     * @param   array   $slots   The stored slots.
+     *
+     * @return  array  Field name => code.
+     *
+     * @since   0.1.0
+     */
     private function slotsToForm(string $typeId, array $slots): array
     {
         $fields = [];
