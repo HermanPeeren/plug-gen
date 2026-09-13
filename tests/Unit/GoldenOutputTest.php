@@ -17,29 +17,60 @@ use Yepr\Component\Pluggen\Tests\TestCase;
  */
 final class GoldenOutputTest extends TestCase
 {
-    public function testFinderRecipesMatchesGoldenOutput(): void
+    /**
+     * Every fixture model, not a named one: dropping a new model and its golden
+     * output into the fixtures folder is enough to have it checked from then on.
+     */
+    public function testEveryFixtureMatchesItsGoldenOutput(): void
     {
-        $files    = $this->generate('finder-recipes');
-        $expected = PLUGGEN_TEST_ROOT . '/Fixtures/expected/finder-recipes';
+        $fixtures = $this->fixtures();
 
-        $this->assertNotEmpty($files->paths(), 'The pipeline generated nothing.');
+        $this->assertNotEmpty($fixtures, 'No fixture models found.');
 
-        foreach ($files as $path => $contents) {
-            $goldenFile = $expected . '/' . $path;
+        foreach ($fixtures as $fixture) {
+            $files    = $this->generate($fixture);
+            $expected = PLUGGEN_TEST_ROOT . '/Fixtures/expected/' . $fixture;
 
-            if (!is_file($goldenFile)) {
-                $this->fail('Generated a file with no golden counterpart: ' . $path);
+            $this->assertNotEmpty($files->paths(), 'The pipeline generated nothing for ' . $fixture . '.');
+
+            foreach ($files as $path => $contents) {
+                $goldenFile = $expected . '/' . $path;
+
+                if (!is_file($goldenFile)) {
+                    $this->fail('Generated a file with no golden counterpart: ' . $fixture . '/' . $path);
+                }
+
+                $golden = str_replace("\r\n", "\n", (string) file_get_contents($goldenFile));
+
+                $this->assertSame(
+                    $golden,
+                    $contents,
+                    'Generated output differs from the golden file: ' . $fixture . '/' . $path
+                );
             }
 
-            $golden = str_replace("\r\n", "\n", (string) file_get_contents($goldenFile));
+            // And nothing in the golden set disappeared.
+            foreach ($this->goldenPaths($expected) as $path) {
+                $this->assertTrue(
+                    $files->has($path),
+                    'A golden file is no longer generated: ' . $fixture . '/' . $path
+                );
+            }
+        }
+    }
 
-            $this->assertSame($golden, $contents, 'Generated output differs from the golden file: ' . $path);
+    /** @return string[] */
+    private function fixtures(): array
+    {
+        $names = [];
+
+        foreach (glob(PLUGGEN_TEST_ROOT . '/Fixtures/models/*.json') ?: [] as $file) {
+            $names[] = basename($file, '.json');
         }
 
-        // And nothing in the golden set disappeared.
-        foreach ($this->goldenPaths($expected) as $path) {
-            $this->assertTrue($files->has($path), 'A golden file is no longer generated: ' . $path);
-        }
+        sort($names, SORT_STRING);
+
+        return $names;
     }
 
     public function testGeneratesTheExpectedFileSet(): void

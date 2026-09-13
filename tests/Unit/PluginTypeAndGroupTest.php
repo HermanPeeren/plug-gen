@@ -75,16 +75,21 @@ final class PluginTypeAndGroupTest extends TestCase
         }
 
         $this->assertNotEmpty($availability['finder'], 'Finder should be selectable.');
+        $this->assertNotEmpty($availability['task'], 'Task should be selectable.');
         $this->assertSame(null, $availability['workflow'], 'Workflow has no bundle yet, so it must be disabled.');
-        $this->assertSame(null, $availability['task'], 'Task has no bundle yet, so it must be disabled.');
+        $this->assertSame(null, $availability['content'], 'Content has no bundle yet, so it must be disabled.');
     }
 
-    /** Exactly one group is selectable for now, and it is the finder. */
-    public function testOnlyFinderIsSelectableForNow(): void
+    /**
+     * Which groups can be chosen today. This list grows as bundles are added,
+     * and the assertion is deliberately exact: a group becoming selectable is a
+     * change worth noticing in a diff.
+     */
+    public function testTheSelectableGroups(): void
     {
         $selectable = array_keys(array_filter(TypeRegistry::default()->availability()));
 
-        $this->assertSame(['finder'], $selectable);
+        $this->assertSame(['finder', 'task'], $selectable);
     }
 
     public function testGroupListAndValidatorAgree(): void

@@ -51,6 +51,21 @@ interface PluginTypeInterface
      */
     public function validate(PluginModel $model): array;
 
+    /**
+     * Language keys this type needs on top of the generic ones.
+     *
+     * A task plugin advertises its routines to the scheduler through language
+     * constants, so which keys are needed follows from the model rather than
+     * from a fixed list. Returned as key => English text.
+     *
+     * @param   PluginModel  $model  The plugin model.
+     *
+     * @return  array<string, string>  Language key => text.
+     *
+     * @since   0.1.0
+     */
+    public function languageKeys(PluginModel $model): array;
+
     /** Contribute the files this type is responsible for. */
     public function generate(PluginModel $model, FileCollection $files): void;
 }

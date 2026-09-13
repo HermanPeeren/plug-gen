@@ -1,0 +1,12 @@
+{
+	"id": "task",
+	"group": "task",
+	"label": "Task (scheduled task)",
+	"description": "Routines the Joomla Task Scheduler can run on a schedule.",
+	"targets": ["joomla-5.0", "joomla-6.0"],
+	"requiredServices": ["application"],
+	"slots": {
+		"task.class.members": "Extra properties or helper methods on the plugin class",
+		"task.constructor": "Extra work in the constructor, after parent::__construct()"
+	}
+}

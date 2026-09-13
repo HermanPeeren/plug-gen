@@ -1,0 +1,73 @@
+{
+	"modelVersion": "1.0",
+	"target": "joomla-6.0",
+	"plugin": {
+		"group": "task",
+		"element": "recipes",
+		"namespace": "Acme\\Plugin\\Task\\Recipes",
+		"className": "Recipes",
+		"version": "1.0.0",
+		"description": "Scheduled maintenance for com_recipes.",
+		"copyright": "(C) 2026 Acme",
+		"author": {
+			"name": "Herman Peeren",
+			"email": "herman@yepr.nl",
+			"url": "https://yepr.nl"
+		},
+		"autoloadLanguage": true,
+		"services": {
+			"application": true,
+			"database": true,
+			"mailerFactory": true
+		},
+		"params": []
+	},
+	"type": {
+		"id": "task",
+		"config": {
+			"routines": [
+				{
+					"id": "recipes.cleanup",
+					"method": "cleanUp",
+					"label": "Remove unpublished recipes",
+					"description": "Deletes recipes that have been unpublished for longer than the given number of days.",
+					"code": "$db     = $this->getDatabase();\n$days   = max(1, (int) $params->max_age_days);\n$limit  = max(1, (int) $params->max_items);\n$cutoff = (new \\DateTimeImmutable('-' . $days . ' days', new \\DateTimeZone('UTC')))->format('Y-m-d H:i:s');\n\n$query = $db->createQuery()\n    ->delete($db->quoteName('#__recipes'))\n    ->where($db->quoteName('published') . ' = 0')\n    ->where($db->quoteName('modified') . ' < :cutoff')\n    ->bind(':cutoff', $cutoff)\n    ->setLimit($limit);\n\n$db->setQuery($query)->execute();\n\n$this->logTask(\\sprintf('Removed %d recipes.', $db->getAffectedRows()));",
+					"params": [
+						{
+							"name": "max_age_days",
+							"type": "number",
+							"label": "Maximum age in days",
+							"default": "30"
+						},
+						{
+							"name": "max_items",
+							"type": "number",
+							"label": "Items per run",
+							"default": "100"
+						}
+					]
+				},
+				{
+					"id": "recipes.report",
+					"method": "mailReport",
+					"label": "Mail a recipe report",
+					"description": "Sends a short report of the recipe collection to the address below.",
+					"code": "$mailer = $this->getMailerFactory()->createMailer();\n\n$mailer->addRecipient($params->recipient);\n$mailer->setSubject('Recipe report');\n$mailer->setBody('Nothing to report yet.');\n$mailer->Send();",
+					"params": [
+						{
+							"name": "recipient",
+							"type": "email",
+							"label": "Send the report to"
+						}
+					]
+				}
+			]
+		}
+	},
+	"slots": {
+		"task.class.members": {
+			"language": "php",
+			"code": "/**\n * How many rows a single run may touch.\n *\n * @var integer\n */\nprivate const HARD_LIMIT = 500;"
+		}
+	}
+}

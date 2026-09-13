@@ -40,11 +40,27 @@ describe('Plug-gen blueprint editing', () => {
     cy.visit('/administrator/index.php?option=com_pluggen&task=blueprint.add');
 
     cy.get('#jform_plugin_type option').should('have.length.greaterThan', 20);
-    cy.get('#jform_plugin_type option[value="finder"]').should('not.be.disabled');
 
-    ['workflow', 'task', 'content', 'system'].forEach((group) => {
+    ['finder', 'task'].forEach((group) => {
+      cy.get(`#jform_plugin_type option[value="${group}"]`).should('not.be.disabled');
+    });
+
+    ['workflow', 'content', 'system'].forEach((group) => {
       cy.get(`#jform_plugin_type option[value="${group}"]`).should('be.disabled');
     });
+  });
+
+  // Each type brings its own fieldset, and only its own.
+  it('swaps the fieldset when the plugin type changes', () => {
+    cy.visit('/administrator/index.php?option=com_pluggen&task=blueprint.add');
+
+    cy.get('#jform_plugin_type').select('task');
+    cy.get('#jform_config_task_routines').should('be.visible');
+    cy.get('#jform_config_finder_context').should('not.be.visible');
+
+    cy.get('#jform_plugin_type').select('finder');
+    cy.get('#jform_config_finder_context').should('be.visible');
+    cy.get('#jform_config_task_routines').should('not.be.visible');
   });
 
   it('saves a blueprint and stores it as a model', () => {

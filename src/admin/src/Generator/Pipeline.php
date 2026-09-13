@@ -50,10 +50,12 @@ final class Pipeline
         private readonly ?ModelValidator $validator = null,
         ?array $generators = null
     ) {
+        // Order matters at one point only: the manifest inventories the folders
+        // that were generated, so it runs after everything that creates them.
         $this->generators = $generators ?? [
-            new ManifestGenerator(),
             new ServiceProviderGenerator(),
-            new LanguageGenerator(),
+            new LanguageGenerator($types),
+            new ManifestGenerator(),
         ];
     }
 
@@ -91,13 +93,16 @@ final class Pipeline
 
         $files = new FileCollection();
 
+        // The plugin type goes first: the manifest lists the folders that were
+        // actually generated, so a type contributing a forms/ or media/ folder
+        // needs no special case in the shared generators.
+        $this->types->get($model->typeId)->generate($model, $files);
+
         foreach ($this->generators as $generator) {
             if ($generator->supports($model)) {
                 $generator->generate($model, $files);
             }
         }
-
-        $this->types->get($model->typeId)->generate($model, $files);
 
         return $files;
     }

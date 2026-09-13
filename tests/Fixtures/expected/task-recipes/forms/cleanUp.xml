@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Parameters for the recipes.cleanup routine. -->
+<form>
+	<fields name="params">
+		<fieldset name="task_params">
+			<field
+				name="max_age_days"
+				type="number"
+				label="PLG_TASK_RECIPES_CLEANUP_PARAM_MAX_AGE_DAYS"
+				default="30"
+				filter="integer"
+				/>
+			<field
+				name="max_items"
+				type="number"
+				label="PLG_TASK_RECIPES_CLEANUP_PARAM_MAX_ITEMS"
+				default="100"
+				filter="integer"
+				/>
+		</fieldset>
+	</fields>
+</form>

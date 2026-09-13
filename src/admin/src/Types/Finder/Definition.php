@@ -196,6 +196,20 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
     }
 
     /**
+     * A finder plugin needs no language keys beyond the generic ones.
+     *
+     * @param   PluginModel  $model  The plugin model.
+     *
+     * @return  array<string, string>  An empty array.
+     *
+     * @since   0.1.0
+     */
+    public function languageKeys(PluginModel $model): array
+    {
+        return [];
+    }
+
+    /**
      * Contribute the adapter class for this plugin.
      *
      * @param   PluginModel     $model  The plugin model.

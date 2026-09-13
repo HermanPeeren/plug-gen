@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Parameters for the recipes.report routine. -->
+<form>
+	<fields name="params">
+		<fieldset name="task_params">
+			<field
+				name="recipient"
+				type="email"
+				label="PLG_TASK_RECIPES_REPORT_PARAM_RECIPIENT"
+				/>
+		</fieldset>
+	</fields>
+</form>

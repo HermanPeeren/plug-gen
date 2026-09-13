@@ -10,6 +10,7 @@
 namespace Yepr\Component\Pluggen\Administrator\Generator\Generators;
 
 use Yepr\Component\Pluggen\Administrator\Generator\Emitter\IniEmitter as Ini;
+use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
 use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
 
@@ -20,6 +21,18 @@ use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
  */
 final class LanguageGenerator implements GeneratorInterface
 {
+    /**
+     * Constructor.
+     *
+     * @param   ?TypeRegistry  $types  The registry, so a plugin type can add the
+     *                                 keys it needs; omit it for the generic keys only.
+     *
+     * @since   0.1.0
+     */
+    public function __construct(private readonly ?TypeRegistry $types = null)
+    {
+    }
+
     /**
      * Every plugin needs language files.
      *
@@ -76,8 +89,37 @@ final class LanguageGenerator implements GeneratorInterface
             }
         }
 
+        $typeKeys = $this->typeKeys($model);
+
+        if ($typeKeys !== []) {
+            $ini[] = '';
+            $ini[] = Ini::comment('Keys this plugin type needs');
+
+            foreach ($typeKeys as $key => $text) {
+                $ini[] = Ini::line($key, $text);
+            }
+        }
+
         $files->add('language/en-GB/' . $name . '.ini', implode("\n", $ini) . "\n");
         $files->add('language/en-GB/' . $name . '.sys.ini', implode("\n", $sys) . "\n");
+    }
+
+    /**
+     * The language keys the plugin type asks for.
+     *
+     * @param   PluginModel  $model  The plugin model.
+     *
+     * @return  array<string, string>  Language key => text.
+     *
+     * @since   0.1.0
+     */
+    private function typeKeys(PluginModel $model): array
+    {
+        if ($this->types === null || $model->typeId === '' || !$this->types->has($model->typeId)) {
+            return [];
+        }
+
+        return $this->types->get($model->typeId)->languageKeys($model);
     }
 
     /**

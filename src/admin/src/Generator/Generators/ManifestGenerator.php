@@ -74,8 +74,13 @@ final class ManifestGenerator implements GeneratorInterface
         $lines[] = "\t" . '<description>' . Xml::text($prefix . '_XML_DESCRIPTION') . '</description>';
         $lines[] = "\t" . '<namespace path="src">' . Xml::text($model->namespace) . '</namespace>';
         $lines[] = "\t" . '<files>';
-        $lines[] = "\t\t" . '<folder plugin="' . Xml::attr($model->element) . '">services</folder>';
-        $lines[] = "\t\t" . '<folder>src</folder>';
+
+        foreach ($this->folders($files) as $folder) {
+            $lines[] = $folder === 'services'
+                ? "\t\t" . '<folder plugin="' . Xml::attr($model->element) . '">services</folder>'
+                : "\t\t" . '<folder>' . Xml::text($folder) . '</folder>';
+        }
+
         $lines[] = "\t" . '</files>';
         $lines[] = "\t" . '<languages>';
         $lines[] = "\t\t" . '<language tag="en-GB">language/en-GB/' . Xml::attr($model->extensionName()) . '.ini</language>';
@@ -89,6 +94,47 @@ final class ManifestGenerator implements GeneratorInterface
         $lines[] = '</extension>';
 
         $files->add($model->element . '.xml', implode("\n", $lines) . "\n");
+    }
+
+    /**
+     * The folders the manifest has to install, read back from what was actually
+     * generated.
+     *
+     * Derived rather than listed, so a type that contributes a forms/ or media/
+     * folder needs no special case here: it appears in the manifest because the
+     * files exist. This is why the pipeline lets the plugin type generate first.
+     *
+     * The language folder is left out: a manifest installs those through
+     * <languages>, not as a plain folder.
+     *
+     * @param   FileCollection  $files  The files generated so far.
+     *
+     * @return  string[]  Folder names, sorted.
+     *
+     * @since   0.1.0
+     */
+    private function folders(FileCollection $files): array
+    {
+        $folders = [];
+
+        foreach ($files->paths() as $path) {
+            $slash = strpos($path, '/');
+
+            if ($slash === false) {
+                continue;
+            }
+
+            $folder = substr($path, 0, $slash);
+
+            if ($folder !== 'language') {
+                $folders[$folder] = true;
+            }
+        }
+
+        $names = array_keys($folders);
+        sort($names, SORT_STRING);
+
+        return $names;
     }
 
     /**

@@ -71,6 +71,20 @@ disabled rather than hidden, so it is visible what the generator cannot write
 yet. Disabling is a browser hint only — `BlueprintModel::save()` refuses an
 unavailable type as well.
 
+## The plugin types that ship
+
+**Finder** — a Smart Search adapter. Configured almost entirely by class
+properties, so the model carries the table, the column-to-alias mapping, the
+taxonomies and whether the content has categories.
+
+**Task** — routines for the Task Scheduler. A task plugin is wired by
+convention: three events point at `TaskPluginTrait`, and a `TASKS_MAP` constant
+tells the trait where everything is. So the model carries the routines — id,
+method, title, parameters and body — and the generator derives the map, the
+handler methods, a parameter form per routine, and the language constants the
+scheduler advertises them under. One plugin can offer several routines, as
+`plg_task_sitestatus` does in core.
+
 ## Adding a plugin type
 
 Drop a folder in `src/admin/src/Types/<Name>/`:
@@ -97,8 +111,7 @@ composer cs-fix-dry       # php-cs-fixer, dry run with a diff
 php build/build.php       # -> build/com_pluggen.zip
 ```
 
-If PHPUnit is not installed, `php tests/run.php` runs the same test classes with a
-zero-dependency runner.
+If PHPUnit is not installed, `php tests/run.php` runs the same test classes with a zero-dependency runner.
 
 ### Joomla as reference material
 
