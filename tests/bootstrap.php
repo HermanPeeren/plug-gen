@@ -35,3 +35,10 @@ spl_autoload_register(static function (string $class): void {
 if (!\defined('PLUGGEN_TEST_ROOT')) {
     \define('PLUGGEN_TEST_ROOT', __DIR__);
 }
+
+// The component classes guard themselves with _JEXEC. Defining it is not the
+// same as bootstrapping Joomla: it is a plain constant, and the classes these
+// tests load still pull in nothing from the CMS.
+if (!\defined('_JEXEC')) {
+    \define('_JEXEC', 1);
+}

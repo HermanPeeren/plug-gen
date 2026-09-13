@@ -2,7 +2,7 @@
 <!--
 	The type-specific fieldset for finder plugins.
 
-	Every field carries showon="type_id:finder", so the component can load all
+	Every field carries showon="plugin_type:finder", so the component can load all
 	registered type forms into one form and let Joomla show only the fieldset
 	belonging to the selected type. No page reload, no custom JavaScript.
 
@@ -16,7 +16,7 @@
 				type="text"
 				label="COM_PLUGGEN_FINDER_FIELD_CONTEXT_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_CONTEXT_DESC"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				required="true"
 				/>
 
@@ -26,7 +26,7 @@
 				label="COM_PLUGGEN_FINDER_FIELD_EXTENSION_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_EXTENSION_DESC"
 				hint="com_recipes"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				required="true"
 				/>
 
@@ -36,7 +36,7 @@
 				label="COM_PLUGGEN_FINDER_FIELD_ITEMNAME_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_ITEMNAME_DESC"
 				hint="recipe"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				required="true"
 				/>
 
@@ -45,7 +45,7 @@
 				type="text"
 				label="COM_PLUGGEN_FINDER_FIELD_TABLE_LABEL"
 				hint="#__recipes"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				required="true"
 				/>
 
@@ -55,7 +55,7 @@
 				label="COM_PLUGGEN_FINDER_FIELD_STATEFIELD_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_STATEFIELD_DESC"
 				default="state"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				/>
 
 			<field
@@ -63,14 +63,14 @@
 				type="text"
 				label="COM_PLUGGEN_FINDER_FIELD_LAYOUT_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_LAYOUT_DESC"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				/>
 
 			<field
 				name="typeTitle"
 				type="text"
 				label="COM_PLUGGEN_FINDER_FIELD_TYPETITLE_LABEL"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				/>
 
 			<field
@@ -81,7 +81,7 @@
 				description="COM_PLUGGEN_FINDER_FIELD_HASCATEGORIES_DESC"
 				default="0"
 				filter="integer"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				>
 				<option value="0">JNO</option>
 				<option value="1">JYES</option>
@@ -93,7 +93,7 @@
 				label="COM_PLUGGEN_FINDER_FIELD_TAXONOMIES_LABEL"
 				multiple="true"
 				default="Type,Language"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				>
 				<option value="Type">COM_PLUGGEN_FINDER_TAXONOMY_TYPE</option>
 				<option value="Language">COM_PLUGGEN_FINDER_TAXONOMY_LANGUAGE</option>
@@ -108,7 +108,7 @@
 				description="COM_PLUGGEN_FINDER_FIELD_COLUMNS_DESC"
 				multiple="true"
 				layout="joomla.form.field.subform.repeatable-table"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				>
 				<form>
 					<field
@@ -142,7 +142,7 @@
 				label="COM_PLUGGEN_FINDER_SLOT_SETUP_LABEL"
 				rows="4"
 				class="code"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				/>
 			<field
 				name="finder_index_before"
@@ -150,7 +150,7 @@
 				label="COM_PLUGGEN_FINDER_SLOT_INDEX_BEFORE_LABEL"
 				rows="4"
 				class="code"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				/>
 			<field
 				name="finder_index_elements"
@@ -159,7 +159,7 @@
 				description="COM_PLUGGEN_FINDER_SLOT_INDEX_ELEMENTS_DESC"
 				rows="6"
 				class="code"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				/>
 			<field
 				name="finder_index_taxonomies"
@@ -167,7 +167,7 @@
 				label="COM_PLUGGEN_FINDER_SLOT_INDEX_TAXONOMIES_LABEL"
 				rows="4"
 				class="code"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				/>
 			<field
 				name="finder_listquery"
@@ -175,7 +175,7 @@
 				label="COM_PLUGGEN_FINDER_SLOT_LISTQUERY_LABEL"
 				rows="4"
 				class="code"
-				showon="type_id:finder"
+				showon="plugin_type:finder"
 				/>
 		</fieldset>
 	</fields>

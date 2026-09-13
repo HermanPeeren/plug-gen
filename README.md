@@ -38,6 +38,29 @@ cypress/                  three end-to-end specs
 build/build.php           assembles the installable zip
 ```
 
+## Plugin types and plugin groups
+
+The form asks for the plugin type once. There is no separate "group" field: a
+Joomla plugin group and a generator type map one to one today, and two fields
+that must agree are only a way for them to disagree. The stored model still
+records `plugin.group`, derived from the chosen type, so a generator reading the
+JSON never has to resolve a type to learn where the plugin belongs.
+
+They are not the same idea, though, and the metamodel keeps them apart. A group
+is a deployment fact — a folder under `plugins/`, what
+`PluginHelper::importPlugin('finder')` loads. A type is one template set. The
+`content` group alone holds an event bridge (`plg_content_finder`), a display
+plugin (`plg_content_vote`) and a referential-integrity plugin
+(`plg_content_joomla`); offering those as separate starting points would be three
+types in one group. `PluginTypeAndGroupTest` pins the one-to-one assumption and
+fails the day it stops holding, pointing at the form that then needs a second
+choice.
+
+The dropdown lists **every** plugin group. Groups without a type bundle are shown
+disabled rather than hidden, so it is visible what the generator cannot write
+yet. Disabling is a browser hint only — `BlueprintModel::save()` refuses an
+unavailable type as well.
+
 ## Adding a plugin type
 
 Drop a folder in `src/admin/src/Types/<Name>/`:
@@ -45,12 +68,13 @@ Drop a folder in `src/admin/src/Types/<Name>/`:
 ```
 Definition.php        implements PluginTypeInterface
 type.json             id, label, plugin group, targets
-form.xml              the type-specific fieldset (fields carry showon="type_id:<id>")
+form.xml              the type-specific fieldset (fields carry showon="plugin_type:<id>")
 templates/*.tpl       the files this type generates
 ```
 
-Nothing else has to change: `TypeRegistry` discovers it, the edit form picks up the
-fieldset, and the pipeline asks the definition which generators to run.
+Nothing else has to change: `TypeRegistry` discovers it, its group stops being
+greyed out in the dropdown, the edit form picks up the fieldset, and the pipeline
+asks the definition which generators to run.
 
 ## Development
 

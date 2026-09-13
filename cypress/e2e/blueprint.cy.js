@@ -25,7 +25,7 @@ describe('com_pluggen blueprint editing', () => {
   it('shows the type-specific fieldset only for the selected type', () => {
     cy.visit('/administrator/index.php?option=com_pluggen&task=blueprint.add');
 
-    cy.get('#jform_type_id').select('finder');
+    cy.get('#jform_plugin_type').select('finder');
     cy.get('#jform_config_finder_context').should('be.visible');
     cy.get('#jform_config_finder_table').should('be.visible');
 
@@ -33,12 +33,25 @@ describe('com_pluggen blueprint editing', () => {
     cy.get('#jform_slots_finder_finder_index_elements').should('exist');
   });
 
+  // Every plugin group is listed, but only the ones with a type bundle can be
+  // chosen. Showing the rest greyed out says what the generator cannot do yet,
+  // instead of pretending those plugin types do not exist.
+  it('lists every plugin group and disables the ones without a generator', () => {
+    cy.visit('/administrator/index.php?option=com_pluggen&task=blueprint.add');
+
+    cy.get('#jform_plugin_type option').should('have.length.greaterThan', 20);
+    cy.get('#jform_plugin_type option[value="finder"]').should('not.be.disabled');
+
+    ['workflow', 'task', 'content', 'system'].forEach((group) => {
+      cy.get(`#jform_plugin_type option[value="${group}"]`).should('be.disabled');
+    });
+  });
+
   it('saves a blueprint and stores it as a model', () => {
     cy.visit('/administrator/index.php?option=com_pluggen&task=blueprint.add');
 
     cy.get('#jform_title').type('Recipes finder');
-    cy.get('#jform_type_id').select('finder');
-    cy.get('#jform_group').select('finder');
+    cy.get('#jform_plugin_type').select('finder');
     cy.get('#jform_element').clear().type('recipes');
     cy.get('#jform_namespace').clear().type('Acme\\Plugin\\Finder\\Recipes');
     cy.get('#jform_className').clear().type('Recipes');
@@ -60,8 +73,7 @@ describe('com_pluggen blueprint editing', () => {
     cy.visit('/administrator/index.php?option=com_pluggen&task=blueprint.add');
 
     cy.get('#jform_title').type('Hostile');
-    cy.get('#jform_type_id').select('finder');
-    cy.get('#jform_group').select('finder');
+    cy.get('#jform_plugin_type').select('finder');
     cy.get('#jform_element').clear().type('../../evil');
     cy.get('#jform_namespace').clear().type('Acme\\Plugin\\Finder\\Evil');
     cy.get('#jform_className').clear().type('Evil');

@@ -54,13 +54,13 @@ final class ModelMapper
      */
     public function toModel(array $data): array
     {
-        $typeId = (string) ($data['type_id'] ?? '');
+        $typeId = (string) ($data['plugin_type'] ?? '');
 
         return [
             'modelVersion' => PluginModel::CURRENT_VERSION,
             'target'       => (string) ($data['target'] ?? 'joomla-6.0'),
             'plugin'       => [
-                'group'            => (string) ($data['group'] ?? ''),
+                'group'            => $this->group($typeId),
                 'element'          => (string) ($data['element'] ?? ''),
                 'namespace'        => trim((string) ($data['namespace'] ?? ''), '\\'),
                 'className'        => (string) ($data['className'] ?? ''),
@@ -102,7 +102,6 @@ final class ModelMapper
 
         $data = [
             'target'           => (string) ($model['target'] ?? 'joomla-6.0'),
-            'group'            => (string) ($plugin['group'] ?? ''),
             'element'          => (string) ($plugin['element'] ?? ''),
             'namespace'        => (string) ($plugin['namespace'] ?? ''),
             'className'        => (string) ($plugin['className'] ?? ''),
@@ -115,7 +114,7 @@ final class ModelMapper
             'autoloadLanguage' => (int) ($plugin['autoloadLanguage'] ?? 1),
             'services'         => array_keys(array_filter((array) ($plugin['services'] ?? []))),
             'params'           => (array) ($plugin['params'] ?? []),
-            'type_id'          => $typeId,
+            'plugin_type'      => $typeId !== '' ? $typeId : (string) ($plugin['group'] ?? ''),
         ];
 
         if ($typeId !== '') {
@@ -124,6 +123,33 @@ final class ModelMapper
         }
 
         return $data;
+    }
+
+    /**
+     * The plugin group a type generates into.
+     *
+     * Derived rather than asked for: the form offers one choice, and the stored
+     * model still records the group explicitly so a generator reading the JSON
+     * never has to resolve a type to learn where the plugin belongs.
+     *
+     * The selected value falls back to itself when no bundle is registered,
+     * because for every type shipped so far the id and the group are the same
+     * name - and a blueprint saved for a group whose bundle was removed should
+     * still say which group it was for.
+     *
+     * @param   string  $typeId  The selected plugin type.
+     *
+     * @return  string  The plugin group.
+     *
+     * @since   0.1.0
+     */
+    private function group(string $typeId): string
+    {
+        if ($typeId !== '' && $this->types->has($typeId)) {
+            return $this->types->get($typeId)->group();
+        }
+
+        return $typeId;
     }
 
     /**

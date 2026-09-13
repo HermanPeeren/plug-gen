@@ -3,7 +3,7 @@
 	The general form: everything that is the same for every plugin type.
 
 	The type-specific fieldsets are appended at runtime by BlueprintModel::getForm()
-	from the registered type bundles, and shown with showon="type_id:<id>".
+	from the registered type bundles, and shown with showon="plugin_type:<id>".
 -->
 <form>
 	<field name="id" type="number" label="JGLOBAL_FIELD_ID_LABEL" default="0" class="readonly" readonly="true"/>
@@ -17,15 +17,24 @@
 		required="true"
 		/>
 
-	<!-- Replaced at runtime with the registered types; this is the fallback. -->
+	<!--
+		The plugin type. There is deliberately no separate "group" field: a
+		Joomla plugin group and a generator type map one to one today, so asking
+		twice only creates a way for the two answers to disagree. The stored
+		model still carries plugin.group, derived from the chosen type.
+
+		This list is replaced at runtime with every known group; the ones that
+		have no type bundle are rendered disabled rather than hidden.
+	-->
 	<field
-		name="type_id"
+		name="plugin_type"
 		type="list"
 		label="COM_PLUGGEN_FIELD_TYPE_LABEL"
+		description="COM_PLUGGEN_FIELD_TYPE_DESC"
 		required="true"
 		validate="options"
 		>
-		<option value="finder">Finder (Smart Search adapter)</option>
+		<option value="finder">Finder (Smart Search)</option>
 	</field>
 
 	<field
@@ -38,40 +47,6 @@
 		>
 		<option value="joomla-6.0">Joomla 6</option>
 		<option value="joomla-5.0">Joomla 5</option>
-	</field>
-
-	<field
-		name="group"
-		type="list"
-		label="COM_PLUGGEN_FIELD_GROUP_LABEL"
-		description="COM_PLUGGEN_FIELD_GROUP_DESC"
-		required="true"
-		validate="options"
-		>
-		<option value="actionlog">actionlog</option>
-		<option value="api-authentication">api-authentication</option>
-		<option value="authentication">authentication</option>
-		<option value="behaviour">behaviour</option>
-		<option value="captcha">captcha</option>
-		<option value="content">content</option>
-		<option value="editors">editors</option>
-		<option value="editors-xtd">editors-xtd</option>
-		<option value="extension">extension</option>
-		<option value="fields">fields</option>
-		<option value="filesystem">filesystem</option>
-		<option value="finder">finder</option>
-		<option value="installer">installer</option>
-		<option value="media-action">media-action</option>
-		<option value="multifactorauth">multifactorauth</option>
-		<option value="privacy">privacy</option>
-		<option value="quickicon">quickicon</option>
-		<option value="sampledata">sampledata</option>
-		<option value="schemaorg">schemaorg</option>
-		<option value="system">system</option>
-		<option value="task">task</option>
-		<option value="user">user</option>
-		<option value="webservices">webservices</option>
-		<option value="workflow">workflow</option>
 	</field>
 
 	<field

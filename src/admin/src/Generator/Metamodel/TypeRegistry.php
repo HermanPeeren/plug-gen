@@ -163,6 +163,92 @@ final class TypeRegistry
     }
 
     /**
+     * The registered types indexed by the plugin group they generate into.
+     *
+     * Today every group has at most one type, which is why the interface can
+     * offer a single choice. The index is by group rather than by id so that the
+     * day a group gains a second type - "content: event listener" next to
+     * "content: Smart Search bridge" - only this method has to change.
+     *
+     * @return  array<string, PluginTypeInterface>  Group name => type.
+     *
+     * @since   0.1.0
+     */
+    public function byGroup(): array
+    {
+        $byGroup = [];
+
+        foreach ($this->all() as $type) {
+            $byGroup[$type->group()] ??= $type;
+        }
+
+        return $byGroup;
+    }
+
+    /**
+     * Whether a generator is available for this plugin group.
+     *
+     * @param   string  $group  The plugin group.
+     *
+     * @return  boolean  True when a type bundle can generate for that group.
+     *
+     * @since   0.1.0
+     */
+    public function hasGroup(string $group): bool
+    {
+        return isset($this->byGroup()[$group]);
+    }
+
+    /**
+     * The type that generates plugins for a group.
+     *
+     * @param   string  $group  The plugin group.
+     *
+     * @return  PluginTypeInterface  The type definition.
+     *
+     * @throws  \OutOfBoundsException  When no bundle covers that group.
+     *
+     * @since   0.1.0
+     */
+    public function forGroup(string $group): PluginTypeInterface
+    {
+        $byGroup = $this->byGroup();
+
+        if (!isset($byGroup[$group])) {
+            throw new \OutOfBoundsException(\sprintf('No generator is available for the "%s" plugin group.', $group));
+        }
+
+        return $byGroup[$group];
+    }
+
+    /**
+     * Every known plugin group with the type that covers it, if any.
+     *
+     * Groups without a bundle are included with a null type, so the interface can
+     * show them greyed out rather than hiding that they exist.
+     *
+     * @return  array<string, ?PluginTypeInterface>  Group name => type or null.
+     *
+     * @since   0.1.0
+     */
+    public function availability(): array
+    {
+        $byGroup      = $this->byGroup();
+        $availability = [];
+
+        foreach (PluginGroups::names() as $group) {
+            $availability[$group] = $byGroup[$group] ?? null;
+        }
+
+        // A bundle for a group outside the core list still belongs in the list.
+        foreach ($byGroup as $group => $type) {
+            $availability[$group] ??= $type;
+        }
+
+        return $availability;
+    }
+
+    /**
      * Scan the types folder once, instantiating every bundle it finds.
      *
      * Folder names are matched against a strict pattern: nothing discovered here

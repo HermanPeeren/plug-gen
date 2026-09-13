@@ -9,6 +9,7 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Generator\Model;
 
+use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\PluginGroups;
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
 
 /**
@@ -23,20 +24,6 @@ use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
  */
 final class ModelValidator
 {
-    /**
-     * The plugin groups shipped by Joomla 6.1.
-     *
-     * @var    string[]
-     * @since  0.1.0
-     */
-    public const KNOWN_GROUPS = [
-        'actionlog', 'api-authentication', 'authentication', 'behaviour', 'captcha',
-        'content', 'editors', 'editors-xtd', 'extension', 'fields', 'filesystem',
-        'finder', 'installer', 'media-action', 'multifactorauth', 'privacy',
-        'quickicon', 'sampledata', 'schemaorg', 'system', 'task', 'user',
-        'webservices', 'workflow',
-    ];
-
     private const ELEMENT_PATTERN   = '/^[a-z][a-z0-9_]{0,63}$/';
     private const CLASSNAME_PATTERN = '/^[A-Z][A-Za-z0-9_]{0,63}$/';
     private const NAMESPACE_PATTERN = '/^[A-Za-z_][A-Za-z0-9_]*(\\\\[A-Za-z_][A-Za-z0-9_]*)+$/';
@@ -78,7 +65,7 @@ final class ModelValidator
             );
         }
 
-        if (!\in_array($model->group, self::KNOWN_GROUPS, true)) {
+        if (!PluginGroups::isKnown($model->group)) {
             $errors[] = \sprintf('Unknown plugin group "%s".', $model->group);
         }
 

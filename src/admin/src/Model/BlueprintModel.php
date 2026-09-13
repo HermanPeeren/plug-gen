@@ -17,6 +17,7 @@ use Yepr\Component\Pluggen\Administrator\Contract\ModelValidatorAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\PipelineAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\TypeRegistryAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\UserStateAwareInterface;
+use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\PluginGroups;
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\ModelValidator;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
@@ -253,6 +254,18 @@ class BlueprintModel extends AdminModel implements
      */
     public function save($data)
     {
+        // The disabled options in the type dropdown are a hint to the browser and
+        // nothing more: a crafted post can still name a group that has no bundle,
+        // and Joomla's options rule would accept it because a disabled option is
+        // still an option. So the rule is enforced here as well.
+        $typeId = (string) ($data['plugin_type'] ?? '');
+
+        if ($typeId === '' || !$this->types->has($typeId)) {
+            $this->setError(Text::sprintf('COM_PLUGGEN_ERR_TYPE_NOT_AVAILABLE', $typeId));
+
+            return false;
+        }
+
         $model = $this->mapper->toModel($data);
 
         $data['type_id'] = (string) ($model['type']['id'] ?? '');
@@ -311,10 +324,12 @@ class BlueprintModel extends AdminModel implements
     }
 
     /**
-     * Add the registered plugin types to the type field.
+     * Fill the plugin type field with every known plugin group.
      *
-     * Built from the registry rather than hard-coded, so adding a type bundle is
-     * enough to make it selectable.
+     * Groups that have no type bundle are listed but disabled, so it is visible
+     * which plugin types exist and which ones this generator can write yet. The
+     * list comes from the registry, so dropping in a bundle is enough to make a
+     * group selectable - no form file has to be edited.
      *
      * @param   Form    $form   The form to be altered.
      * @param   mixed   $data   The associated data for the form.
@@ -326,17 +341,26 @@ class BlueprintModel extends AdminModel implements
      */
     protected function preprocessForm(Form $form, $data, $group = 'content')
     {
-        $options = $this->types->options();
+        $availability = $this->types->availability();
 
-        if ($options !== []) {
+        if ($availability !== []) {
             $field = new \SimpleXMLElement(
-                '<field name="type_id" type="list" label="COM_PLUGGEN_FIELD_TYPE_LABEL"'
+                '<field name="plugin_type" type="list" label="COM_PLUGGEN_FIELD_TYPE_LABEL"'
                 . ' description="COM_PLUGGEN_FIELD_TYPE_DESC" required="true" validate="options"/>'
             );
 
-            foreach ($options as $id => $label) {
+            foreach ($availability as $name => $type) {
+                $label = $type?->label() ?? Text::sprintf(
+                    'COM_PLUGGEN_TYPE_NOT_AVAILABLE',
+                    PluginGroups::label($name)
+                );
+
                 $option = $field->addChild('option', htmlspecialchars($label, ENT_XML1, 'UTF-8'));
-                $option->addAttribute('value', $id);
+                $option->addAttribute('value', $name);
+
+                if ($type === null) {
+                    $option->addAttribute('disabled', 'true');
+                }
             }
 
             $form->setField($field, null, true);
