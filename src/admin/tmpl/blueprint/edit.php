@@ -34,9 +34,8 @@ foreach ($this->form->getFieldsets() as $name => $fieldset) {
 		<div class="row">
 			<div class="col-lg-6">
 				<?php echo $this->form->renderField('title'); ?>
-				<?php echo $this->form->renderField('type_id'); ?>
+				<?php echo $this->form->renderField('plugin_type'); ?>
 				<?php echo $this->form->renderField('target'); ?>
-				<?php echo $this->form->renderField('group'); ?>
 				<?php echo $this->form->renderField('element'); ?>
 				<?php echo $this->form->renderField('namespace'); ?>
 				<?php echo $this->form->renderField('className'); ?>

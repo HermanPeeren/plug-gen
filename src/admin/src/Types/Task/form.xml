@@ -8,6 +8,14 @@
 
 	Field names map onto type.config.<name> in the model.
 -->
+<!--
+	No field here carries required="true". Joomla validates the whole form in
+	the browser, including fields that showon has hidden, so a required field
+	belonging to one plugin type would refuse to let any other type be saved.
+	What a type needs is checked by its Definition::validate() instead, which is
+	the single source of truth and reports a proper message. A blueprint may be
+	saved half-finished; generating it is what demands a complete model.
+-->
 <form>
 	<fields name="config_task">
 		<fieldset name="type_task" label="COM_PLUGGEN_TYPE_TASK_FIELDSET">
@@ -27,7 +35,6 @@
 						label="COM_PLUGGEN_TASK_FIELD_ROUTINE_ID_LABEL"
 						description="COM_PLUGGEN_TASK_FIELD_ROUTINE_ID_DESC"
 						hint="recipes.cleanup"
-						required="true"
 						/>
 
 					<field
@@ -36,7 +43,6 @@
 						label="COM_PLUGGEN_TASK_FIELD_ROUTINE_METHOD_LABEL"
 						description="COM_PLUGGEN_TASK_FIELD_ROUTINE_METHOD_DESC"
 						hint="cleanUp"
-						required="true"
 						/>
 
 					<field
@@ -104,7 +110,7 @@
 		the routine, so it is a field of the routine above.
 	-->
 	<fields name="slots_task">
-		<fieldset name="slots_task" label="COM_PLUGGEN_SLOTS_FIELDSET">
+		<fieldset name="slots_task" label="COM_PLUGGEN_TYPE_TASK_SLOTS">
 			<field
 				name="task_class_members"
 				type="textarea"

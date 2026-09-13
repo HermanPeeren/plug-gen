@@ -1,0 +1,15 @@
+{
+	"name": "pluggen",
+	"version": "0.1.0",
+	"description": "Plug-gen end-to-end tests",
+	"private": true,
+	"license": "GPL-3.0-or-later",
+	"scripts": {
+		"cypress:run": "cypress run",
+		"cypress:open": "cypress open"
+	},
+	"devDependencies": {
+		"cypress": "^13.0.0",
+		"dotenv": "^16.4.0"
+	}
+}

@@ -10,3 +10,4 @@
 /.vscode/
 /joomla/
 /composer.lock
+/.env

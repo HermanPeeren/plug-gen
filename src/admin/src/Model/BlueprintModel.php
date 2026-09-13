@@ -199,14 +199,6 @@ class BlueprintModel extends AdminModel implements
             return false;
         }
 
-        foreach ($this->types->all() as $type) {
-            $formPath = $type->formPath();
-
-            if ($formPath !== null && is_file($formPath)) {
-                $form->loadFile($formPath, false);
-            }
-        }
-
         return $form;
     }
 
@@ -347,6 +339,20 @@ class BlueprintModel extends AdminModel implements
      */
     protected function preprocessForm(Form $form, $data, $group = 'content')
     {
+        // The type fieldsets are loaded here rather than in getForm() because
+        // Joomla binds the data straight after this method returns, and
+        // Form::bindLevel() silently drops a scalar whose field does not exist
+        // yet. Loading them afterwards left every type-specific field empty when
+        // a saved blueprint was reopened - the fields were there, the values
+        // were in the model, and nothing complained.
+        foreach ($this->types->all() as $type) {
+            $formPath = $type->formPath();
+
+            if ($formPath !== null && is_file($formPath)) {
+                $form->loadFile($formPath, false);
+            }
+        }
+
         $availability = $this->types->availability();
 
         if ($availability !== []) {

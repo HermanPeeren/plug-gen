@@ -8,6 +8,14 @@
 
 	Field names map onto type.config.<name> in the model.
 -->
+<!--
+	No field here carries required="true". Joomla validates the whole form in
+	the browser, including fields that showon has hidden, so a required field
+	belonging to one plugin type would refuse to let any other type be saved.
+	What a type needs is checked by its Definition::validate() instead, which is
+	the single source of truth and reports a proper message. A blueprint may be
+	saved half-finished; generating it is what demands a complete model.
+-->
 <form>
 	<fields name="config_finder">
 		<fieldset name="type_finder" label="COM_PLUGGEN_TYPE_FINDER_FIELDSET">
@@ -17,7 +25,6 @@
 				label="COM_PLUGGEN_FINDER_FIELD_CONTEXT_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_CONTEXT_DESC"
 				showon="plugin_type:finder"
-				required="true"
 				/>
 
 			<field
@@ -27,7 +34,6 @@
 				description="COM_PLUGGEN_FINDER_FIELD_EXTENSION_DESC"
 				hint="com_recipes"
 				showon="plugin_type:finder"
-				required="true"
 				/>
 
 			<field
@@ -37,7 +43,6 @@
 				description="COM_PLUGGEN_FINDER_FIELD_ITEMNAME_DESC"
 				hint="recipe"
 				showon="plugin_type:finder"
-				required="true"
 				/>
 
 			<field
@@ -46,7 +51,6 @@
 				label="COM_PLUGGEN_FINDER_FIELD_TABLE_LABEL"
 				hint="#__recipes"
 				showon="plugin_type:finder"
-				required="true"
 				/>
 
 			<field
@@ -135,7 +139,7 @@
 		survives regeneration either way.
 	-->
 	<fields name="slots_finder">
-		<fieldset name="slots_finder" label="COM_PLUGGEN_SLOTS_FIELDSET">
+		<fieldset name="slots_finder" label="COM_PLUGGEN_TYPE_FINDER_SLOTS">
 			<field
 				name="finder_setup"
 				type="textarea"

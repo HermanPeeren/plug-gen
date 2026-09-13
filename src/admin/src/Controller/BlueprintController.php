@@ -74,7 +74,11 @@ class BlueprintController extends FormController implements ZipWriterAwareInterf
      */
     public function generate()
     {
-        $this->checkToken();
+        // Generate is reachable from two places: the edit toolbar, which posts
+        // the form, and a link per row in the list. checkToken() defaults to
+        // looking in POST only, which let the toolbar through and rejected every
+        // link with a token mismatch. "request" covers both.
+        $this->checkToken('request');
 
         $app  = $this->app;
         $user = $app->getIdentity();
