@@ -6,16 +6,11 @@ means by the word: a complete description of the thing you want — the plugin's
 type, namespace, parameters, taxonomies and custom code — stated in the
 vocabulary of the domain rather than in PHP, and precise enough that the
 implementation can be derived from it. What a plugin *can* be at all is the
-metamodel; one concrete description of a plugin is a model.
+metamodel; one concrete description is a model, and the generators turn it into
+code.
 
 Note the collision with Joomla's own vocabulary: this is not a Model in the MVC
-sense, the class that fetches data for a view. That is one layer of one
-extension, while a model here describes an entire plugin — and if the plugin
-being generated ever had an MVC Model of its own, that Model would be part of
-what the model describes.
-
-Plug-gen installs as `com_pluggen`; that name stays in the code and on disk,
-while Plug-gen is what people read.
+sense, the class that fetches and processes data for a view. That is one layer of one extension, while a model here describes an entire plugin — and if the plugin being generated ever had an MVC Model of its own, that Model would be part of what the model describes.
 
 Forms collect everything needed to describe a plugin 
 - general information shared by all plugin types, 
