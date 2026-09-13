@@ -79,13 +79,36 @@ asks the definition which generators to run.
 ## Development
 
 ```
-composer install          # phpunit
+composer install          # phpunit, phpstan, phpcs, php-cs-fixer
 composer test             # unit tests
+composer analyse          # phpstan, level 5
+composer cs               # phpcs, see phpcs.xml.dist
+composer cs-fix-dry       # php-cs-fixer, dry run with a diff
 php build/build.php       # -> build/com_pluggen.zip
 ```
 
 If PHPUnit is not installed, `php tests/run.php` runs the same test classes with a
 zero-dependency runner.
+
+### Joomla as reference material
+
+Static analysis needs the Joomla classes the component extends. Unpack a Joomla
+package into `/joomla` (git-ignored, listed under `scanDirectories` in
+`phpstan.neon`):
+
+```bash
+curl -L -o joomla.zip https://github.com/joomla/joomla-cms/releases/download/6.1.3/Joomla_6.1.3-Stable-Full_Package.zip
+unzip -q joomla.zip -d joomla && rm joomla.zip
+```
+
+Use the **full package**, not a git clone: the framework packages
+(`Joomla\Database`, `Joomla\DI`, `Joomla\Event`) live in `libraries/vendor`,
+which the repository does not carry.
+
+One trap worth knowing: do not give PHPStan a `bootstrapFiles` entry that
+registers an autoloader. Once an autoloader is present PHPStan resolves classes
+through it instead of through the scanned files, and every Joomla base class
+turns into "class not found" even though `/joomla` is scanned.
 
 ## Security
 

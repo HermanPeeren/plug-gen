@@ -4,7 +4,7 @@
  * @package     Pluggen
  * @subpackage  com_pluggen
  *
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -13,6 +13,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Session\Session;
 
 /** @var \Yepr\Component\Pluggen\Administrator\View\Blueprints\HtmlView $this */
 
@@ -71,8 +72,10 @@ $canGen    = $this->getCurrentUser()->authorise('core.generate', 'com_pluggen');
 								<td class="d-none d-md-table-cell"><?php echo $this->escape($item->type_id); ?></td>
 								<td>
 									<?php if ($canGen) : ?>
-										<a class="btn btn-sm btn-secondary"
-											href="<?php echo Route::_('index.php?option=com_pluggen&task=blueprint.generate&id=' . (int) $item->id . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1'); ?>">
+										<?php $generateUrl = 'index.php?option=com_pluggen&task=blueprint.generate'
+											. '&id=' . (int) $item->id
+											. '&' . Session::getFormToken() . '=1'; ?>
+										<a class="btn btn-sm btn-secondary" href="<?php echo Route::_($generateUrl); ?>">
 											<span class="icon-download" aria-hidden="true"></span>
 											<?php echo Text::_('COM_PLUGGEN_TOOLBAR_GENERATE'); ?>
 										</a>

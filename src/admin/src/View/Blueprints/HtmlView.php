@@ -4,14 +4,17 @@
  * @package     Pluggen
  * @subpackage  com_pluggen
  *
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 namespace Yepr\Component\Pluggen\Administrator\View\Blueprints;
 
+use Joomla\CMS\Document\HtmlDocument;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Toolbar\Button\DropdownButton;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Yepr\Component\Pluggen\Administrator\Model\BlueprintsModel;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -71,21 +74,26 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @throws  \Exception  When the model reports errors.
+     * @throws  \UnexpectedValueException  When the view was given the wrong model.
      *
      * @since   0.1.0
      */
     public function display($tpl = null): void
     {
-        $this->items         = $this->get('Items');
-        $this->pagination    = $this->get('Pagination');
-        $this->state         = $this->get('State');
-        $this->filterForm    = $this->get('FilterForm');
-        $this->activeFilters = $this->get('ActiveFilters');
+        // Asked of the model directly. AbstractView::get() is deprecated for
+        // removal in Joomla 7, and so is the getErrors() collection behind the
+        // usual error block - a model that cannot deliver throws these days.
+        $model = $this->getModel();
 
-        if (\count($errors = $this->get('Errors'))) {
-            throw new \Exception(implode("\n", $errors), 500);
+        if (!$model instanceof BlueprintsModel) {
+            throw new \UnexpectedValueException('The blueprints view needs the blueprints model.');
         }
+
+        $this->items         = $model->getItems();
+        $this->pagination    = $model->getPagination();
+        $this->state         = $model->getState();
+        $this->filterForm    = $model->getFilterForm();
+        $this->activeFilters = $model->getActiveFilters();
 
         $this->filterForm
             ->addControlField('task')
@@ -105,8 +113,21 @@ class HtmlView extends BaseHtmlView
      */
     protected function addToolbar(): void
     {
-        $user    = $this->getCurrentUser();
-        $toolbar = $this->getDocument()->getToolbar();
+        $document = $this->getDocument();
+
+        // Only an HTML document has a toolbar, and it only hands one out when it
+        // has one to give. Both are worth checking rather than assuming.
+        if (!$document instanceof HtmlDocument) {
+            return;
+        }
+
+        $toolbar = $document->getToolbar();
+
+        if ($toolbar === null) {
+            return;
+        }
+
+        $user = $this->getCurrentUser();
 
         ToolbarHelper::title(Text::_('COM_PLUGGEN_MANAGER_BLUEPRINTS'), 'code');
 
@@ -121,9 +142,14 @@ class HtmlView extends BaseHtmlView
                 ->buttonClass('btn btn-action')
                 ->listCheck(true);
 
-            $childBar = $dropdown->getChildToolbar();
-            $childBar->publish('blueprints.publish')->listCheck(true);
-            $childBar->unpublish('blueprints.unpublish')->listCheck(true);
+            // Only a dropdown button carries a child toolbar. Joomla's toolbar
+            // declares the looser ToolbarButton return type, so this is asked
+            // rather than assumed.
+            if ($dropdown instanceof DropdownButton) {
+                $childBar = $dropdown->getChildToolbar();
+                $childBar->publish('blueprints.publish')->listCheck(true);
+                $childBar->unpublish('blueprints.unpublish')->listCheck(true);
+            }
         }
 
         if ($user->authorise('core.delete', 'com_pluggen')) {

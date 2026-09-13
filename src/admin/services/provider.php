@@ -4,11 +4,12 @@
  * @package     Pluggen
  * @subpackage  com_pluggen
  *
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSWebApplicationInterface;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Dispatcher\ComponentDispatcherFactoryInterface;
 use Joomla\CMS\Extension\ComponentInterface;
@@ -142,7 +143,16 @@ return new class () implements ServiceProviderInterface {
         $container->share(
             UserStateInterface::class,
             function (Container $container) {
-                return new ApplicationUserState(Factory::getApplication());
+                $app = Factory::getApplication();
+
+                // User state needs a session, which only a web application has.
+                // com_pluggen is an administrator component, so this holds - but
+                // it is worth saying out loud rather than assuming.
+                if (!$app instanceof CMSWebApplicationInterface) {
+                    throw new \RuntimeException('com_pluggen needs a web application to keep user state.');
+                }
+
+                return new ApplicationUserState($app);
             }
         );
     }

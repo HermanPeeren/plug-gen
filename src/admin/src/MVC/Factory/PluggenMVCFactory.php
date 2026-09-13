@@ -4,7 +4,7 @@
  * @package     Pluggen
  * @subpackage  com_pluggen
  *
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 namespace Yepr\Component\Pluggen\Administrator\MVC\Factory;
@@ -96,9 +96,7 @@ final class PluggenMVCFactory extends MVCFactory
     {
         $controller = parent::createController($name, $prefix, $config, $app, $input);
 
-        if ($controller !== null) {
-            $this->injectServices($controller);
-        }
+        $this->injectServices($controller);
 
         return $controller;
     }
@@ -110,7 +108,7 @@ final class PluggenMVCFactory extends MVCFactory
      * @param   string  $prefix  The model prefix.
      * @param   array   $config  The model configuration, forwarded unchanged.
      *
-     * @return  \Joomla\CMS\MVC\Model\ModelInterface|null
+     * @return  \Joomla\CMS\MVC\Model\ModelInterface
      *
      * @since   0.1.0
      */
@@ -118,9 +116,7 @@ final class PluggenMVCFactory extends MVCFactory
     {
         $model = parent::createModel($name, $prefix, $config);
 
-        if ($model !== null) {
-            $this->injectServices($model);
-        }
+        $this->injectServices($model);
 
         return $model;
     }
@@ -133,7 +129,7 @@ final class PluggenMVCFactory extends MVCFactory
      * @param   string  $type    The view type.
      * @param   array   $config  The view configuration.
      *
-     * @return  \Joomla\CMS\MVC\View\ViewInterface|null
+     * @return  \Joomla\CMS\MVC\View\ViewInterface
      *
      * @since   0.1.0
      */
@@ -141,9 +137,7 @@ final class PluggenMVCFactory extends MVCFactory
     {
         $view = parent::createView($name, $prefix, $type, $config);
 
-        if ($view !== null) {
-            $this->injectServices($view);
-        }
+        $this->injectServices($view);
 
         return $view;
     }
@@ -154,14 +148,22 @@ final class PluggenMVCFactory extends MVCFactory
      * Each dependency is asked for explicitly by the class that needs it, so a
      * class cannot quietly reach for something it never declared.
      *
-     * @param   object  $object  A freshly created controller, model or view.
+     * Null is accepted because the parent factory returns null when it cannot
+     * find the class for a name - the caller decides what to do about that, and
+     * there is simply nothing to inject.
+     *
+     * @param   ?object  $object  A freshly created controller, model or view.
      *
      * @return  void
      *
      * @since   0.1.0
      */
-    private function injectServices(object $object): void
+    private function injectServices(?object $object): void
     {
+        if ($object === null) {
+            return;
+        }
+
         if ($object instanceof TypeRegistryAwareInterface) {
             $object->setTypeRegistry($this->types);
         }

@@ -4,7 +4,7 @@
  * @package     Pluggen
  * @subpackage  Types.Finder
  *
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 namespace Yepr\Component\Pluggen\Administrator\Types\Finder;
@@ -102,11 +102,14 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
     /**
      * The absolute path of the type-specific form.
      *
-     * @return  ?string  The form file, or null when the type has no extra fields.
+     * Narrowed to string: the interface allows null for a type with no extra
+     * fields, but a finder plugin always has some.
+     *
+     * @return  string  The form file.
      *
      * @since   0.1.0
      */
-    public function formPath(): ?string
+    public function formPath(): string
     {
         return __DIR__ . \DIRECTORY_SEPARATOR . 'form.xml';
     }

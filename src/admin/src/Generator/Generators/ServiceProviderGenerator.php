@@ -4,7 +4,7 @@
  * @package     Pluggen
  * @subpackage  Generator
  *
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 namespace Yepr\Component\Pluggen\Administrator\Generator\Generators;
@@ -34,8 +34,14 @@ final class ServiceProviderGenerator implements GeneratorInterface
         'application'   => [null, '$plugin->setApplication(Factory::getApplication());'],
         'database'      => ['Joomla\\Database\\DatabaseInterface', '$plugin->setDatabase($container->get(DatabaseInterface::class));'],
         'dispatcher'    => ['Joomla\\Event\\DispatcherInterface', '$plugin->setDispatcher($container->get(DispatcherInterface::class));'],
-        'mailerFactory' => ['Joomla\\CMS\\Mail\\MailerFactoryInterface', '$plugin->setMailerFactory($container->get(MailerFactoryInterface::class));'],
-        'userFactory'   => ['Joomla\\CMS\\User\\UserFactoryInterface', '$plugin->setUserFactory($container->get(UserFactoryInterface::class));'],
+        'mailerFactory' => [
+            'Joomla\\CMS\\Mail\\MailerFactoryInterface',
+            '$plugin->setMailerFactory($container->get(MailerFactoryInterface::class));',
+        ],
+        'userFactory'   => [
+            'Joomla\\CMS\\User\\UserFactoryInterface',
+            '$plugin->setUserFactory($container->get(UserFactoryInterface::class));',
+        ],
     ];
 
     /**

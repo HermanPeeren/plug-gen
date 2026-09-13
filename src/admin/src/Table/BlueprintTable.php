@@ -4,7 +4,7 @@
  * @package     Pluggen
  * @subpackage  com_pluggen
  *
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 namespace Yepr\Component\Pluggen\Administrator\Table;
@@ -59,34 +59,32 @@ class BlueprintTable extends Table implements CurrentUserInterface
     /**
      * Check the row before it is stored.
      *
+     * Problems are thrown rather than collected with setError(), which Joomla
+     * deprecated in 3.1.4 and removes in 7.0. AdminModel::save() wraps the whole
+     * save in a try/catch and turns the exception into the same message the user
+     * would have seen, so nothing about the experience changes. Exceptions from
+     * parent::check() are simply left to travel the same road.
+     *
      * @return  boolean  True when the row may be stored.
+     *
+     * @throws  \UnexpectedValueException  When the row is not storable.
      *
      * @since   0.1.0
      */
     public function check()
     {
-        try {
-            parent::check();
-        } catch (\Exception $e) {
-            $this->setError($e->getMessage());
-
-            return false;
-        }
+        parent::check();
 
         $this->title = trim((string) $this->title);
 
         if ($this->title === '') {
-            $this->setError(Text::_('COM_PLUGGEN_ERR_TABLE_TITLE'));
-
-            return false;
+            throw new \UnexpectedValueException(Text::_('COM_PLUGGEN_ERR_TABLE_TITLE'));
         }
 
         // The model column must always hold decodable JSON: everything downstream
         // assumes it, and a half-written model is harder to diagnose later.
         if (!\is_string($this->model) || json_decode($this->model, true) === null) {
-            $this->setError(Text::_('COM_PLUGGEN_ERR_TABLE_MODEL'));
-
-            return false;
+            throw new \UnexpectedValueException(Text::_('COM_PLUGGEN_ERR_TABLE_MODEL'));
         }
 
         return true;

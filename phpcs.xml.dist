@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<ruleset name="pluggen">
+	<description>
+		PSR-12, minus the handful of rules that contradict Joomla's own
+		conventions. Joomla ships a full standard in joomla/coding-standards;
+		this ruleset keeps the dependency list short and says out loud which
+		Joomla-isms are deliberate rather than silently accepting everything.
+	</description>
+
+	<file>src</file>
+	<file>tests</file>
+	<file>tools</file>
+	<file>build</file>
+
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/joomla/*</exclude-pattern>
+	<!-- Generated output: reviewed as a diff, not as hand-written source. -->
+	<exclude-pattern>*/tests/Fixtures/expected/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+
+	<rule ref="PSR12">
+		<!--
+			Every Joomla file declares a class and guards itself with
+			`defined('_JEXEC') or die;` in the same breath. The files carry
+			phpcs:disable comments for this, but the ruleset should agree.
+		-->
+		<exclude name="PSR1.Files.SideEffects"/>
+	</rule>
+
+	<!-- Joomla layouts indent markup with tabs; PHP sources still use spaces. -->
+	<rule ref="Generic.WhiteSpace.DisallowTabIndent">
+		<exclude-pattern>src/admin/tmpl/*</exclude-pattern>
+	</rule>
+
+	<!-- Joomla's Table base class uses underscore-prefixed properties. -->
+	<rule ref="PSR2.Classes.PropertyDeclaration.Underscore">
+		<exclude-pattern>src/admin/src/Table/*</exclude-pattern>
+	</rule>
+
+	<!--
+		The test base class declares a shim class alongside itself when PHPUnit
+		is absent. That is the point of the file.
+	-->
+	<rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+		<exclude-pattern>tests/TestCase.php</exclude-pattern>
+	</rule>
+
+	<rule ref="Generic.Files.LineLength">
+		<properties>
+			<property name="lineLimit" value="150"/>
+			<property name="absoluteLineLimit" value="0"/>
+		</properties>
+	</rule>
+</ruleset>

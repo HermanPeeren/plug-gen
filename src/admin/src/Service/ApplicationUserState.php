@@ -4,12 +4,12 @@
  * @package     Pluggen
  * @subpackage  com_pluggen
  *
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 namespace Yepr\Component\Pluggen\Administrator\Service;
 
-use Joomla\CMS\Application\CMSApplicationInterface;
+use Joomla\CMS\Application\CMSWebApplicationInterface;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -23,6 +23,9 @@ use Joomla\CMS\Application\CMSApplicationInterface;
  * provider, which is the composition root and the one place allowed to know
  * where objects come from.
  *
+ * User state lives on CMSWebApplicationInterface rather than on the broader
+ * CMSApplicationInterface: a console application has no session to keep it in.
+ *
  * @since  0.1.0
  */
 final class ApplicationUserState implements UserStateInterface
@@ -30,11 +33,11 @@ final class ApplicationUserState implements UserStateInterface
     /**
      * Constructor.
      *
-     * @param   CMSApplicationInterface  $app  The application holding the session state.
+     * @param   CMSWebApplicationInterface  $app  The application holding the session state.
      *
      * @since   0.1.0
      */
-    public function __construct(private readonly CMSApplicationInterface $app)
+    public function __construct(private readonly CMSWebApplicationInterface $app)
     {
     }
 

@@ -26,15 +26,16 @@ final class MvcDependencyInjectionTest extends TestCase
         'Extension',
     ];
 
-    /** Classes a generated or wired object may still instantiate itself. */
+    /**
+     * Classes a wired object may still instantiate itself: PHP's own value
+     * types. Anything whose name ends in "Exception" is allowed too - an
+     * exception is a value created at the point it is thrown, never a
+     * collaborator that could have been injected.
+     */
     private const ALLOWED_NEW = [
-        // PHP's own classes are values, not collaborators.
         'DateTimeImmutable', 'DateTime', 'DateTimeZone', 'DateInterval',
         'ArrayIterator', 'ArrayObject', 'SplStack', 'SplQueue',
         'SimpleXMLElement',
-        // Exceptions are created at the point they are thrown.
-        'Exception', 'RuntimeException', 'InvalidArgumentException',
-        'LogicException', 'OutOfBoundsException', 'DomainException',
     ];
 
     /**
@@ -74,6 +75,10 @@ final class MvcDependencyInjectionTest extends TestCase
             foreach ($this->instantiatedClasses($source) as $class) {
                 $separator = strrpos($class, '\\');
                 $short     = $separator === false ? $class : substr($class, $separator + 1);
+
+                if (str_ends_with($short, 'Exception')) {
+                    continue;
+                }
 
                 if (!\in_array($short, self::ALLOWED_NEW, true)) {
                     $offenders[] = basename($file) . ' -> new ' . $short;
@@ -132,8 +137,10 @@ final class MvcDependencyInjectionTest extends TestCase
                     continue;
                 }
 
-                if (\is_array($tokens[$j])
-                    && \in_array($tokens[$j][0], [T_STRING, T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED], true)) {
+                if (
+                    \is_array($tokens[$j])
+                    && \in_array($tokens[$j][0], [T_STRING, T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED], true)
+                ) {
                     $classes[] = trim($tokens[$j][1], '\\');
                 }
 

@@ -1,0 +1,46 @@
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+
+parameters:
+    level: 5
+
+    paths:
+        - src
+        - tests
+        - tools
+        - build
+
+    # Joomla itself is reference material, not code we analyse: it supplies the
+    # classes the component extends. A fresh Joomla 6.1.3 package is unpacked in
+    # /joomla (git-ignored); see README for the one command that puts it there.
+    scanDirectories:
+        - joomla
+
+    excludePaths:
+        analyse:
+            # Type bundle templates are text being written, not code being run.
+            # Their variables come from the renderer, so analysing them in
+            # isolation says nothing useful.
+            - src/admin/src/Types/*/templates/*
+
+            # Joomla layouts are included from inside the view instance, so they
+            # legitimately reach protected members - a runtime arrangement no
+            # static analyser can see. Joomla core has the same shape and does
+            # not analyse its tmpl folders either.
+            - src/admin/tmpl/*
+
+            # Golden fixtures are generated output, kept to diff against. They
+            # are already syntax-checked and pinned by the test suite. Analysing
+            # them mostly reports inaccuracies in com_finder's own docblocks -
+            # Result::addInstruction() documents $group as string while core
+            # itself passes the integer constant Indexer::META_CONTEXT - which
+            # is not something this project can fix.
+            - tests/Fixtures/expected/*
+
+    # Deliberately no bootstrapFiles. tests/bootstrap.php registers an
+    # autoloader, and once an autoloader is present PHPStan resolves classes
+    # through it instead of through the scanned files - which makes every Joomla
+    # base class "not found" even though /joomla is scanned. PHPStan never
+    # executes the _JEXEC guard, so nothing needs defining up front.
+
+    treatPhpDocTypesAsCertain: false

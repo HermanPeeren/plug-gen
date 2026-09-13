@@ -4,7 +4,7 @@
  * @package     Pluggen
  * @subpackage  com_pluggen
  *
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 namespace Yepr\Component\Pluggen\Administrator\Model;
@@ -250,6 +250,8 @@ class BlueprintModel extends AdminModel implements
      *
      * @return  boolean  True on success.
      *
+     * @throws  \RuntimeException  When no generator is available for the chosen type.
+     *
      * @since   0.1.0
      */
     public function save($data)
@@ -258,12 +260,16 @@ class BlueprintModel extends AdminModel implements
         // nothing more: a crafted post can still name a group that has no bundle,
         // and Joomla's options rule would accept it because a disabled option is
         // still an option. So the rule is enforced here as well.
+        //
+        // This throws rather than using the deprecated setError(): the form only
+        // offers selectable types, so reaching this line means the request was
+        // forged or a type bundle vanished between loading and saving the form.
+        // An error page is the right answer to that, and it is honest about the
+        // request being wrong rather than the input being invalid.
         $typeId = (string) ($data['plugin_type'] ?? '');
 
         if ($typeId === '' || !$this->types->has($typeId)) {
-            $this->setError(Text::sprintf('COM_PLUGGEN_ERR_TYPE_NOT_AVAILABLE', $typeId));
-
-            return false;
+            throw new \RuntimeException(Text::sprintf('COM_PLUGGEN_ERR_TYPE_NOT_AVAILABLE', $typeId));
         }
 
         $model = $this->mapper->toModel($data);
