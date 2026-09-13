@@ -7,6 +7,10 @@
  * the git-ignored .env through cypress.config.js.
  */
 
+// Every blueprint these specs create carries this marker in its title, so the
+// cleanup can delete exactly what the suite made and nothing else.
+const MARKER = '[cypress] ';
+
 const ADMIN = '/administrator/index.php';
 const NEW_BLUEPRINT = `${ADMIN}?option=com_pluggen&task=blueprint.add`;
 
@@ -25,6 +29,9 @@ const login = () => {
 const openTab = (label) => cy.contains('joomla-tab button', label).click();
 
 describe('Plug-gen blueprint editing', () => {
+  before(() => cy.exec(`php build/test-cleanup.php "${MARKER}"`));
+  after(() => cy.exec(`php build/test-cleanup.php "${MARKER}"`));
+
   beforeEach(login);
 
   // Every plugin group is listed, but only the ones with a type bundle can be
@@ -88,7 +95,7 @@ describe('Plug-gen blueprint editing', () => {
   it('saves a blueprint and stores it as a model', () => {
     cy.visit(NEW_BLUEPRINT);
 
-    cy.get('#jform_title').clear().type('Recipes finder');
+    cy.get('#jform_title').clear().type(`${MARKER}Recipes finder`);
     cy.get('#jform_plugin_type').select('finder');
     cy.get('#jform_element').clear().type('recipes');
     cy.get('#jform_namespace').clear().type('Acme\\Plugin\\Finder\\Recipes');
@@ -120,7 +127,7 @@ describe('Plug-gen blueprint editing', () => {
     cy.visit(`${ADMIN}?option=com_pluggen&view=blueprints`);
 
     cy.get('#blueprintList tbody tr')
-      .contains('th a', 'Recipes finder')
+      .contains('th a', `${MARKER}Recipes finder`)
       .parents('tr')
       .find('a.btn')
       .invoke('attr', 'href')
@@ -144,7 +151,7 @@ describe('Plug-gen blueprint editing', () => {
   it('refuses an element name that could escape the output directory', () => {
     cy.visit(NEW_BLUEPRINT);
 
-    cy.get('#jform_title').clear().type('Hostile');
+    cy.get('#jform_title').clear().type(`${MARKER}Hostile`);
     cy.get('#jform_plugin_type').select('finder');
     cy.get('#jform_element').clear().type('../../evil');
     cy.get('#jform_namespace').clear().type('Acme\\Plugin\\Finder\\Evil');
