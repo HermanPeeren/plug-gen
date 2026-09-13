@@ -7,7 +7,7 @@ const { defineConfig } = require('cypress');
 // them and nothing to commit by accident.
 module.exports = defineConfig({
   e2e: {
-    baseUrl: process.env.CYPRESS_baseUrl || process.env.SITE_URL || 'http://localhost/pluggen-test/joomla',
+    baseUrl: process.env.CYPRESS_baseUrl || process.env.SITE_URL || 'http://localhost/plug-gen/joomla',
     supportFile: false,
     video: false,
     screenshotOnRunFailure: false,
