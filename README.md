@@ -75,16 +75,16 @@ unavailable type as well.
 
 In the order of the Joomla Community Magazine series on custom plugins.
 
-**Task** — routines for the Task Scheduler.
+**Task**: routines for the Task Scheduler.
 ([Custom Plugins, part 2](https://magazine.joomla.org/issues/2026/may-2026/custom-plugins-part-2-task-plugin))
 A task plugin is wired by convention: three events point at `TaskPluginTrait`,
 and a `TASKS_MAP` constant tells the trait where everything is. So the model
-carries the routines — id, method, title, parameters and body — and the
+carries the routines (id, method, title, parameters and body) and the
 generator derives the map, the handler methods, a parameter form per routine,
 and the language constants the scheduler advertises them under. One plugin can
 offer several routines, as `plg_task_sitestatus` does in core.
 
-**Workflow** — actions that run at a transition.
+**Workflow**: actions that run at a transition.
 ([Custom Plugins, part 3](https://magazine.joomla.org/issues/2026/july-2026/custom-plugins-part-3-workflow-plugin))
 Users trigger transitions and transitions trigger actions; this plugin supplies
 the actions. The model carries the supported contexts and the action fields, and
@@ -93,7 +93,7 @@ the generator writes `forms/action.xml`, reads the values back from
 `isSupported()`, which returns false in `WorkflowPluginTrait` and is the usual
 reason a workflow plugin appears to do nothing at all.
 
-**Finder** — a Smart Search adapter. (Custom Plugins, part 4; link to follow on
+**Finder**: a Smart Search adapter. (Custom Plugins, part 4; link to follow on
 publication.) Configured almost entirely by class properties, so the model
 carries the table, the column-to-alias mapping, the taxonomies and whether the
 content has categories.
