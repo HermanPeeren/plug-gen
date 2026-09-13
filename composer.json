@@ -1,6 +1,6 @@
 {
 	"name": "yepr/pluggen",
-	"description": "Joomla component that generates Joomla plugins from a saved model",
+	"description": "Plug-gen: a Joomla component that generates Joomla plugins from a saved model",
 	"type": "joomla-component",
 	"license": "GPL-3.0-or-later",
 	"require": {

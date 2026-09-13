@@ -146,10 +146,10 @@ return new class () implements ServiceProviderInterface {
                 $app = Factory::getApplication();
 
                 // User state needs a session, which only a web application has.
-                // com_pluggen is an administrator component, so this holds - but
+                // Plug-gen is an administrator component, so this holds - but
                 // it is worth saying out loud rather than assuming.
                 if (!$app instanceof CMSWebApplicationInterface) {
-                    throw new \RuntimeException('com_pluggen needs a web application to keep user state.');
+                    throw new \RuntimeException('Plug-gen needs a web application to keep user state.');
                 }
 
                 return new ApplicationUserState($app);

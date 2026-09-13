@@ -47,7 +47,13 @@ $canGen    = $this->getCurrentUser()->authorise('core.generate', 'com_pluggen');
 									<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 								</th>
 								<th scope="col" class="w-15 d-none d-md-table-cell">
-									<?php echo HTMLHelper::_('searchtools.sort', 'COM_PLUGGEN_FIELD_TYPE_LABEL', 'a.type_id', $listDirn, $listOrder); ?>
+									<?php echo HTMLHelper::_(
+										'searchtools.sort',
+										'COM_PLUGGEN_FIELD_TYPE_LABEL',
+										'a.type_id',
+										$listDirn,
+										$listOrder
+									); ?>
 								</th>
 								<th scope="col" class="w-15"><?php echo Text::_('COM_PLUGGEN_HEADING_GENERATE'); ?></th>
 								<th scope="col" class="w-5 d-none d-md-table-cell">

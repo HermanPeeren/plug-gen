@@ -1,6 +1,8 @@
-# com_pluggen
+# Plug-gen
 
-A Joomla 6 component that generates Joomla plugins from a saved model.
+Plug-gen, short for Plugin Generator, is a Joomla 6 component that generates
+Joomla plugins from a saved model. It installs as `com_pluggen`; that name stays
+in the code and on disk, while Plug-gen is what people read.
 
 Forms collect everything needed to describe a plugin 
 - general information shared by all plugin types, 
@@ -92,7 +94,7 @@ zero-dependency runner.
 
 ### Joomla as reference material
 
-Static analysis needs the Joomla classes the component extends. Unpack a Joomla
+Static analysis needs the Joomla classes Plug-gen extends. Unpack a Joomla
 package into `/joomla` (git-ignored, listed under `scanDirectories` in
 `phpstan.neon`):
 
@@ -112,7 +114,7 @@ turns into "class not found" even though `/joomla` is scanned.
 
 ## Security
 
-Generation writes arbitrary PHP. The component therefore:
+Generation writes arbitrary PHP. Plug-gen therefore:
 
 - never writes into `plugins/` — output is a ZIP, installed through Joomla's installer;
 - requires the dedicated `core.generate` action, which is Super User equivalent;

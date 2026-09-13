@@ -19,7 +19,7 @@ use Psr\Container\ContainerInterface;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
- * The com_pluggen component.
+ * Plug-gen, the plugin generator. Installed as com_pluggen.
  *
  * @since  0.1.0
  */

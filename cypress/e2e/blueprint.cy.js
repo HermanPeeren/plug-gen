@@ -17,7 +17,7 @@ const login = () => {
   });
 };
 
-describe('com_pluggen blueprint editing', () => {
+describe('Plug-gen blueprint editing', () => {
   beforeEach(login);
 
   // The one thing only a browser can check: showon actually swaps the
