@@ -274,7 +274,7 @@ final class PluginModel
      *
      * @return  integer  The major version, for example 6.
      *
-     * @since   0.5.0
+     * @since   0.4.2
      */
     public function targetMajor(): int
     {
