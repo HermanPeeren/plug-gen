@@ -175,8 +175,10 @@ disagrees with it.
 
 1. Edit `<version>` in `src/pluggen.xml` (and `package.json`, which is cosmetic
    but easier to keep in step than to explain later).
-2. Commit.
-3. Create the tag `v<version>` and push it with the tag included. In PhpStorm:
+2. Run `php build/update-xml.php`, which rewrites `updates.xml` from the
+   manifest.
+3. Commit both.
+4. Create the tag `v<version>` and push it with the tag included. In PhpStorm:
    **Git > New Tag...**, then **Git > Push...** with *Push Tags* ticked.
 
 Pushing the tag runs `.github/workflows/release.yml`, which checks the tag
@@ -186,6 +188,22 @@ by hand.
 
 To build locally without releasing: `composer build`, or run `build/build.php`
 from the Composer tool window in PhpStorm.
+
+### The update server
+
+An installed site learns about a new version from `updates.xml` in the root of
+this repository, served raw by GitHub and pointed at by `<updateservers>` in the
+manifest. It names the release asset by URL, so it has to be regenerated for
+every version - step 2 above. Forgetting either hides the release from every
+installed site or offers a download that 404s, and nothing else in the build
+would notice, so the release workflow regenerates the file and fails when the
+committed one differs.
+
+`targetplatform` is a regular expression anchored at the start of the Joomla
+version. It reads `6\.[0-9]+`, which offers the update on any Joomla 6 and on
+nothing older: Plug-gen is written against Joomla 6, whatever version a
+*generated plugin* targets. `client` is omitted because Joomla defaults it to
+the administrator application, which is where a component belongs.
 
 ## Security
 

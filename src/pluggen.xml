@@ -39,6 +39,15 @@
 	</administration>
 
 	<!--
+		The update server. A static file in the repository, served raw by GitHub
+		and regenerated from this manifest by build/update-xml.php, so the
+		version it advertises cannot drift from the version released.
+	-->
+	<updateservers>
+		<server type="extension" name="Plug-gen" priority="1">https://raw.githubusercontent.com/HermanPeeren/plug-gen/main/updates.xml</server>
+	</updateservers>
+
+	<!--
 		The site and media folders exist in the repository layout but carry no
 		files yet. Declaring an empty folder makes the installer copy nothing and
 		report a missing source, so the blocks are written out here rather than
