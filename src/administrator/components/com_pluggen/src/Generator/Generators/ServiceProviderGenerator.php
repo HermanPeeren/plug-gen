@@ -20,6 +20,14 @@ use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
  * database setter is not optional for every type: a finder adapter dies in its
  * own constructor without it, so a type definition can force it on.
  *
+ * This is the one generator whose output depends on the target. A Joomla 6
+ * plugin is registered through Container::lazy(), which wraps the factory in a
+ * lazy proxy so the plugin is only constructed when an event it listens for is
+ * actually dispatched. That method does not exist in the DI container Joomla
+ * 5.0 to 5.3 ship (joomla/di 3.0), so a Joomla 5 target gets the plain closure
+ * core used before 6.1. Emitting lazy() for Joomla 5 would not degrade - it
+ * would fatal with "Call to undefined method" the first time the plugin boots.
+ *
  * @since  0.1.0
  */
 final class ServiceProviderGenerator implements GeneratorInterface
@@ -115,23 +123,34 @@ final class ServiceProviderGenerator implements GeneratorInterface
         }
 
         $body[] = '';
+        // Only the wrapper differs between the two targets; the closure body sits
+        // at the same depth either way, as it does in core.
+        $lazy   = $model->targetMajor() >= 6;
+        $indent = '                ';
+
         $body[] = 'return new class () implements ServiceProviderInterface {';
         $body[] = '    public function register(Container $container)';
         $body[] = '    {';
         $body[] = '        $container->set(';
         $body[] = '            PluginInterface::class,';
-        $body[] = '            $container->lazy(' . $class . '::class, function (Container $container) {';
-        $body[] = '                $plugin = new ' . $class . '(';
-        $body[] = '                    (array) PluginHelper::getPlugin(' . Php::string($model->group) . ', ' . Php::string($model->element) . ')';
-        $body[] = '                );';
+
+        if ($lazy) {
+            $body[] = '            $container->lazy(' . $class . '::class, function (Container $container) {';
+        } else {
+            $body[] = '            function (Container $container) {';
+        }
+
+        $body[] = $indent . '$plugin = new ' . $class . '(';
+        $body[] = $indent . '    (array) PluginHelper::getPlugin(' . Php::string($model->group) . ', ' . Php::string($model->element) . ')';
+        $body[] = $indent . ');';
 
         foreach ($setters as $setter) {
-            $body[] = '                ' . $setter;
+            $body[] = $indent . $setter;
         }
 
         $body[] = '';
-        $body[] = '                return $plugin;';
-        $body[] = '            })';
+        $body[] = $indent . 'return $plugin;';
+        $body[] = $lazy ? '            })' : '            }';
         $body[] = '        );';
         $body[] = '    }';
         $body[] = '};';

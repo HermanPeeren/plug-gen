@@ -265,6 +265,23 @@ final class PluginModel
     }
 
     /**
+     * The major Joomla version the output targets.
+     *
+     * Targets are stored as "joomla-6.0", so the number after the dash is the
+     * major line. Anything unreadable counts as the oldest supported line: a
+     * generator asking "may I use this?" should get "no" from a value it does
+     * not understand, never a plugin that fatals on the user's site.
+     *
+     * @return  integer  The major version, for example 6.
+     *
+     * @since   0.5.0
+     */
+    public function targetMajor(): int
+    {
+        return preg_match('/^joomla-(\d+)\./', $this->target, $m) === 1 ? (int) $m[1] : 5;
+    }
+
+    /**
      * Read one value from the type-specific configuration.
      *
      * @param   string  $key      The configuration key.

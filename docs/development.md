@@ -71,6 +71,33 @@ disabled rather than hidden, so it is visible what the generator cannot write
 yet. Disabling is a browser hint only: `BlueprintModel::save()` refuses an
 unavailable type as well.
 
+## Targets
+
+The blueprint asks which Joomla version the output is for, and that choice
+changes exactly one thing: how `services/provider.php` registers the plugin.
+
+A Joomla 6 plugin is registered through `Container::lazy()`, which wraps the
+factory in a lazy proxy, so the plugin object is only constructed when an event
+it listens for is actually dispatched rather than on every request that imports
+its group. `lazy()` arrived with joomla/di 3.1, which Joomla ships from 5.4
+onwards, and core plugins adopted it in 6.1.
+
+A Joomla 5 plugin gets the plain closure core used before that. This is not a
+matter of taste: Joomla 5.0 to 5.3 carry joomla/di 3.0, where the method does
+not exist, so `lazy()` there is a fatal "Call to undefined method" the first
+time the plugin boots - and it boots during `importPlugin()`, which means the
+whole page, not just the feature. `TargetTest` pins both variants.
+
+Everything else is the same for both lines, which is worth stating because it
+is easy to assume otherwise. The manifest does not differ: `php_minimum` and
+`targetplatform` are update-server elements, not install-manifest ones, and
+Joomla ignores them in an extension manifest. The generated plugin classes use
+no syntax newer than PHP 8.1. `SubscriberInterface` and the service provider
+work the same way in both.
+
+One gap: each type declares a `targets` list in its `type.json`, and nothing
+reads it. A type that could not support Joomla 5 has no way to say so yet.
+
 ## Adding a plugin type
 
 Drop a folder in `ADMIN/src/Types/<Name>/`:
