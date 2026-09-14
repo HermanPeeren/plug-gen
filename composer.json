@@ -15,7 +15,7 @@
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"Yepr\\Component\\Pluggen\\Administrator\\": "src/admin/src/",
+			"Yepr\\Component\\Pluggen\\Administrator\\": "src/administrator/components/com_pluggen/src/",
 			"Yepr\\Component\\Pluggen\\Tests\\": "tests/"
 		}
 	},

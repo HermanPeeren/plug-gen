@@ -23,7 +23,7 @@
 
 	<administration>
 		<menu link="option=com_pluggen" img="class:default">com_pluggen</menu>
-		<files folder="admin">
+		<files folder="administrator/components/com_pluggen">
 			<filename>access.xml</filename>
 			<filename>config.xml</filename>
 			<folder>forms</folder>
@@ -32,9 +32,28 @@
 			<folder>src</folder>
 			<folder>tmpl</folder>
 		</files>
-		<languages folder="admin">
+		<languages folder="administrator/components/com_pluggen">
 			<language tag="en-GB">language/en-GB/com_pluggen.ini</language>
 			<language tag="en-GB">language/en-GB/com_pluggen.sys.ini</language>
 		</languages>
 	</administration>
+
+	<!--
+		The site and media folders exist in the repository layout but carry no
+		files yet. Declaring an empty folder makes the installer copy nothing and
+		report a missing source, so the blocks are written out here rather than
+		left to be re-derived:
+
+		<files folder="components/com_pluggen">
+			<folder>src</folder>
+			<folder>tmpl</folder>
+		</files>
+		<media destination="com_pluggen" folder="media/com_pluggen">
+			<folder>css</folder>
+			<folder>js</folder>
+		</media>
+
+		The site <files> block goes before <administration>, the <media> block
+		after it; both are children of <extension>.
+	-->
 </extension>

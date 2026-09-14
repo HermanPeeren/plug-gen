@@ -20,12 +20,15 @@ The result is stored as JSON. That JSON model is the single input to generation:
 
 ## Layers
 
+Paths below are relative to `ADMIN`, which is
+`src/administrator/components/com_pluggen`.
+
 | Layer                                                   | Where | Depends on Joomla |
 |---------------------------------------------------------|---|---|
-| Metamodel: what a plugin *can* be                       | `src/admin/src/Generator/Metamodel`, `src/admin/src/Types/*/form.xml` | no |
-| Model: one concrete plugin description (the saved JSON) | `src/admin/src/Generator/Model` | no |
-| Generators: pure `model → file set`                     | `src/admin/src/Generator/Generators` | no |
-| Component: forms, storage, download                     | `src/admin/src/{Controller,Model,View,Table}` | yes |
+| Metamodel: what a plugin *can* be                       | `ADMIN/src/Generator/Metamodel`, `ADMIN/src/Types/*/form.xml` | no |
+| Model: one concrete plugin description (the saved JSON) | `ADMIN/src/Generator/Model` | no |
+| Generators: pure `model → file set`                     | `ADMIN/src/Generator/Generators` | no |
+| Component: forms, storage, download                     | `ADMIN/src/{Controller,Model,View,Table}` | yes |
 
 The generator core deliberately contains **no Joomla imports at all**, so it can be unit
 tested without bootstrapping the CMS. `tests/Unit/NoJoomlaDependencyTest.php` enforces that.
@@ -35,18 +38,30 @@ a separate writer turns that into a ZIP. This is what makes the whole core testa
 
 ## Layout
 
+`src/` mirrors the folder layout of a Joomla installation, so every file sits at
+the path it will occupy on the site. The manifest's `folder=` attributes then
+name real directories rather than translating between two layouts, and a new
+part of the component - site code, media - is a folder in the obvious place
+rather than a decision.
+
 ```
-src/                      the installable component
-  pluggen.xml             manifest
-  admin/
-    src/Generator/        framework-agnostic generator core
-    src/Types/<Type>/     one self-contained bundle per plugin type
+src/                                            the installable component
+  pluggen.xml                                   manifest
+  administrator/components/com_pluggen/
+    src/Generator/                              framework-agnostic generator core
+    src/Types/<Type>/                           one self-contained bundle per plugin type
     src/{Controller,Model,View,Table,Extension}/
     forms/ language/ services/ sql/ tmpl/
-tests/                    unit tests + golden fixtures
-cypress/                  three end-to-end specs
-build/build.php           assembles the installable zip
+  components/com_pluggen/                       site code, when there is any
+  media/com_pluggen/                            css and js, when there is any
+tests/                                          unit tests + golden fixtures
+cypress/                                        end-to-end specs
+build/build.php                                 assembles the installable zip
 ```
+
+The last two are not there yet; the manifest carries the blocks they will need
+as a comment. The build script copies whatever is under `src/`, so adding them
+is a matter of writing files and uncommenting.
 
 ## Plugin types and plugin groups
 
@@ -100,7 +115,7 @@ content has categories.
 
 ## Adding a plugin type
 
-Drop a folder in `src/admin/src/Types/<Name>/`:
+Drop a folder in `ADMIN/src/Types/<Name>/`:
 
 ```
 Definition.php        implements PluginTypeInterface

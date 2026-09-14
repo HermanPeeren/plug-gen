@@ -6,7 +6,7 @@
  * PSR-12 plus a few rules the codebase already follows. Two things are kept out
  * of the fixer's reach on purpose:
  *
- * - src/admin/tmpl: Joomla layouts indent markup with tabs, and the fixer would
+ * - the admin tmpl folder: Joomla layouts indent markup with tabs, and the fixer would
  *   convert them to spaces.
  * - tests/Fixtures/expected: generated output, compared byte for byte by the
  *   golden tests. Reformatting it would break the very thing it pins.
@@ -19,7 +19,7 @@ declare(strict_types=1);
 $finder = PhpCsFixer\Finder::create()
     ->in([__DIR__ . '/src', __DIR__ . '/tests', __DIR__ . '/tools', __DIR__ . '/build'])
     ->exclude(['Fixtures/expected'])
-    ->notPath('#^admin/tmpl/#')
+    ->notPath('#^administrator/components/com_pluggen/tmpl/#')
     ->name('*.php')
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);

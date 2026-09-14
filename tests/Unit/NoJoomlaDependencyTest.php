@@ -22,7 +22,7 @@ final class NoJoomlaDependencyTest extends TestCase
     {
         $offenders = [];
 
-        foreach ($this->phpFilesIn(\dirname(PLUGGEN_TEST_ROOT) . '/src/admin/src/Generator') as $file) {
+        foreach ($this->phpFilesIn(\PLUGGEN_ADMIN_ROOT . '/src/Generator') as $file) {
             $source = (string) file_get_contents($file);
 
             if (preg_match('/^\s*use\s+Joomla\\\\/mi', $source)) {
@@ -37,7 +37,7 @@ final class NoJoomlaDependencyTest extends TestCase
     {
         $offenders = [];
 
-        foreach ($this->phpFilesIn(\dirname(PLUGGEN_TEST_ROOT) . '/src/admin/src/Types') as $file) {
+        foreach ($this->phpFilesIn(\PLUGGEN_ADMIN_ROOT . '/src/Types') as $file) {
             if (str_ends_with($file, '.tpl')) {
                 continue;
             }

@@ -13,8 +13,8 @@
 	</testsuites>
 	<source>
 		<include>
-			<directory suffix=".php">src/admin/src/Generator</directory>
-			<directory suffix=".php">src/admin/src/Types</directory>
+			<directory suffix=".php">src/administrator/components/com_pluggen/src/Generator</directory>
+			<directory suffix=".php">src/administrator/components/com_pluggen/src/Types</directory>
 		</include>
 	</source>
 </phpunit>

@@ -156,10 +156,10 @@ final class MvcDependencyInjectionTest extends TestCase
     public function testEveryAwareInterfaceIsUsedByTheFactory(): void
     {
         $factory = (string) file_get_contents(
-            \dirname(PLUGGEN_TEST_ROOT) . '/src/admin/src/MVC/Factory/PluggenMVCFactory.php'
+            \PLUGGEN_ADMIN_ROOT . '/src/MVC/Factory/PluggenMVCFactory.php'
         );
 
-        $contracts = glob(\dirname(PLUGGEN_TEST_ROOT) . '/src/admin/src/Contract/*AwareInterface.php') ?: [];
+        $contracts = glob(\PLUGGEN_ADMIN_ROOT . '/src/Contract/*AwareInterface.php') ?: [];
 
         $this->assertNotEmpty($contracts, 'No aware interfaces found.');
 
@@ -177,7 +177,7 @@ final class MvcDependencyInjectionTest extends TestCase
     /** @return array<string, string> file path => source */
     private function mvcFiles(): array
     {
-        $root  = \dirname(PLUGGEN_TEST_ROOT) . '/src/admin/src';
+        $root  = \PLUGGEN_ADMIN_ROOT . '/src';
         $files = [];
 
         foreach (self::MVC_DIRECTORIES as $directory) {

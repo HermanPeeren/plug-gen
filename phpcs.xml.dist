@@ -32,12 +32,12 @@
 
 	<!-- Joomla layouts indent markup with tabs; PHP sources still use spaces. -->
 	<rule ref="Generic.WhiteSpace.DisallowTabIndent">
-		<exclude-pattern>src/admin/tmpl/*</exclude-pattern>
+		<exclude-pattern>src/administrator/components/com_pluggen/tmpl/*</exclude-pattern>
 	</rule>
 
 	<!-- Joomla's Table base class uses underscore-prefixed properties. -->
 	<rule ref="PSR2.Classes.PropertyDeclaration.Underscore">
-		<exclude-pattern>src/admin/src/Table/*</exclude-pattern>
+		<exclude-pattern>src/administrator/components/com_pluggen/src/Table/*</exclude-pattern>
 	</rule>
 
 	<!--

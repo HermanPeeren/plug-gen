@@ -21,13 +21,13 @@ parameters:
             # Type bundle templates are text being written, not code being run.
             # Their variables come from the renderer, so analysing them in
             # isolation says nothing useful.
-            - src/admin/src/Types/*/templates/*
+            - src/administrator/components/com_pluggen/src/Types/*/templates/*
 
             # Joomla layouts are included from inside the view instance, so they
             # legitimately reach protected members - a runtime arrangement no
             # static analyser can see. Joomla core has the same shape and does
             # not analyse its tmpl folders either.
-            - src/admin/tmpl/*
+            - src/administrator/components/com_pluggen/tmpl/*
 
             # Golden fixtures are generated output, kept to diff against. They
             # are already syntax-checked and pinned by the test suite. Analysing
