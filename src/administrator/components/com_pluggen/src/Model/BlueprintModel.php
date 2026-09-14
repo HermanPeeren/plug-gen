@@ -12,6 +12,8 @@ namespace Yepr\Component\Pluggen\Administrator\Model;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\Registry\Registry;
+use Yepr\Component\Pluggen\Administrator\Contract\ComponentParamsAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\ModelMapperAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\ModelValidatorAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\PipelineAwareInterface;
@@ -41,6 +43,7 @@ use Yepr\Component\Pluggen\Administrator\Service\UserStateInterface;
  */
 class BlueprintModel extends AdminModel implements
     TypeRegistryAwareInterface,
+    ComponentParamsAwareInterface,
     ModelMapperAwareInterface,
     PipelineAwareInterface,
     ModelValidatorAwareInterface,
@@ -93,6 +96,14 @@ class BlueprintModel extends AdminModel implements
      * @since  0.1.0
      */
     private UserStateInterface $userState;
+
+    /**
+     * The component's own options.
+     *
+     * @var    Registry
+     * @since  0.4.2
+     */
+    private Registry $params;
 
     /**
      * Set the plugin type registry.
@@ -165,6 +176,20 @@ class BlueprintModel extends AdminModel implements
     }
 
     /**
+     * Set the component options.
+     *
+     * @param   Registry  $params  The component options.
+     *
+     * @return  void
+     *
+     * @since   0.4.2
+     */
+    public function setComponentParams(Registry $params): void
+    {
+        $this->params = $params;
+    }
+
+    /**
      * Get the registry of plugin types.
      *
      * @return  TypeRegistry  The injected registry.
@@ -224,12 +249,49 @@ class BlueprintModel extends AdminModel implements
             if (!empty($item->model)) {
                 $flat = $this->mapper->toForm((array) json_decode((string) $item->model, true));
                 $data = array_merge((array) $item, $flat);
+            } else {
+                // A blueprint that has no model yet is a new one, and the
+                // answers that are the same for every plugin an organisation
+                // writes are in the component options. Only here: once a
+                // blueprint is saved the values are its own, so editing an
+                // option later cannot change what an existing blueprint
+                // generates.
+                $data = array_merge((array) $item, $this->defaults());
             }
         }
 
         $this->preprocessData('com_pluggen.blueprint', $data);
 
         return $data;
+    }
+
+    /**
+     * The form values a new blueprint starts with.
+     *
+     * Empty options are left out rather than written as empty strings, so a
+     * field's own default in the form still applies when the option is unset.
+     *
+     * @return  array  Form data for a new blueprint.
+     *
+     * @since   0.4.2
+     */
+    private function defaults(): array
+    {
+        $defaults = [];
+
+        foreach (['org_namespace', 'author_name', 'author_email', 'author_url', 'copyright'] as $key) {
+            $value = (string) $this->params->get($key, '');
+
+            if ($value !== '') {
+                $defaults[$key] = $value;
+            }
+        }
+
+        if ($this->params->exists('autoloadLanguage')) {
+            $defaults['autoloadLanguage'] = (int) $this->params->get('autoloadLanguage');
+        }
+
+        return $defaults;
     }
 
     /**

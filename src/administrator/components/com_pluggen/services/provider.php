@@ -11,6 +11,7 @@
 
 use Joomla\CMS\Application\CMSWebApplicationInterface;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Dispatcher\ComponentDispatcherFactoryInterface;
 use Joomla\CMS\Extension\ComponentInterface;
 use Joomla\CMS\Extension\Service\Provider\ComponentDispatcherFactory;
@@ -183,7 +184,8 @@ return new class () implements ServiceProviderInterface {
                     $container->get(Pipeline::class),
                     $container->get(ModelValidator::class),
                     $container->get(ZipWriter::class),
-                    $container->get(UserStateInterface::class)
+                    $container->get(UserStateInterface::class),
+                    ComponentHelper::getParams('com_pluggen')
                 );
 
                 $factory->setFormFactory($container->get(FormFactoryInterface::class));

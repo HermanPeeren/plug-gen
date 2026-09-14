@@ -72,12 +72,12 @@ final class ManifestGenerator implements GeneratorInterface
         $lines[] = "\t" . '<license>GNU General Public License version 2 or later; see LICENSE.txt</license>';
         $lines[] = "\t" . '<version>' . Xml::text($model->version) . '</version>';
         $lines[] = "\t" . '<description>' . Xml::text($prefix . '_XML_DESCRIPTION') . '</description>';
-        $lines[] = "\t" . '<namespace path="src">' . Xml::text($model->namespace) . '</namespace>';
+        $lines[] = "\t" . '<namespace path="src">' . Xml::text($model->rootNamespace()) . '</namespace>';
         $lines[] = "\t" . '<files>';
 
         foreach ($this->folders($files) as $folder) {
             $lines[] = $folder === 'services'
-                ? "\t\t" . '<folder plugin="' . Xml::attr($model->element) . '">services</folder>'
+                ? "\t\t" . '<folder plugin="' . Xml::attr($model->systemName) . '">services</folder>'
                 : "\t\t" . '<folder>' . Xml::text($folder) . '</folder>';
         }
 
@@ -93,7 +93,7 @@ final class ManifestGenerator implements GeneratorInterface
 
         $lines[] = '</extension>';
 
-        $files->add($model->element . '.xml', implode("\n", $lines) . "\n");
+        $files->add($model->systemName . '.xml', implode("\n", $lines) . "\n");
     }
 
     /**

@@ -117,15 +117,21 @@ final class SecurityTest extends TestCase
     public function testHostileModelValuesAreRejected(): void
     {
         $cases = [
-            'element traversal'      => ['element' => '../../evil'],
-            'element with slash'     => ['element' => 'a/b'],
-            'uppercase element'      => ['element' => 'Recipes'],
+            'system name traversal'  => ['systemName' => '../../evil'],
+            'system name with slash' => ['systemName' => 'a/b'],
+            'uppercase system name'  => ['systemName' => 'Recipes'],
+            'system name with space' => ['systemName' => 'my recipes'],
+            'system name underscore' => ['systemName' => 'my_recipes'],
+            'system name hyphen'     => ['systemName' => 'my-recipes'],
             'unknown group'          => ['group' => 'evil'],
             'group traversal'        => ['group' => '../finder'],
-            'namespace with code'    => ['namespace' => 'Acme\\Plugin; echo 1'],
-            'single part namespace'  => ['namespace' => 'Acme'],
-            'class name lowercase'   => ['className' => 'recipes'],
+            'namespace with code'    => ['orgNamespace' => 'Acme; echo 1'],
+            'namespace with space'   => ['orgNamespace' => 'Acme Labs'],
             'javascript author url'  => ['authorUrl' => 'javascript:alert(1)'],
+            'service without name'   => ['customServices' => [['expression' => '$container']]],
+            'service name with code' => ['customServices' => [['name' => 'a()', 'expression' => '$c']]],
+            'service without value'  => ['customServices' => [['name' => 'thing', 'expression' => '  ']]],
+            'service bad import'     => ['customServices' => [['name' => 'thing', 'expression' => '$c', 'use' => 'A B']]],
         ];
 
         foreach ($cases as $label => $override) {
@@ -144,12 +150,14 @@ final class SecurityTest extends TestCase
     private function baseModel(array $override = []): array
     {
         $plugin = array_merge([
-            'group'     => 'finder',
-            'element'   => 'recipes',
-            'namespace' => 'Acme\\Plugin\\Finder\\Recipes',
-            'className' => 'Recipes',
-            'version'   => '1.0.0',
-        ], array_intersect_key($override, array_flip(['group', 'element', 'namespace', 'className', 'version'])));
+            'group'        => 'finder',
+            'systemName'   => 'recipes',
+            'orgNamespace' => 'Acme',
+            'version'      => '1.0.0',
+        ], array_intersect_key(
+            $override,
+            array_flip(['group', 'systemName', 'orgNamespace', 'version', 'customServices'])
+        ));
 
         if (isset($override['authorUrl'])) {
             $plugin['author'] = ['url' => $override['authorUrl']];

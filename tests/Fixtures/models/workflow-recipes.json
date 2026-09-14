@@ -1,11 +1,10 @@
 {
-	"modelVersion": "1.0",
+	"modelVersion": "1.1",
 	"target": "joomla-6.0",
 	"plugin": {
 		"group": "workflow",
-		"element": "recipes",
-		"namespace": "Acme\\Plugin\\Workflow\\Recipes",
-		"className": "Recipes",
+		"systemName": "recipes",
+		"orgNamespace": "Acme",
 		"version": "1.0.0",
 		"description": "Moves a recipe to another category when it changes workflow stage.",
 		"copyright": "(C) 2026 Acme",
@@ -24,7 +23,9 @@
 	"type": {
 		"id": "workflow",
 		"config": {
-			"contexts": ["com_recipes.recipe"],
+			"contexts": [
+				"com_recipes.recipe"
+			],
 			"supportFunctionality": "core.state",
 			"fieldsetName": "actions",
 			"fieldsetLabel": "COM_WORKFLOW_TRANSITION_ACTIONS_LABEL",

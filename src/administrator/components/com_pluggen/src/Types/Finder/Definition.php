@@ -148,14 +148,14 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
 
         if (!preg_match('/^[A-Za-z][A-Za-z0-9_]*$/', $context)) {
             $errors[] = 'The finder context must be a plain identifier, for example "Recipes".';
-        } elseif (strtolower($context) !== $model->element) {
+        } elseif (strtolower($context) !== $model->systemName) {
             // pluginDisable() matches getPluginType($id) against strtolower($context),
             // so a context that does not match the element silently never fires.
             $errors[] = \sprintf(
                 'The finder context "%s" must match the plugin element "%s" apart from capitals, '
                 . 'otherwise un-indexing on disable will not work.',
                 $context,
-                $model->element
+                $model->systemName
             );
         }
 
@@ -221,7 +221,7 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
      */
     public function generate(PluginModel $model, FileCollection $files): void
     {
-        $path = 'src/Extension/' . Php::identifier($model->className) . '.php';
+        $path = 'src/Extension/' . Php::identifier($model->className()) . '.php';
 
         // Templates get closures rather than class references: a template file has
         // no namespace of its own, and every value it interpolates must go through

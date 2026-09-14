@@ -9,6 +9,7 @@
 \defined('_JEXEC') or die;
 
 use Acme\Plugin\Finder\Recipes\Extension\Recipes;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Extension\PluginInterface;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\PluginHelper;
@@ -27,6 +28,7 @@ return new class () implements ServiceProviderInterface {
                 );
                 $plugin->setApplication(Factory::getApplication());
                 $plugin->setDatabase($container->get(DatabaseInterface::class));
+                $plugin->setCacheControllerFactory($container->get(CacheControllerFactoryInterface::class));
 
                 return $plugin;
             })

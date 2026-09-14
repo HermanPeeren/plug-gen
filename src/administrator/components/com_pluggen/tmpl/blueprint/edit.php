@@ -15,13 +15,21 @@ use Joomla\CMS\Router\Route;
 
 /** @var \Yepr\Component\Pluggen\Administrator\View\Blueprint\HtmlView $this */
 
-// Every fieldset a type bundle contributed, so new types appear here without
-// this layout having to know about them.
-$typeFieldsets = [];
+// Two tabs hold every plugin type, not two tabs per type. Each type contributes
+// one settings block and one custom-code block, both single subforms carrying
+// showon="plugin_type:<id>", so the browser shows the pair belonging to the
+// selected type and hides the rest. With a dozen types installed this is still
+// four tabs.
+$settings = [];
+$code     = [];
 
-foreach ($this->form->getFieldsets() as $name => $fieldset) {
-    if (str_starts_with($name, 'type_') || str_starts_with($name, 'slots_')) {
-        $typeFieldsets[$name] = $fieldset;
+foreach ($this->form->getFieldset() as $field) {
+    if (str_starts_with($field->fieldname, 'config_')) {
+        $settings[] = $field->fieldname;
+    }
+
+    if (str_starts_with($field->fieldname, 'slots_')) {
+        $code[] = $field->fieldname;
     }
 }
 ?>
@@ -33,12 +41,11 @@ foreach ($this->form->getFieldsets() as $name => $fieldset) {
 	<?php echo HTMLHelper::_('uitab.addTab', 'blueprintTab', 'general', Text::_('COM_PLUGGEN_TAB_GENERAL')); ?>
 		<div class="row">
 			<div class="col-lg-6">
-				<?php echo $this->form->renderField('title'); ?>
+				<?php echo $this->form->renderField('name'); ?>
 				<?php echo $this->form->renderField('plugin_type'); ?>
 				<?php echo $this->form->renderField('target'); ?>
-				<?php echo $this->form->renderField('element'); ?>
-				<?php echo $this->form->renderField('namespace'); ?>
-				<?php echo $this->form->renderField('className'); ?>
+				<?php echo $this->form->renderField('system_name'); ?>
+				<?php echo $this->form->renderField('org_namespace'); ?>
 				<?php echo $this->form->renderField('version'); ?>
 			</div>
 			<div class="col-lg-6">
@@ -51,17 +58,24 @@ foreach ($this->form->getFieldsets() as $name => $fieldset) {
 				<?php echo $this->form->renderField('services'); ?>
 			</div>
 		</div>
+		<?php echo $this->form->renderField('custom_services'); ?>
 	<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
 	<?php echo HTMLHelper::_('uitab.addTab', 'blueprintTab', 'params', Text::_('COM_PLUGGEN_TAB_PARAMS')); ?>
 		<?php echo $this->form->renderField('params'); ?>
 	<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-	<?php foreach ($typeFieldsets as $name => $fieldset) : ?>
-		<?php echo HTMLHelper::_('uitab.addTab', 'blueprintTab', $name, Text::_($fieldset->label ?: $name)); ?>
-			<?php echo $this->form->renderFieldset($name); ?>
-		<?php echo HTMLHelper::_('uitab.endTab'); ?>
-	<?php endforeach; ?>
+	<?php echo HTMLHelper::_('uitab.addTab', 'blueprintTab', 'settings', Text::_('COM_PLUGGEN_TAB_SETTINGS')); ?>
+		<?php foreach ($settings as $field) : ?>
+			<?php echo $this->form->renderField($field); ?>
+		<?php endforeach; ?>
+	<?php echo HTMLHelper::_('uitab.endTab'); ?>
+
+	<?php echo HTMLHelper::_('uitab.addTab', 'blueprintTab', 'code', Text::_('COM_PLUGGEN_TAB_CODE')); ?>
+		<?php foreach ($code as $field) : ?>
+			<?php echo $this->form->renderField($field); ?>
+		<?php endforeach; ?>
+	<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
 	<?php echo HTMLHelper::_('uitab.endTabSet'); ?>
 

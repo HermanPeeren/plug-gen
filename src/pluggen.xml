@@ -21,6 +21,17 @@
 		</sql>
 	</uninstall>
 
+	<!--
+		Schema updates. The path is relative to the administrator folder of the
+		installed component; Joomla runs every file newer than the schema version
+		the site records, so a fresh install runs none of them.
+	-->
+	<update>
+		<schemas>
+			<schemapath type="mysql">sql/updates/mysql</schemapath>
+		</schemas>
+	</update>
+
 	<administration>
 		<menu link="option=com_pluggen" img="class:default">com_pluggen</menu>
 		<files folder="administrator/components/com_pluggen">

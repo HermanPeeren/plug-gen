@@ -12,7 +12,9 @@ namespace Yepr\Component\Pluggen\Administrator\MVC\Factory;
 use Joomla\CMS\Application\CMSApplicationInterface;
 use Joomla\CMS\MVC\Factory\MVCFactory;
 use Joomla\Input\Input;
+use Joomla\Registry\Registry;
 use Psr\Log\LoggerInterface;
+use Yepr\Component\Pluggen\Administrator\Contract\ComponentParamsAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\ModelMapperAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\ModelValidatorAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\PipelineAwareInterface;
@@ -62,6 +64,7 @@ final class PluggenMVCFactory extends MVCFactory
      * @param   ModelValidator       $validator   The model validator.
      * @param   ZipWriter            $zipWriter   The writer that persists a file set.
      * @param   UserStateInterface   $userState   The per-user state store.
+     * @param   Registry             $params      The component's own options.
      * @param   ?LoggerInterface     $logger      An optional logger.
      *
      * @since   0.1.0
@@ -74,6 +77,7 @@ final class PluggenMVCFactory extends MVCFactory
         private readonly ModelValidator $validator,
         private readonly ZipWriter $zipWriter,
         private readonly UserStateInterface $userState,
+        private readonly Registry $params,
         ?LoggerInterface $logger = null
     ) {
         parent::__construct($namespace, $logger);
@@ -186,6 +190,10 @@ final class PluggenMVCFactory extends MVCFactory
 
         if ($object instanceof UserStateAwareInterface) {
             $object->setUserState($this->userState);
+        }
+
+        if ($object instanceof ComponentParamsAwareInterface) {
+            $object->setComponentParams($this->params);
         }
     }
 }

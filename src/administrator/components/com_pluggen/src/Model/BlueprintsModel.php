@@ -37,7 +37,7 @@ class BlueprintsModel extends ListModel
         if (empty($config['filter_fields'])) {
             $config['filter_fields'] = [
                 'id', 'a.id',
-                'title', 'a.title',
+                'name', 'a.name',
                 'type_id', 'a.type_id',
                 'published', 'a.published',
                 'created', 'a.created',
@@ -57,7 +57,7 @@ class BlueprintsModel extends ListModel
      *
      * @since   0.1.0
      */
-    protected function populateState($ordering = 'a.title', $direction = 'asc')
+    protected function populateState($ordering = 'a.name', $direction = 'asc')
     {
         $this->setState('filter.search', $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search', ''));
         $this->setState('filter.type_id', $this->getUserStateFromRequest($this->context . '.filter.type_id', 'filter_type_id', ''));
@@ -96,7 +96,7 @@ class BlueprintsModel extends ListModel
         $db    = $this->getDatabase();
         $query = $db->getQuery(true);
 
-        $query->select($db->quoteName(['a.id', 'a.title', 'a.type_id', 'a.published', 'a.created', 'a.checked_out', 'a.checked_out_time']))
+        $query->select($db->quoteName(['a.id', 'a.name', 'a.type_id', 'a.published', 'a.created', 'a.checked_out', 'a.checked_out_time']))
             ->select($db->quoteName('uc.name', 'editor'))
             ->from($db->quoteName('#__pluggen_blueprints', 'a'))
             ->join('LEFT', $db->quoteName('#__users', 'uc'), $db->quoteName('uc.id') . ' = ' . $db->quoteName('a.checked_out'));
@@ -122,12 +122,12 @@ class BlueprintsModel extends ListModel
 
         if ($search !== '') {
             $search = '%' . str_replace(' ', '%', trim($search)) . '%';
-            $query->where($db->quoteName('a.title') . ' LIKE :search')
+            $query->where($db->quoteName('a.name') . ' LIKE :search')
                 ->bind(':search', $search);
         }
 
         $query->order(
-            $db->escape($this->state->get('list.ordering', 'a.title')) . ' '
+            $db->escape($this->state->get('list.ordering', 'a.name')) . ' '
             . $db->escape($this->state->get('list.direction', 'asc'))
         );
 

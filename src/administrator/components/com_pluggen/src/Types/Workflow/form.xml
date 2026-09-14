@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	The type-specific fieldset for workflow plugins.
+	The type-specific part of the form for workflow plugins.
 
-	Every field carries showon="plugin_type:workflow", so the component can load
-	all registered type forms into one form and let Joomla show only the fieldset
-	belonging to the selected type.
+	Each of the two blocks is a single non-repeating subform carrying
+	showon="plugin_type:workflow". The component loads every registered type's form
+	into one form, and the browser then shows only the block belonging to the
+	selected type - one wrapper per type rather than a showon on every field, so
+	a tab holds one visible block however many types are installed.
+
+	A subform posts its children as config_workflow[<name>] / slots_workflow[<name>], which
+	is the grouping ModelMapper reads, so the data shape is unchanged.
 
 	Field names map onto type.config.<name> in the model.
--->
-<!--
-	No field here carries required="true". Joomla validates the whole form in
-	the browser, including fields that showon has hidden, so a required field
+
+	No field here carries required="true". Joomla validates the whole form in the
+	browser, including fields that showon has hidden, so a required field
 	belonging to one plugin type would refuse to let any other type be saved.
 	What a type needs is checked by its Definition::validate() instead, which is
 	the single source of truth and reports a proper message. A blueprint may be
 	saved half-finished; generating it is what demands a complete model.
 -->
 <form>
-	<fields name="config_workflow">
-		<fieldset name="type_workflow" label="COM_PLUGGEN_TYPE_WORKFLOW_FIELDSET">
+	<field
+		name="config_workflow"
+		type="subform"
+		label="COM_PLUGGEN_TYPE_WORKFLOW_FIELDSET"
+		showon="plugin_type:workflow"
+		>
+		<form>
 			<field
 				name="contexts"
 				type="textarea"
@@ -26,7 +35,6 @@
 				description="COM_PLUGGEN_WORKFLOW_FIELD_CONTEXTS_DESC"
 				hint="com_content.article"
 				rows="3"
-				showon="plugin_type:workflow"
 				/>
 
 			<field
@@ -35,7 +43,6 @@
 				label="COM_PLUGGEN_WORKFLOW_FIELD_FUNCTIONALITY_LABEL"
 				description="COM_PLUGGEN_WORKFLOW_FIELD_FUNCTIONALITY_DESC"
 				hint="core.state"
-				showon="plugin_type:workflow"
 				/>
 
 			<field
@@ -44,7 +51,6 @@
 				label="COM_PLUGGEN_WORKFLOW_FIELD_FIELDSETNAME_LABEL"
 				description="COM_PLUGGEN_WORKFLOW_FIELD_FIELDSETNAME_DESC"
 				default="actions"
-				showon="plugin_type:workflow"
 				/>
 
 			<field
@@ -52,7 +58,6 @@
 				type="text"
 				label="COM_PLUGGEN_WORKFLOW_FIELD_FIELDSETLABEL_LABEL"
 				default="COM_WORKFLOW_TRANSITION_ACTIONS_LABEL"
-				showon="plugin_type:workflow"
 				/>
 
 			<field
@@ -63,7 +68,6 @@
 				description="COM_PLUGGEN_WORKFLOW_FIELD_HANDLEBEFORE_DESC"
 				default="0"
 				filter="integer"
-				showon="plugin_type:workflow"
 				>
 				<option value="0">JNO</option>
 				<option value="1">JYES</option>
@@ -76,7 +80,6 @@
 				description="COM_PLUGGEN_WORKFLOW_FIELD_ACTIONS_DESC"
 				multiple="true"
 				layout="joomla.form.field.subform.repeatable-table"
-				showon="plugin_type:workflow"
 				>
 				<form>
 					<field
@@ -106,20 +109,24 @@
 						type="text"
 						label="COM_PLUGGEN_WORKFLOW_FIELD_ACTION_DEFAULT_LABEL"
 						/>
-				</form>
-			</field>
-		</fieldset>
-	</fields>
+			</form>
+		</field>
+	</form>
+	</field>
 
-	<fields name="slots_workflow">
-		<fieldset name="slots_workflow" label="COM_PLUGGEN_TYPE_WORKFLOW_SLOTS">
+	<field
+		name="slots_workflow"
+		type="subform"
+		label="COM_PLUGGEN_TYPE_WORKFLOW_SLOTS"
+		showon="plugin_type:workflow"
+		>
+		<form>
 			<field
 				name="workflow_class_members"
 				type="textarea"
 				label="COM_PLUGGEN_WORKFLOW_SLOT_CLASS_MEMBERS_LABEL"
 				rows="4"
 				class="code"
-				showon="plugin_type:workflow"
 				/>
 			<field
 				name="workflow_issupported"
@@ -128,7 +135,6 @@
 				description="COM_PLUGGEN_WORKFLOW_SLOT_ISSUPPORTED_DESC"
 				rows="4"
 				class="code"
-				showon="plugin_type:workflow"
 				/>
 			<field
 				name="workflow_before"
@@ -137,7 +143,6 @@
 				description="COM_PLUGGEN_WORKFLOW_SLOT_BEFORE_DESC"
 				rows="6"
 				class="code"
-				showon="plugin_type:workflow"
 				/>
 			<field
 				name="workflow_after"
@@ -146,8 +151,7 @@
 				description="COM_PLUGGEN_WORKFLOW_SLOT_AFTER_DESC"
 				rows="8"
 				class="code"
-				showon="plugin_type:workflow"
 				/>
-		</fieldset>
-	</fields>
+	</form>
+	</field>
 </form>

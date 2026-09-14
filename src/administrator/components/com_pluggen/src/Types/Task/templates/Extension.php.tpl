@@ -52,7 +52,7 @@ echo "<?php\n";
 ?>
 
 /**
- * @package     <?= str_replace('\\', '.', $m->namespace) ?>
+ * @package     <?= str_replace('\\', '.', $m->rootNamespace()) ?>
 
  *
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -71,7 +71,7 @@ use <?= $use ?>;
 /**
  * Task plugin with <?= \count($routines) === 1 ? 'a routine' : \count($routines) . ' routines' ?> for the Joomla Task Scheduler.
  */
-final class <?= $id($m->className) ?> extends CMSPlugin implements <?= implode(', ', $interfaces) ?>
+final class <?= $id($m->className()) ?> extends CMSPlugin implements <?= implode(', ', $interfaces) ?>
 
 {
 <?php foreach ($traits as $trait) : ?>

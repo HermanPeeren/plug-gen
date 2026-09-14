@@ -61,9 +61,11 @@ final class ModelMapper
             'target'       => (string) ($data['target'] ?? 'joomla-6.0'),
             'plugin'       => [
                 'group'            => $this->group($typeId),
-                'element'          => (string) ($data['element'] ?? ''),
-                'namespace'        => trim((string) ($data['namespace'] ?? ''), '\\'),
-                'className'        => (string) ($data['className'] ?? ''),
+                // Lowercased here rather than in the model: this is the edge the
+                // user's typing arrives at, and normalising it further in would
+                // mean the model quietly accepted what the validator forbids.
+                'systemName'       => strtolower(trim((string) ($data['system_name'] ?? ''))),
+                'orgNamespace'     => trim((string) ($data['org_namespace'] ?? ''), '\\ '),
                 'version'          => (string) ($data['version'] ?? '1.0.0'),
                 'description'      => (string) ($data['description'] ?? ''),
                 'copyright'        => (string) ($data['copyright'] ?? ''),
@@ -74,6 +76,7 @@ final class ModelMapper
                 ],
                 'autoloadLanguage' => (bool) ($data['autoloadLanguage'] ?? true),
                 'services'         => $this->services((array) ($data['services'] ?? [])),
+                'customServices'   => $this->customServices((array) ($data['custom_services'] ?? [])),
                 'params'           => array_values((array) ($data['params'] ?? [])),
             ],
             'type'         => [
@@ -102,9 +105,8 @@ final class ModelMapper
 
         $data = [
             'target'           => (string) ($model['target'] ?? 'joomla-6.0'),
-            'element'          => (string) ($plugin['element'] ?? ''),
-            'namespace'        => (string) ($plugin['namespace'] ?? ''),
-            'className'        => (string) ($plugin['className'] ?? ''),
+            'system_name'      => (string) ($plugin['systemName'] ?? ''),
+            'org_namespace'    => (string) ($plugin['orgNamespace'] ?? ''),
             'version'          => (string) ($plugin['version'] ?? '1.0.0'),
             'description'      => (string) ($plugin['description'] ?? ''),
             'copyright'        => (string) ($plugin['copyright'] ?? ''),
@@ -113,6 +115,7 @@ final class ModelMapper
             'author_url'       => (string) ($author['url'] ?? ''),
             'autoloadLanguage' => (int) ($plugin['autoloadLanguage'] ?? 1),
             'services'         => array_keys(array_filter((array) ($plugin['services'] ?? []))),
+            'custom_services'  => array_values((array) ($plugin['customServices'] ?? [])),
             'params'           => (array) ($plugin['params'] ?? []),
             'plugin_type'      => $typeId !== '' ? $typeId : (string) ($plugin['group'] ?? ''),
         ];
@@ -169,6 +172,46 @@ final class ModelMapper
             if (\is_string($service) && preg_match('/^[a-zA-Z]+$/', $service)) {
                 $services[$service] = true;
             }
+        }
+
+        return $services;
+    }
+
+    /**
+     * Keep the freely declared services that say something.
+     *
+     * A repeatable subform posts an empty row whenever the user opened one and
+     * thought better of it, so a row without both a name and an expression is
+     * dropped rather than stored and later reported as invalid. Whether what is
+     * kept is usable is ModelValidator's question.
+     *
+     * @param   array  $rows  The subform rows from the form.
+     *
+     * @return  array  The services to inject, each with name, use and expression.
+     *
+     * @since   0.4.2
+     */
+    private function customServices(array $rows): array
+    {
+        $services = [];
+
+        foreach ($rows as $row) {
+            if (!\is_array($row)) {
+                continue;
+            }
+
+            $name       = trim((string) ($row['name'] ?? ''));
+            $expression = trim((string) ($row['expression'] ?? ''));
+
+            if ($name === '' || $expression === '') {
+                continue;
+            }
+
+            $services[] = [
+                'name'       => $name,
+                'use'        => trim((string) ($row['use'] ?? '')),
+                'expression' => $expression,
+            ];
         }
 
         return $services;

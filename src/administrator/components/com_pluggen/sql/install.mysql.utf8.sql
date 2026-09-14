@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `#__pluggen_blueprints` (
 	`id` int unsigned NOT NULL AUTO_INCREMENT,
-	`title` varchar(255) NOT NULL DEFAULT '',
+	`name` varchar(255) NOT NULL DEFAULT '',
 	`type_id` varchar(64) NOT NULL DEFAULT '',
 	`model` mediumtext COMMENT 'The plugin model, as JSON',
 	`published` tinyint NOT NULL DEFAULT 1,

@@ -75,10 +75,10 @@ class BlueprintTable extends Table implements CurrentUserInterface
     {
         parent::check();
 
-        $this->title = trim((string) $this->title);
+        $this->name = trim((string) $this->name);
 
-        if ($this->title === '') {
-            throw new \UnexpectedValueException(Text::_('COM_PLUGGEN_ERR_TABLE_TITLE'));
+        if ($this->name === '') {
+            throw new \UnexpectedValueException(Text::_('COM_PLUGGEN_ERR_TABLE_NAME'));
         }
 
         // The model column must always hold decodable JSON: everything downstream

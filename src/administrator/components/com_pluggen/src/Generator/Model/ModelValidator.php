@@ -24,10 +24,16 @@ use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
  */
 final class ModelValidator
 {
-    private const ELEMENT_PATTERN   = '/^[a-z][a-z0-9_]{0,63}$/';
-    private const CLASSNAME_PATTERN = '/^[A-Z][A-Za-z0-9_]{0,63}$/';
-    private const NAMESPACE_PATTERN = '/^[A-Za-z_][A-Za-z0-9_]*(\\\\[A-Za-z_][A-Za-z0-9_]*)+$/';
-    private const VERSION_PATTERN   = '/^[0-9]+(\.[0-9]+){0,3}(-[A-Za-z0-9.]+)?$/';
+    // One lowercase word: no spaces, no underscores, no hyphens. It has to
+    // serve at once as a folder name, a Joomla plugin element, the tail of a
+    // language key and, capitalised, a class name - and the only spelling that
+    // is legal in all four at once is this one.
+    private const SYSTEM_NAME_PATTERN = '/^[a-z][a-z0-9]{0,63}$/';
+
+    // The organisation part only, for example "Acme" or "Acme\Labs". The rest of
+    // the namespace is derived, so there is nothing here to disagree with.
+    private const ORG_NAMESPACE_PATTERN = '/^[A-Za-z_][A-Za-z0-9_]*(\\\\[A-Za-z_][A-Za-z0-9_]*)*$/';
+    private const VERSION_PATTERN       = '/^[0-9]+(\.[0-9]+){0,3}(-[A-Za-z0-9.]+)?$/';
 
     /**
      * Constructor.
@@ -69,17 +75,15 @@ final class ModelValidator
             $errors[] = \sprintf('Unknown plugin group "%s".', $model->group);
         }
 
-        if (!preg_match(self::ELEMENT_PATTERN, $model->element)) {
-            $errors[] = 'The plugin element must be lowercase, start with a letter and contain only letters, digits and underscores.';
+        if (!preg_match(self::SYSTEM_NAME_PATTERN, $model->systemName)) {
+            $errors[] = 'The system name must be one lowercase word: a letter followed by letters or digits, with no spaces, underscores or hyphens.';
         }
 
-        if (!preg_match(self::CLASSNAME_PATTERN, $model->className)) {
-            $errors[] = 'The class name must start with a capital and contain only letters, digits and underscores.';
+        if (!preg_match(self::ORG_NAMESPACE_PATTERN, $model->orgNamespace)) {
+            $errors[] = 'The organisation namespace must be a PHP identifier, optionally backslash-separated, for example "Acme".';
         }
 
-        if (!preg_match(self::NAMESPACE_PATTERN, $model->namespace)) {
-            $errors[] = 'The namespace must be a backslash-separated list of PHP identifiers, with at least two parts.';
-        }
+        $errors = array_merge($errors, $this->validateCustomServices($model));
 
         if (!preg_match(self::VERSION_PATTERN, $model->version)) {
             $errors[] = 'The version must look like 1.0.0.';
@@ -100,6 +104,60 @@ final class ModelValidator
         }
 
         $errors = array_merge($errors, $this->validateType($model));
+
+        return $errors;
+    }
+
+    /**
+     * Check the freely declared services.
+     *
+     * The expression is written into the generated provider as typed, the way
+     * custom code in a slot is. What is checked here is everything around it:
+     * a setter name that is a PHP identifier, an expression that is not empty,
+     * and an import that looks like a class name. A malformed name would
+     * produce a provider that does not parse, and the user would meet that as
+     * a white page on their own site rather than as a message here.
+     *
+     * @param   PluginModel  $model  The model to check.
+     *
+     * @return  string[]  The problems found.
+     *
+     * @since   0.4.2
+     */
+    private function validateCustomServices(PluginModel $model): array
+    {
+        $errors = [];
+        $seen   = [];
+
+        foreach ($model->customServices as $index => $service) {
+            $position = $index + 1;
+
+            if (!\is_array($service)) {
+                $errors[] = \sprintf('Injected service %d is not a set of values.', $position);
+
+                continue;
+            }
+
+            $name = (string) ($service['name'] ?? '');
+
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/', $name)) {
+                $errors[] = \sprintf('Injected service %d has no valid name.', $position);
+            } elseif (isset($seen[strtolower($name)])) {
+                $errors[] = \sprintf('Injected service "%s" is named twice.', $name);
+            } else {
+                $seen[strtolower($name)] = true;
+            }
+
+            if (trim((string) ($service['expression'] ?? '')) === '') {
+                $errors[] = \sprintf('Injected service %d has no expression saying how to build it.', $position);
+            }
+
+            $use = trim((string) ($service['use'] ?? ''));
+
+            if ($use !== '' && !preg_match(self::ORG_NAMESPACE_PATTERN, trim($use, '\\'))) {
+                $errors[] = \sprintf('Injected service %d has an import that is not a class name.', $position);
+            }
+        }
 
         return $errors;
     }

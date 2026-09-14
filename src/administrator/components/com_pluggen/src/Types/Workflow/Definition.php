@@ -246,7 +246,7 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
         }
 
         $files->add(
-            'src/Extension/' . Php::identifier($model->className) . '.php',
+            'src/Extension/' . Php::identifier($model->className()) . '.php',
             $this->renderer->render(__DIR__ . '/templates/Extension.php.tpl', [
                 'm'        => $model,
                 'contexts' => $this->contexts($model),

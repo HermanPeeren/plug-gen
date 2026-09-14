@@ -261,7 +261,7 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
         }
 
         $files->add(
-            'src/Extension/' . Php::identifier($model->className) . '.php',
+            'src/Extension/' . Php::identifier($model->className()) . '.php',
             $this->renderer->render(__DIR__ . '/templates/Extension.php.tpl', [
                 'm'        => $model,
                 'routines' => $routines,
@@ -350,7 +350,7 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
         // recipes plugin would advertise PLG_TASK_RECIPES_RECIPES_CLEANUP.
         $segments = explode('.', $id);
 
-        if (\count($segments) > 1 && strcasecmp($segments[0], $model->element) === 0) {
+        if (\count($segments) > 1 && strcasecmp($segments[0], $model->systemName) === 0) {
             array_shift($segments);
         }
 

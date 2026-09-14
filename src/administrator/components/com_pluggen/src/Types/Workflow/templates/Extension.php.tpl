@@ -59,7 +59,7 @@ echo "<?php\n";
 ?>
 
 /**
- * @package     <?= str_replace('\\', '.', $m->namespace) ?>
+ * @package     <?= str_replace('\\', '.', $m->rootNamespace()) ?>
 
  *
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -78,7 +78,7 @@ use <?= $use ?>;
 /**
  * Workflow plugin: actions executed at a transition.
  */
-final class <?= $id($m->className) ?> extends CMSPlugin implements <?= implode(', ', $interfaces) ?>
+final class <?= $id($m->className()) ?> extends CMSPlugin implements <?= implode(', ', $interfaces) ?>
 
 {
 <?php foreach ($traits as $trait) : ?>

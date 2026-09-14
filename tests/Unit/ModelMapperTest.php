@@ -61,13 +61,34 @@ final class ModelMapperTest extends TestCase
         $form   = $mapper->toForm($mapper->toModel($this->formData()));
 
         $this->assertSame('finder', $form['plugin_type']);
-        $this->assertSame('recipes', $form['element']);
+        $this->assertSame('recipes', $form['system_name']);
+        $this->assertSame('Acme', $form['org_namespace']);
         $this->assertSame('Recipes', $form['config_finder']['context']);
         $this->assertSame('$item->prep_time = 1;', $form['slots_finder']['finder_index_elements']);
 
         // The form has no group field any more; offering one would be a second
         // way to answer a question that is already answered.
         $this->assertFalse(\array_key_exists('group', $form));
+    }
+
+    /** A system name typed with capitals is lowered here, not silently accepted deeper in. */
+    public function testTheSystemNameIsLowercased(): void
+    {
+        $data = $this->formData();
+
+        $data['system_name'] = '  Recipes  ';
+
+        $this->assertSame('recipes', $this->mapper()->toModel($data)['plugin']['systemName']);
+    }
+
+    /** An empty repeatable row is the user opening one and thinking better of it. */
+    public function testBlankCustomServiceRowsAreDropped(): void
+    {
+        $services = $this->mapper()->toModel($this->formData())['plugin']['customServices'];
+
+        $this->assertCount(1, $services);
+        $this->assertSame('cache', $services[0]['name']);
+        $this->assertSame('$container->get(Some::class)', $services[0]['expression']);
     }
 
     public function testSelectedServicesBecomeAMap(): void
@@ -86,11 +107,14 @@ final class ModelMapperTest extends TestCase
     {
         return [
             'plugin_type'  => 'finder',
-            'element'      => 'recipes',
-            'namespace'    => 'Acme\\Plugin\\Finder\\Recipes',
-            'className'    => 'Recipes',
+            'system_name'  => 'recipes',
+            'org_namespace' => 'Acme',
             'version'      => '1.0.0',
             'services'     => ['application', 'database'],
+            'custom_services' => [
+                ['name' => 'cache', 'use' => 'Some\\Class', 'expression' => '$container->get(Some::class)'],
+                ['name' => '', 'use' => '', 'expression' => ''],
+            ],
             'config_finder' => [
                 'context'   => 'Recipes',
                 'extension' => 'com_recipes',

@@ -1,11 +1,10 @@
 {
-	"modelVersion": "1.0",
+	"modelVersion": "1.1",
 	"target": "joomla-6.0",
 	"plugin": {
 		"group": "finder",
-		"element": "recipes",
-		"namespace": "Acme\\Plugin\\Finder\\Recipes",
-		"className": "Recipes",
+		"systemName": "recipes",
+		"orgNamespace": "Acme",
 		"version": "1.0.0",
 		"description": "Smart Search adapter that indexes com_recipes recipes.",
 		"copyright": "(C) 2026 Acme",
@@ -19,6 +18,13 @@
 			"application": true,
 			"database": true
 		},
+		"customServices": [
+			{
+				"name": "cacheControllerFactory",
+				"use": "Joomla\\CMS\\Cache\\CacheControllerFactoryInterface",
+				"expression": "$container->get(CacheControllerFactoryInterface::class)"
+			}
+		],
 		"params": [
 			{
 				"name": "search_archived",
@@ -44,26 +50,83 @@
 			"typeTitle": "Recipe",
 			"stateField": "published",
 			"hasCategories": false,
-			"taxonomies": ["Type", "Language"],
+			"taxonomies": [
+				"Type",
+				"Language"
+			],
 			"columns": [
-				{ "column": "a.id", "alias": "" },
-				{ "column": "a.title", "alias": "" },
-				{ "column": "a.alias", "alias": "" },
-				{ "column": "a.description", "alias": "summary" },
-				{ "column": "a.instructions", "alias": "body" },
-				{ "column": "a.published", "alias": "state" },
-				{ "column": "a.access", "alias": "" },
-				{ "column": "a.language", "alias": "" },
-				{ "column": "a.params", "alias": "" },
-				{ "column": "a.metadata", "alias": "" },
-				{ "column": "a.metakey", "alias": "" },
-				{ "column": "a.metadesc", "alias": "" },
-				{ "column": "a.created", "alias": "start_date" },
-				{ "column": "a.modified", "alias": "" },
-				{ "column": "a.image", "alias": "" },
-				{ "column": "a.prep_time", "alias": "" },
-				{ "column": "a.servings", "alias": "" },
-				{ "column": "a.difficulty", "alias": "" }
+				{
+					"column": "a.id",
+					"alias": ""
+				},
+				{
+					"column": "a.title",
+					"alias": ""
+				},
+				{
+					"column": "a.alias",
+					"alias": ""
+				},
+				{
+					"column": "a.description",
+					"alias": "summary"
+				},
+				{
+					"column": "a.instructions",
+					"alias": "body"
+				},
+				{
+					"column": "a.published",
+					"alias": "state"
+				},
+				{
+					"column": "a.access",
+					"alias": ""
+				},
+				{
+					"column": "a.language",
+					"alias": ""
+				},
+				{
+					"column": "a.params",
+					"alias": ""
+				},
+				{
+					"column": "a.metadata",
+					"alias": ""
+				},
+				{
+					"column": "a.metakey",
+					"alias": ""
+				},
+				{
+					"column": "a.metadesc",
+					"alias": ""
+				},
+				{
+					"column": "a.created",
+					"alias": "start_date"
+				},
+				{
+					"column": "a.modified",
+					"alias": ""
+				},
+				{
+					"column": "a.image",
+					"alias": ""
+				},
+				{
+					"column": "a.prep_time",
+					"alias": ""
+				},
+				{
+					"column": "a.servings",
+					"alias": ""
+				},
+				{
+					"column": "a.difficulty",
+					"alias": ""
+				}
 			]
 		}
 	},

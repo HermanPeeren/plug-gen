@@ -12,8 +12,8 @@
 $context       = (string) $m->config('context');
 $extension     = (string) $m->config('extension');
 $table         = (string) $m->config('table');
-$layout        = (string) $m->config('layout', strtolower($m->element));
-$typeTitle     = (string) $m->config('typeTitle', ucfirst($m->element));
+$layout        = (string) $m->config('layout', strtolower($m->systemName));
+$typeTitle     = (string) $m->config('typeTitle', ucfirst($m->systemName));
 $stateField    = (string) $m->config('stateField', 'state');
 $hasCategories = (bool) $m->config('hasCategories', false);
 // The context is <extension>.<model name>, and the model name is the component's,
@@ -31,7 +31,7 @@ echo "<?php\n";
 ?>
 
 /**
- * @package     <?= str_replace('\\', '.', $m->namespace) ?>
+ * @package     <?= str_replace('\\', '.', $m->rootNamespace()) ?>
 
  *
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -57,7 +57,7 @@ use Joomla\Registry\Registry;
 /**
  * Smart Search adapter for <?= $extension ?>.
  */
-final class <?= $id($m->className) ?> extends Adapter implements SubscriberInterface
+final class <?= $id($m->className()) ?> extends Adapter implements SubscriberInterface
 {
     use DatabaseAwareTrait;
 

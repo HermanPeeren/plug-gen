@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	The type-specific fieldset for task plugins.
+	The type-specific part of the form for task plugins.
 
-	Every field carries showon="plugin_type:task", so the component can load all
-	registered type forms into one form and let Joomla show only the fieldset
-	belonging to the selected type.
+	Each of the two blocks is a single non-repeating subform carrying
+	showon="plugin_type:task". The component loads every registered type's form
+	into one form, and the browser then shows only the block belonging to the
+	selected type - one wrapper per type rather than a showon on every field, so
+	a tab holds one visible block however many types are installed.
+
+	A subform posts its children as config_task[<name>] / slots_task[<name>], which
+	is the grouping ModelMapper reads, so the data shape is unchanged.
 
 	Field names map onto type.config.<name> in the model.
--->
-<!--
-	No field here carries required="true". Joomla validates the whole form in
-	the browser, including fields that showon has hidden, so a required field
+
+	No field here carries required="true". Joomla validates the whole form in the
+	browser, including fields that showon has hidden, so a required field
 	belonging to one plugin type would refuse to let any other type be saved.
 	What a type needs is checked by its Definition::validate() instead, which is
 	the single source of truth and reports a proper message. A blueprint may be
 	saved half-finished; generating it is what demands a complete model.
 -->
 <form>
-	<fields name="config_task">
-		<fieldset name="type_task" label="COM_PLUGGEN_TYPE_TASK_FIELDSET">
+	<field
+		name="config_task"
+		type="subform"
+		label="COM_PLUGGEN_TYPE_TASK_FIELDSET"
+		showon="plugin_type:task"
+		>
+		<form>
 			<field
 				name="routines"
 				type="subform"
@@ -26,7 +35,6 @@
 				description="COM_PLUGGEN_TASK_FIELD_ROUTINES_DESC"
 				multiple="true"
 				layout="joomla.form.field.subform.repeatable"
-				showon="plugin_type:task"
 				>
 				<form>
 					<field
@@ -98,19 +106,24 @@
 								type="text"
 								label="COM_PLUGGEN_TASK_FIELD_PARAM_DEFAULT_LABEL"
 								/>
-						</form>
-					</field>
-				</form>
-			</field>
-		</fieldset>
-	</fields>
+					</form>
+				</field>
+			</form>
+		</field>
+	</form>
+	</field>
 
 	<!--
 		Plugin-wide open spots. A routine's own body is not here: it belongs to
 		the routine, so it is a field of the routine above.
 	-->
-	<fields name="slots_task">
-		<fieldset name="slots_task" label="COM_PLUGGEN_TYPE_TASK_SLOTS">
+	<field
+		name="slots_task"
+		type="subform"
+		label="COM_PLUGGEN_TYPE_TASK_SLOTS"
+		showon="plugin_type:task"
+		>
+		<form>
 			<field
 				name="task_class_members"
 				type="textarea"
@@ -118,7 +131,6 @@
 				description="COM_PLUGGEN_TASK_SLOT_CLASS_MEMBERS_DESC"
 				rows="6"
 				class="code"
-				showon="plugin_type:task"
 				/>
 			<field
 				name="task_constructor"
@@ -127,8 +139,7 @@
 				description="COM_PLUGGEN_TASK_SLOT_CONSTRUCTOR_DESC"
 				rows="4"
 				class="code"
-				showon="plugin_type:task"
 				/>
-		</fieldset>
-	</fields>
+	</form>
+	</field>
 </form>

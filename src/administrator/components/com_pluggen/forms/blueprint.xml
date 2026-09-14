@@ -9,10 +9,10 @@
 	<field name="id" type="number" label="JGLOBAL_FIELD_ID_LABEL" default="0" class="readonly" readonly="true"/>
 
 	<field
-		name="title"
+		name="name"
 		type="text"
-		label="COM_PLUGGEN_FIELD_TITLE_LABEL"
-		description="COM_PLUGGEN_FIELD_TITLE_DESC"
+		label="COM_PLUGGEN_FIELD_NAME_LABEL"
+		description="COM_PLUGGEN_FIELD_NAME_DESC"
 		size="40"
 		required="true"
 		/>
@@ -49,30 +49,29 @@
 		<option value="joomla-5.0">Joomla 5</option>
 	</field>
 
+	<!--
+		The system name is one lowercase word, because it has to serve at once as
+		a folder name, the plugin element, the tail of every language key and,
+		capitalised, the class name. The class name and the full namespace are
+		derived from it and from the group, so the form does not ask: a value the
+		user could set wrong is a value that can disagree with the one Joomla
+		will look for.
+	-->
 	<field
-		name="element"
+		name="system_name"
 		type="text"
-		label="COM_PLUGGEN_FIELD_ELEMENT_LABEL"
-		description="COM_PLUGGEN_FIELD_ELEMENT_DESC"
+		label="COM_PLUGGEN_FIELD_SYSTEM_NAME_LABEL"
+		description="COM_PLUGGEN_FIELD_SYSTEM_NAME_DESC"
 		hint="recipes"
 		required="true"
 		/>
 
 	<field
-		name="namespace"
+		name="org_namespace"
 		type="text"
-		label="COM_PLUGGEN_FIELD_NAMESPACE_LABEL"
-		description="COM_PLUGGEN_FIELD_NAMESPACE_DESC"
-		hint="Acme\Plugin\Finder\Recipes"
-		required="true"
-		/>
-
-	<field
-		name="className"
-		type="text"
-		label="COM_PLUGGEN_FIELD_CLASSNAME_LABEL"
-		description="COM_PLUGGEN_FIELD_CLASSNAME_DESC"
-		hint="Recipes"
+		label="COM_PLUGGEN_FIELD_ORG_NAMESPACE_LABEL"
+		description="COM_PLUGGEN_FIELD_ORG_NAMESPACE_DESC"
+		hint="Acme"
 		required="true"
 		/>
 
@@ -143,6 +142,39 @@
 		<option value="dispatcher">COM_PLUGGEN_SERVICE_DISPATCHER</option>
 		<option value="mailerFactory">COM_PLUGGEN_SERVICE_MAILERFACTORY</option>
 		<option value="userFactory">COM_PLUGGEN_SERVICE_USERFACTORY</option>
+	</field>
+
+	<field
+		name="custom_services"
+		type="subform"
+		label="COM_PLUGGEN_FIELD_CUSTOM_SERVICES_LABEL"
+		description="COM_PLUGGEN_FIELD_CUSTOM_SERVICES_DESC"
+		multiple="true"
+		layout="joomla.form.field.subform.repeatable-table"
+		>
+		<form>
+			<field
+				name="name"
+				type="text"
+				label="COM_PLUGGEN_FIELD_CUSTOM_SERVICE_NAME_LABEL"
+				description="COM_PLUGGEN_FIELD_CUSTOM_SERVICE_NAME_DESC"
+				hint="cacheControllerFactory"
+				/>
+			<field
+				name="use"
+				type="text"
+				label="COM_PLUGGEN_FIELD_CUSTOM_SERVICE_USE_LABEL"
+				description="COM_PLUGGEN_FIELD_CUSTOM_SERVICE_USE_DESC"
+				hint="Joomla\CMS\Cache\CacheControllerFactoryInterface"
+				/>
+			<field
+				name="expression"
+				type="text"
+				label="COM_PLUGGEN_FIELD_CUSTOM_SERVICE_EXPRESSION_LABEL"
+				description="COM_PLUGGEN_FIELD_CUSTOM_SERVICE_EXPRESSION_DESC"
+				hint="$container->get(CacheControllerFactoryInterface::class)"
+				/>
+		</form>
 	</field>
 
 	<field

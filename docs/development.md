@@ -71,6 +71,74 @@ disabled rather than hidden, so it is visible what the generator cannot write
 yet. Disabling is a browser hint only: `BlueprintModel::save()` refuses an
 unavailable type as well.
 
+## The edit form
+
+Four tabs, whatever is installed:
+
+| Tab | Holds |
+|---|---|
+| General | Everything shared by all plugin types, plus the injected services |
+| Plugin Parameters | The parameters the generated plugin offers its own users |
+| Type Settings | One `config_<type>` block per plugin type |
+| Custom Code | One `slots_<type>` block per plugin type |
+
+The last two hold every type at once. Each type's block is a single
+non-repeating `subform` field carrying `showon="plugin_type:<id>"`, so the
+browser shows the one belonging to the selected type and hides the rest. The
+alternative - a tab per type - is two tabs per plugin type, which is fine at
+three types and unreadable at twelve.
+
+A non-repeating subform posts its children as `config_finder[context]`, exactly
+the grouping `<fields name="config_finder">` produced before, so `ModelMapper`
+did not change. What did change is the rendered ids, which gain a second
+underscore: `jform_config_finder__context`. The Cypress specs select on those.
+
+### What the form asks for, and what it works out
+
+The system name is one lowercase word - no spaces, underscores or hyphens. It
+has to be at once a folder name, the plugin element, the tail of every language
+key, and capitalised a class name, and that is the only spelling legal in all
+four at once.
+
+From it and the plugin group, the model derives the class name
+(`PluginModel::className()`) and the whole namespace
+(`rootNamespace()`: `Acme\Plugin\Finder\Recipes`, group studly-cased as Joomla
+does it). The form asks only for the organisation. A field the user can set is a
+field they can set wrong, and a plugin whose namespace disagrees with its group
+does not autoload - a failure with no message attached.
+
+Answers that repeat across every plugin one organisation writes - the
+organisation, the author, the copyright, whether to autoload the language file -
+are component options, copied into a blueprint when it is created. Only then: a
+saved blueprint owns its values, so editing an option later cannot change what
+an existing blueprint generates.
+
+### Injected services
+
+Beside the fixed list of stock services, a blueprint can declare any number of
+its own: a name, an expression that builds the value, and an optional import.
+Each becomes one setter call in the generated provider, `name` capitalised into
+`set<Name>()`. The expression is written out as typed - the same contract as the
+custom code in a slot - while the name and the import are checked before
+generation starts, because a malformed one produces a provider that does not
+parse and the user meets that as a white page on their own site.
+
+## The stored format
+
+The model JSON carries `modelVersion`. It is at **1.1**, which renamed
+`plugin.element` to `plugin.systemName` and replaced `plugin.namespace` and
+`plugin.className` with `plugin.orgNamespace`.
+
+`PluginModel::fromArray()` reads a 1.0 model and upgrades it on the way in, so a
+blueprint saved before the change still opens; the upgraded model is written
+back in the new shape the next time it is saved. A version this code does not
+know is left as it is, so `ModelValidator` refuses it rather than misreading it.
+`ModelFormatTest` pins all of that, including that the values 1.0 stored
+explicitly come back identical from the derivation.
+
+The blueprint table's `title` column became `name` at the same time, through
+`sql/updates/mysql/0.4.2.sql`.
+
 ## Targets
 
 The blueprint asks which Joomla version the output is for, and that choice

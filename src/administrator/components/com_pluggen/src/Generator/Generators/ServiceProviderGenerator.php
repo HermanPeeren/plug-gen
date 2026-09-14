@@ -78,7 +78,7 @@ final class ServiceProviderGenerator implements GeneratorInterface
      */
     public function generate(PluginModel $model, FileCollection $files): void
     {
-        $class     = Php::identifier($model->className);
+        $class     = Php::identifier($model->className());
         $namespace = Php::namespaceName($model->extensionNamespace());
 
         $uses = [
@@ -104,13 +104,37 @@ final class ServiceProviderGenerator implements GeneratorInterface
             $setters[] = $setter;
         }
 
+        // Anything the stock list does not cover. The expression is the user's
+        // own text, written out as typed - the same contract as the custom code
+        // in a slot - while the setter name and the import are checked by
+        // ModelValidator before generation is allowed to start.
+        foreach ($model->customServices as $service) {
+            if (!\is_array($service)) {
+                continue;
+            }
+
+            $name       = (string) ($service['name'] ?? '');
+            $expression = trim((string) ($service['expression'] ?? ''));
+            $use        = trim(trim((string) ($service['use'] ?? '')), '\\');
+
+            if ($name === '' || $expression === '') {
+                continue;
+            }
+
+            if ($use !== '') {
+                $uses[] = $use;
+            }
+
+            $setters[] = '$plugin->set' . ucfirst(Php::identifier($name)) . '(' . $expression . ');';
+        }
+
         sort($uses, SORT_STRING);
 
         $body = [];
         $body[] = '<?php';
         $body[] = '';
         $body[] = '/**';
-        $body[] = ' * @package     ' . str_replace('\\', '.', $model->namespace);
+        $body[] = ' * @package     ' . str_replace('\\', '.', $model->rootNamespace());
         $body[] = ' *';
         $body[] = ' * @license     GNU General Public License version 2 or later; see LICENSE.txt';
         $body[] = ' */';
@@ -141,7 +165,7 @@ final class ServiceProviderGenerator implements GeneratorInterface
         }
 
         $body[] = $indent . '$plugin = new ' . $class . '(';
-        $body[] = $indent . '    (array) PluginHelper::getPlugin(' . Php::string($model->group) . ', ' . Php::string($model->element) . ')';
+        $body[] = $indent . '    (array) PluginHelper::getPlugin(' . Php::string($model->group) . ', ' . Php::string($model->systemName) . ')';
         $body[] = $indent . ');';
 
         foreach ($setters as $setter) {

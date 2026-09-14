@@ -1,30 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	The type-specific fieldset for finder plugins.
+	The type-specific part of the form for finder plugins.
 
-	Every field carries showon="plugin_type:finder", so the component can load all
-	registered type forms into one form and let Joomla show only the fieldset
-	belonging to the selected type. No page reload, no custom JavaScript.
+	Each of the two blocks is a single non-repeating subform carrying
+	showon="plugin_type:finder". The component loads every registered type's form
+	into one form, and the browser then shows only the block belonging to the
+	selected type - one wrapper per type rather than a showon on every field, so
+	a tab holds one visible block however many types are installed.
+
+	A subform posts its children as config_finder[<name>] / slots_finder[<name>], which
+	is the grouping ModelMapper reads, so the data shape is unchanged.
 
 	Field names map onto type.config.<name> in the model.
--->
-<!--
-	No field here carries required="true". Joomla validates the whole form in
-	the browser, including fields that showon has hidden, so a required field
+
+	No field here carries required="true". Joomla validates the whole form in the
+	browser, including fields that showon has hidden, so a required field
 	belonging to one plugin type would refuse to let any other type be saved.
 	What a type needs is checked by its Definition::validate() instead, which is
 	the single source of truth and reports a proper message. A blueprint may be
 	saved half-finished; generating it is what demands a complete model.
 -->
 <form>
-	<fields name="config_finder">
-		<fieldset name="type_finder" label="COM_PLUGGEN_TYPE_FINDER_FIELDSET">
+	<field
+		name="config_finder"
+		type="subform"
+		label="COM_PLUGGEN_TYPE_FINDER_FIELDSET"
+		showon="plugin_type:finder"
+		>
+		<form>
 			<field
 				name="context"
 				type="text"
 				label="COM_PLUGGEN_FINDER_FIELD_CONTEXT_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_CONTEXT_DESC"
-				showon="plugin_type:finder"
 				/>
 
 			<field
@@ -33,7 +41,6 @@
 				label="COM_PLUGGEN_FINDER_FIELD_EXTENSION_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_EXTENSION_DESC"
 				hint="com_recipes"
-				showon="plugin_type:finder"
 				/>
 
 			<field
@@ -42,7 +49,6 @@
 				label="COM_PLUGGEN_FINDER_FIELD_ITEMNAME_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_ITEMNAME_DESC"
 				hint="recipe"
-				showon="plugin_type:finder"
 				/>
 
 			<field
@@ -50,7 +56,6 @@
 				type="text"
 				label="COM_PLUGGEN_FINDER_FIELD_TABLE_LABEL"
 				hint="#__recipes"
-				showon="plugin_type:finder"
 				/>
 
 			<field
@@ -59,7 +64,6 @@
 				label="COM_PLUGGEN_FINDER_FIELD_STATEFIELD_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_STATEFIELD_DESC"
 				default="state"
-				showon="plugin_type:finder"
 				/>
 
 			<field
@@ -67,14 +71,12 @@
 				type="text"
 				label="COM_PLUGGEN_FINDER_FIELD_LAYOUT_LABEL"
 				description="COM_PLUGGEN_FINDER_FIELD_LAYOUT_DESC"
-				showon="plugin_type:finder"
 				/>
 
 			<field
 				name="typeTitle"
 				type="text"
 				label="COM_PLUGGEN_FINDER_FIELD_TYPETITLE_LABEL"
-				showon="plugin_type:finder"
 				/>
 
 			<field
@@ -85,7 +87,6 @@
 				description="COM_PLUGGEN_FINDER_FIELD_HASCATEGORIES_DESC"
 				default="0"
 				filter="integer"
-				showon="plugin_type:finder"
 				>
 				<option value="0">JNO</option>
 				<option value="1">JYES</option>
@@ -97,7 +98,6 @@
 				label="COM_PLUGGEN_FINDER_FIELD_TAXONOMIES_LABEL"
 				multiple="true"
 				default="Type,Language"
-				showon="plugin_type:finder"
 				>
 				<option value="Type">COM_PLUGGEN_FINDER_TAXONOMY_TYPE</option>
 				<option value="Language">COM_PLUGGEN_FINDER_TAXONOMY_LANGUAGE</option>
@@ -112,7 +112,6 @@
 				description="COM_PLUGGEN_FINDER_FIELD_COLUMNS_DESC"
 				multiple="true"
 				layout="joomla.form.field.subform.repeatable-table"
-				showon="plugin_type:finder"
 				>
 				<form>
 					<field
@@ -127,10 +126,10 @@
 						label="COM_PLUGGEN_FINDER_FIELD_ALIAS_LABEL"
 						hint="summary"
 						/>
-				</form>
-			</field>
-		</fieldset>
-	</fields>
+			</form>
+		</field>
+	</form>
+	</field>
 
 	<!--
 		The open spots. One textarea per slot declared in type.json; the field
@@ -138,15 +137,19 @@
 		stored in the model and injected into the matching protected region, so it
 		survives regeneration either way.
 	-->
-	<fields name="slots_finder">
-		<fieldset name="slots_finder" label="COM_PLUGGEN_TYPE_FINDER_SLOTS">
+	<field
+		name="slots_finder"
+		type="subform"
+		label="COM_PLUGGEN_TYPE_FINDER_SLOTS"
+		showon="plugin_type:finder"
+		>
+		<form>
 			<field
 				name="finder_setup"
 				type="textarea"
 				label="COM_PLUGGEN_FINDER_SLOT_SETUP_LABEL"
 				rows="4"
 				class="code"
-				showon="plugin_type:finder"
 				/>
 			<field
 				name="finder_index_before"
@@ -154,7 +157,6 @@
 				label="COM_PLUGGEN_FINDER_SLOT_INDEX_BEFORE_LABEL"
 				rows="4"
 				class="code"
-				showon="plugin_type:finder"
 				/>
 			<field
 				name="finder_index_elements"
@@ -163,7 +165,6 @@
 				description="COM_PLUGGEN_FINDER_SLOT_INDEX_ELEMENTS_DESC"
 				rows="6"
 				class="code"
-				showon="plugin_type:finder"
 				/>
 			<field
 				name="finder_index_taxonomies"
@@ -171,7 +172,6 @@
 				label="COM_PLUGGEN_FINDER_SLOT_INDEX_TAXONOMIES_LABEL"
 				rows="4"
 				class="code"
-				showon="plugin_type:finder"
 				/>
 			<field
 				name="finder_listquery"
@@ -179,8 +179,7 @@
 				label="COM_PLUGGEN_FINDER_SLOT_LISTQUERY_LABEL"
 				rows="4"
 				class="code"
-				showon="plugin_type:finder"
 				/>
-		</fieldset>
-	</fields>
+	</form>
+	</field>
 </form>

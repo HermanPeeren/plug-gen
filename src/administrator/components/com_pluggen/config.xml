@@ -1,5 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
+	<!--
+		Defaults for a new blueprint. These are the answers that are the same for
+		every plugin one organisation writes, so typing them once here beats
+		typing them again on every blueprint. They are copied into a new
+		blueprint and then belong to it: changing an option later does not reach
+		back into blueprints already saved, which would quietly change what those
+		generate.
+	-->
+	<fieldset name="defaults" label="COM_PLUGGEN_CONFIG_DEFAULTS_LABEL" description="COM_PLUGGEN_CONFIG_DEFAULTS_DESC">
+		<field
+			name="org_namespace"
+			type="text"
+			label="COM_PLUGGEN_FIELD_ORG_NAMESPACE_LABEL"
+			description="COM_PLUGGEN_FIELD_ORG_NAMESPACE_DESC"
+			hint="Acme"
+			/>
+
+		<field
+			name="author_name"
+			type="text"
+			label="COM_PLUGGEN_FIELD_AUTHOR_NAME_LABEL"
+			/>
+
+		<field
+			name="author_email"
+			type="email"
+			label="COM_PLUGGEN_FIELD_AUTHOR_EMAIL_LABEL"
+			validate="email"
+			/>
+
+		<field
+			name="author_url"
+			type="url"
+			label="COM_PLUGGEN_FIELD_AUTHOR_URL_LABEL"
+			validate="url"
+			relative="false"
+			/>
+
+		<field
+			name="copyright"
+			type="text"
+			label="COM_PLUGGEN_FIELD_COPYRIGHT_LABEL"
+			/>
+
+		<field
+			name="autoloadLanguage"
+			type="radio"
+			layout="joomla.form.field.radio.switcher"
+			label="COM_PLUGGEN_FIELD_AUTOLOADLANGUAGE_LABEL"
+			description="COM_PLUGGEN_FIELD_AUTOLOADLANGUAGE_DESC"
+			default="1"
+			filter="integer"
+			>
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+	</fieldset>
+
 	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
 		<field
 			name="rules"

@@ -13,6 +13,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\Router\Route;
 use Yepr\Component\Pluggen\Administrator\Contract\ZipWriterAwareInterface;
+use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\ValidationException;
 use Yepr\Component\Pluggen\Administrator\Generator\Output\ZipWriter;
 use Yepr\Component\Pluggen\Administrator\Model\BlueprintModel;
@@ -121,13 +122,19 @@ class BlueprintController extends FormController implements ZipWriterAwareInterf
             return false;
         }
 
-        $item     = $model->getItem($id);
-        $modelArr = (array) json_decode((string) $item->model, true);
-        $plugin   = (array) ($modelArr['plugin'] ?? []);
+        $item = $model->getItem($id);
 
-        // Rebuilt from validated parts, never from user input directly.
-        $name = 'plg_' . preg_replace('/[^a-z0-9_]/', '', (string) ($plugin['group'] ?? 'x'))
-            . '_' . preg_replace('/[^a-z0-9_]/', '', (string) ($plugin['element'] ?? 'x'));
+        // The model has just passed validation inside generate(), so its own
+        // extensionName() is a checked value; it is stripped again here anyway,
+        // because this string becomes a file name and a download header.
+        // Deriving it from the model rather than re-reading the stored JSON also
+        // means the name cannot drift from what the manifest inside the archive
+        // says.
+        $name = preg_replace(
+            '/[^a-z0-9_]/',
+            '',
+            PluginModel::fromJson((string) $item->model)->extensionName()
+        );
 
         $directory = rtrim($app->get('tmp_path'), '/\\') . \DIRECTORY_SEPARATOR . 'pluggen'
             . \DIRECTORY_SEPARATOR . bin2hex(random_bytes(8));

@@ -44,7 +44,7 @@ $canGen    = $this->getCurrentUser()->authorise('core.generate', 'com_pluggen');
 									<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.published', $listDirn, $listOrder); ?>
 								</th>
 								<th scope="col">
-									<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
+									<?php echo HTMLHelper::_('searchtools.sort', 'COM_PLUGGEN_HEADING_NAME', 'a.name', $listDirn, $listOrder); ?>
 								</th>
 								<th scope="col" class="w-15 d-none d-md-table-cell">
 									<?php echo HTMLHelper::_(
@@ -65,14 +65,14 @@ $canGen    = $this->getCurrentUser()->authorise('core.generate', 'com_pluggen');
 						<?php foreach ($this->items as $i => $item) : ?>
 							<tr class="row<?php echo $i % 2; ?>">
 								<td class="text-center">
-									<?php echo HTMLHelper::_('grid.id', $i, $item->id, false, 'cid', 'cb', $item->title); ?>
+									<?php echo HTMLHelper::_('grid.id', $i, $item->id, false, 'cid', 'cb', $item->name); ?>
 								</td>
 								<td class="text-center">
 									<?php echo HTMLHelper::_('jgrid.published', $item->published, $i, 'blueprints.', true, 'cb'); ?>
 								</td>
 								<th scope="row">
 									<a href="<?php echo Route::_('index.php?option=com_pluggen&task=blueprint.edit&id=' . (int) $item->id); ?>">
-										<?php echo $this->escape($item->title); ?>
+										<?php echo $this->escape($item->name); ?>
 									</a>
 								</th>
 								<td class="d-none d-md-table-cell"><?php echo $this->escape($item->type_id); ?></td>

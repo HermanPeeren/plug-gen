@@ -133,6 +133,6 @@ final class LanguageGenerator implements GeneratorInterface
      */
     private function title(PluginModel $model): string
     {
-        return ucfirst($model->group) . ' - ' . ucfirst(str_replace('_', ' ', $model->element));
+        return ucfirst($model->group) . ' - ' . ucfirst(str_replace('_', ' ', $model->systemName));
     }
 }

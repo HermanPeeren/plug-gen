@@ -7,7 +7,7 @@
  * a crashed run cannot leave rows that make the next one ambiguous; after, so a
  * finished run leaves the site as it found it.
  *
- * Only rows whose title starts with the test marker are deleted. That is the
+ * Only rows whose name starts with the test marker are deleted. That is the
  * whole safety mechanism: this never truncates the table and never touches a
  * blueprint somebody wrote by hand, even when both live in the same database.
  *
@@ -85,7 +85,7 @@ if ($mysqli->query('SHOW TABLES LIKE ' . "'" . $mysqli->real_escape_string($tabl
     exit(0);
 }
 
-$statement = $mysqli->prepare('DELETE FROM `' . $table . '` WHERE `title` LIKE ?');
+$statement = $mysqli->prepare('DELETE FROM `' . $table . '` WHERE `name` LIKE ?');
 
 if ($statement === false) {
     fwrite(STDERR, 'Cannot prepare the delete: ' . $mysqli->error . "\n");

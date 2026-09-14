@@ -1,11 +1,10 @@
 {
-	"modelVersion": "1.0",
+	"modelVersion": "1.1",
 	"target": "joomla-6.0",
 	"plugin": {
 		"group": "task",
-		"element": "recipes",
-		"namespace": "Acme\\Plugin\\Task\\Recipes",
-		"className": "Recipes",
+		"systemName": "recipes",
+		"orgNamespace": "Acme",
 		"version": "1.0.0",
 		"description": "Scheduled maintenance for com_recipes.",
 		"copyright": "(C) 2026 Acme",
