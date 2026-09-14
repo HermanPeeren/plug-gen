@@ -183,7 +183,7 @@ final class TaskTypeTest extends TestCase
             'modelVersion' => PluginModel::CURRENT_VERSION,
             'plugin'       => [
                 'group'     => 'task',
-                'systemName'   => 'recipes',
+                'name'         => 'Recipes',
                 'orgNamespace' => 'Acme',
                 'version'   => '1.0.0',
                 'services'  => ['application' => true],

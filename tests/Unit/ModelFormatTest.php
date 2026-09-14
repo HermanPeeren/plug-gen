@@ -12,10 +12,11 @@ use Yepr\Component\Pluggen\Tests\TestCase;
  * The stored format, and what happens to models written in the older one.
  *
  * Version 1.0 asked for the element, the full namespace and the class name.
- * Version 1.1 asks for the system name and the organisation, and works the
- * other three out. A blueprint saved before that change is still a valid
- * description of a plugin, so it is read rather than refused - and refusing it
- * would be the difference between a user's saved work opening and not.
+ * Version 1.1 asks for a name written the way a person writes it, plus the
+ * organisation, and works the other three out. A blueprint saved before that
+ * change is still a valid description of a plugin, so it is read rather than
+ * refused - and refusing it would be the difference between a user's saved work
+ * opening and not.
  */
 final class ModelFormatTest extends TestCase
 {
@@ -24,11 +25,12 @@ final class ModelFormatTest extends TestCase
         $model = PluginModel::fromArray($this->version10());
 
         $this->assertSame(PluginModel::CURRENT_VERSION, $model->modelVersion);
-        $this->assertSame('recipes', $model->systemName);
+        $this->assertSame('Recipes', $model->name);
         $this->assertSame('Acme', $model->orgNamespace);
 
         // And the derived values come back the same as the ones 1.0 stored.
         $this->assertSame('Recipes', $model->className());
+        $this->assertSame('recipes', $model->elementName());
         $this->assertSame('Acme\\Plugin\\Finder\\Recipes', $model->rootNamespace());
         $this->assertSame('plg_finder_recipes', $model->extensionName());
     }
@@ -47,6 +49,68 @@ final class ModelFormatTest extends TestCase
         $data['plugin']['namespace'] = 'Acme\\Finder\\Recipes';
 
         $this->assertSame('Acme', PluginModel::fromArray($data)->orgNamespace);
+    }
+
+    /**
+     * A 1.0 class name becomes a name again: the capitals were the word
+     * boundaries, so they are where the spaces go back.
+     */
+    public function testAVersion10ClassNameIsSplitBackIntoWords(): void
+    {
+        $data = $this->version10();
+
+        unset($data['plugin']['element'], $data['plugin']['namespace']);
+
+        $data['plugin']['className'] = 'ArticleUpdateNotification';
+
+        $model = PluginModel::fromArray($data);
+
+        $this->assertSame('Article Update Notification', $model->name);
+        $this->assertSame('ArticleUpdateNotification', $model->className());
+        $this->assertSame('articleupdatenotification', $model->elementName());
+        $this->assertSame('plg_finder_articleupdatenotification', $model->extensionName());
+        $this->assertSame('PLG_FINDER_ARTICLEUPDATENOTIFICATION', $model->languagePrefix());
+    }
+
+    /** A run of capitals is one word, not one word per letter, in both directions. */
+    public function testAnAcronymSurvivesTheRoundTrip(): void
+    {
+        $data = $this->version10();
+
+        $data['plugin']['className'] = 'HTMLCleaner';
+
+        $model = PluginModel::fromArray($data);
+
+        $this->assertSame('HTML Cleaner', $model->name);
+        $this->assertSame('HTMLCleaner', $model->className());
+    }
+
+    /**
+     * The names a person would actually type, and the code they all become.
+     *
+     * The fixtures are all one word, so this is the only place the difference
+     * between a name and the identifiers derived from it is visible at all.
+     */
+    public function testAnyReasonableSpellingOfANameGivesTheSameCode(): void
+    {
+        $written = [
+            'Article Update Notification',
+            'article update notification',
+            'Article-update-notification',
+            '  Article   Update   Notification  ',
+        ];
+
+        foreach ($written as $name) {
+            $data = $this->version10();
+
+            $data['modelVersion']   = PluginModel::CURRENT_VERSION;
+            $data['plugin']['name'] = $name;
+
+            $model = PluginModel::fromArray($data);
+
+            $this->assertSame('ArticleUpdateNotification', $model->className(), 'from: ' . $name);
+            $this->assertSame('articleupdatenotification', $model->elementName(), 'from: ' . $name);
+        }
     }
 
     /** A version this code does not know is left alone, so the validator can refuse it. */

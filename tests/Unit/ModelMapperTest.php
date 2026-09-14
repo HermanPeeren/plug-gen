@@ -38,7 +38,6 @@ final class ModelMapperTest extends TestCase
     {
         $model = $this->mapper()->toModel($this->formData());
 
-        $this->assertSame('Recipes', $model['type']['config']['context']);
         $this->assertSame('recipe', $model['type']['config']['itemName']);
         $this->assertSame('$item->prep_time = 1;', $model['slots']['finder.index.elements']['code']);
     }
@@ -61,7 +60,7 @@ final class ModelMapperTest extends TestCase
         $form   = $mapper->toForm($mapper->toModel($this->formData()));
 
         $this->assertSame('finder', $form['plugin_type']);
-        $this->assertSame('recipes', $form['system_name']);
+        $this->assertSame('Recipes', $form['name']);
         $this->assertSame('Acme', $form['org_namespace']);
         $this->assertSame('Recipes', $form['config_finder']['context']);
         $this->assertSame('$item->prep_time = 1;', $form['slots_finder']['finder_index_elements']);
@@ -71,14 +70,17 @@ final class ModelMapperTest extends TestCase
         $this->assertFalse(\array_key_exists('group', $form));
     }
 
-    /** A system name typed with capitals is lowered here, not silently accepted deeper in. */
-    public function testTheSystemNameIsLowercased(): void
+    /** The name is stored as written, tidied of surrounding space only. */
+    public function testTheNameIsStoredAsWritten(): void
     {
         $data = $this->formData();
 
-        $data['system_name'] = '  Recipes  ';
+        $data['name'] = '  Article update notification  ';
 
-        $this->assertSame('recipes', $this->mapper()->toModel($data)['plugin']['systemName']);
+        $this->assertSame(
+            'Article update notification',
+            $this->mapper()->toModel($data)['plugin']['name']
+        );
     }
 
     /** An empty repeatable row is the user opening one and thinking better of it. */
@@ -107,7 +109,7 @@ final class ModelMapperTest extends TestCase
     {
         return [
             'plugin_type'  => 'finder',
-            'system_name'  => 'recipes',
+            'name'         => 'Recipes',
             'org_namespace' => 'Acme',
             'version'      => '1.0.0',
             'services'     => ['application', 'database'],

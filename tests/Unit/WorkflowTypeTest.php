@@ -150,7 +150,7 @@ final class WorkflowTypeTest extends TestCase
             'modelVersion' => PluginModel::CURRENT_VERSION,
             'plugin'       => [
                 'group'     => 'workflow',
-                'systemName'   => 'recipes',
+                'name'         => 'Recipes',
                 'orgNamespace' => 'Acme',
                 'version'   => '1.0.0',
                 'services'  => ['application' => true],

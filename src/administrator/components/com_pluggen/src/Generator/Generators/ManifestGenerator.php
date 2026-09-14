@@ -77,7 +77,7 @@ final class ManifestGenerator implements GeneratorInterface
 
         foreach ($this->folders($files) as $folder) {
             $lines[] = $folder === 'services'
-                ? "\t\t" . '<folder plugin="' . Xml::attr($model->systemName) . '">services</folder>'
+                ? "\t\t" . '<folder plugin="' . Xml::attr($model->elementName()) . '">services</folder>'
                 : "\t\t" . '<folder>' . Xml::text($folder) . '</folder>';
         }
 
@@ -93,7 +93,7 @@ final class ManifestGenerator implements GeneratorInterface
 
         $lines[] = '</extension>';
 
-        $files->add($model->systemName . '.xml', implode("\n", $lines) . "\n");
+        $files->add($model->elementName() . '.xml', implode("\n", $lines) . "\n");
     }
 
     /**

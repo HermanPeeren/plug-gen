@@ -24,11 +24,11 @@ use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
  */
 final class ModelValidator
 {
-    // One lowercase word: no spaces, no underscores, no hyphens. It has to
-    // serve at once as a folder name, a Joomla plugin element, the tail of a
-    // language key and, capitalised, a class name - and the only spelling that
-    // is legal in all four at once is this one.
-    private const SYSTEM_NAME_PATTERN = '/^[a-z][a-z0-9]{0,63}$/';
+    // The name is checked through what it becomes. Users write a name the way
+    // they would write it anywhere - "Article update notification" - and the
+    // class name and element are derived from it, so what has to be legal is
+    // the derivation: a PHP identifier, and short enough to live in a path.
+    private const CLASS_NAME_PATTERN = '/^[A-Za-z][A-Za-z0-9]{0,63}$/';
 
     // The organisation part only, for example "Acme" or "Acme\Labs". The rest of
     // the namespace is derived, so there is nothing here to disagree with.
@@ -75,8 +75,14 @@ final class ModelValidator
             $errors[] = \sprintf('Unknown plugin group "%s".', $model->group);
         }
 
-        if (!preg_match(self::SYSTEM_NAME_PATTERN, $model->systemName)) {
-            $errors[] = 'The system name must be one lowercase word: a letter followed by letters or digits, with no spaces, underscores or hyphens.';
+        if (trim($model->name) === '') {
+            $errors[] = 'The plugin needs a name.';
+        } elseif (!preg_match(self::CLASS_NAME_PATTERN, $model->className())) {
+            $errors[] = \sprintf(
+                'The name "%s" does not give a usable class name. It must contain letters or digits, '
+                . 'and start with a letter.',
+                $model->name
+            );
         }
 
         if (!preg_match(self::ORG_NAMESPACE_PATTERN, $model->orgNamespace)) {

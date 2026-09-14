@@ -61,14 +61,14 @@ describe('Plug-gen blueprint editing', () => {
 
     cy.get('#jform_plugin_type').select('finder');
     openTab('Type Settings');
-    cy.get('#jform_config_finder__context').should('be.visible');
+    cy.get('#jform_config_finder__extension').should('be.visible');
     cy.get('#jform_config_workflow__contexts').should('not.be.visible');
 
     openTab('General');
     cy.get('#jform_plugin_type').select('workflow');
     openTab('Type Settings');
     cy.get('#jform_config_workflow__contexts').should('be.visible');
-    cy.get('#jform_config_finder__context').should('not.be.visible');
+    cy.get('#jform_config_finder__extension').should('not.be.visible');
 
     // A subform renders no input of its own, so the label is what to look for.
     openTab('General');
@@ -99,11 +99,9 @@ describe('Plug-gen blueprint editing', () => {
 
     cy.get('#jform_name').clear().type(`${MARKER}Recipes finder`);
     cy.get('#jform_plugin_type').select('finder');
-    cy.get('#jform_system_name').clear().type('recipes');
     cy.get('#jform_org_namespace').clear().type('Acme');
 
     openTab('Type Settings');
-    cy.get('#jform_config_finder__context').clear().type('Recipes');
     cy.get('#jform_config_finder__extension').clear().type('com_recipes');
     cy.get('#jform_config_finder__itemName').clear().type('recipe');
     cy.get('#jform_config_finder__table').clear().type('#__recipes');
@@ -111,7 +109,7 @@ describe('Plug-gen blueprint editing', () => {
     cy.get('joomla-toolbar-button[task="blueprint.apply"] button').click();
 
     cy.get('#system-message-container').should('contain', 'saved');
-    cy.get('#jform_system_name').should('have.value', 'recipes');
+    cy.get('#jform_name').should('have.value', `${MARKER}Recipes finder`);
 
     // The blueprint survives a round trip through the stored model: the type
     // and its own fields come back as they were entered.
@@ -128,7 +126,6 @@ describe('Plug-gen blueprint editing', () => {
 
     cy.get('#jform_name').clear().type(`${MARKER}Service blueprint`);
     cy.get('#jform_plugin_type').select('finder');
-    cy.get('#jform_system_name').clear().type('svc');
     cy.get('#jform_org_namespace').clear().type('Acme');
 
     // The custom element carries the field's name, not an id.
@@ -167,39 +164,56 @@ describe('Plug-gen blueprint editing', () => {
         cy.request(absolute).then((response) => {
           expect(response.status).to.eq(200);
           expect(response.headers['content-type']).to.contain('application/zip');
-          expect(response.headers['content-disposition']).to.contain('plg_finder_recipes.zip');
+          // The name carries the test marker, and the element is derived from
+          // the whole name - so "[cypress] Recipes finder" really does generate
+          // plg_finder_cypressrecipesfinder. That is the derivation working,
+          // not the test cheating.
+          expect(response.headers['content-disposition'])
+            .to.contain('plg_finder_cypressrecipesfinder.zip');
           // PK: the archive really is an archive.
           expect(response.body.slice(0, 2)).to.eq('PK');
         });
       });
   });
 
-  // A system name that could escape the output directory must be refused before
-  // anything is written. This is the path-safety boundary, so it gets an
-  // end-to-end check as well as a unit test.
-  it('refuses a system name that could escape the output directory', () => {
+  // Path separators in the name never reach a path. They cannot: the element is
+  // derived from the name by keeping letters and digits and dropping the rest,
+  // so there is no spelling of a name that escapes the output directory. This
+  // used to be a rule the validator enforced on a field the user typed
+  // directly; now it is a property of the derivation, and this is the spec that
+  // says so out loud.
+  it('cannot be made to write outside the output directory', () => {
     cy.visit(NEW_BLUEPRINT);
 
-    cy.get('#jform_name').clear().type(`${MARKER}Hostile`);
+    cy.get('#jform_name').clear().type(`${MARKER}../../Evil`);
     cy.get('#jform_plugin_type').select('finder');
-    cy.get('#jform_system_name').clear().type('../../evil');
     cy.get('#jform_org_namespace').clear().type('Acme');
 
     openTab('Type Settings');
-    cy.get('#jform_config_finder__context').clear().type('Evil');
     cy.get('#jform_config_finder__extension').clear().type('com_evil');
     cy.get('#jform_config_finder__itemName').clear().type('evil');
     cy.get('#jform_config_finder__table').clear().type('#__evil');
 
     cy.get('joomla-toolbar-button[task="blueprint.apply"] button').click();
+    cy.get('#system-message-container').should('contain', 'saved');
 
-    // Saving may well succeed - the model is stored, not executed. The gate
-    // that matters is generation, which must refuse to write such a plugin.
-    cy.get('body').then(($body) => {
-      if ($body.find('joomla-toolbar-button[task="blueprint.generate"]').length) {
-        cy.get('joomla-toolbar-button[task="blueprint.generate"] button').click();
-        cy.get('#system-message-container').should('contain', 'system name');
-      }
-    });
+    cy.visit(`${ADMIN}?option=com_pluggen&view=blueprints`);
+
+    cy.get('#blueprintList tbody tr')
+      .contains('th a', `${MARKER}../../Evil`)
+      .parents('tr')
+      .find('a.btn')
+      .invoke('attr', 'href')
+      .then((href) => {
+        const absolute = new URL(href, Cypress.config('baseUrl')).toString();
+
+        cy.request(absolute).then((response) => {
+          const disposition = response.headers['content-disposition'];
+
+          expect(disposition).to.contain('plg_finder_cypressevil.zip');
+          expect(disposition).to.not.contain('..');
+          expect(disposition).to.not.contain('/');
+        });
+      });
   });
 });

@@ -36,7 +36,7 @@ final class PluginModel
      * @param   string   $modelVersion      The model format version.
      * @param   string   $target            The Joomla version the output targets.
      * @param   string   $group             The plugin group.
-     * @param   string   $systemName        The plugin system name: one lowercase word.
+     * @param   string   $name              The plugin's name, as a person would write it.
      * @param   string   $orgNamespace      The organisation namespace, for example "Acme".
      * @param   string   $version           The plugin version.
      * @param   string   $description       The plugin description.
@@ -58,7 +58,7 @@ final class PluginModel
         public readonly string $modelVersion,
         public readonly string $target,
         public readonly string $group,
-        public readonly string $systemName,
+        public readonly string $name,
         public readonly string $orgNamespace,
         public readonly string $version,
         public readonly string $description,
@@ -110,7 +110,7 @@ final class PluginModel
             modelVersion: $version,
             target: self::asString($data['target'] ?? 'joomla-6.0'),
             group: self::asString($plugin['group'] ?? ''),
-            systemName: self::asString($plugin['systemName'] ?? ''),
+            name: self::asString($plugin['name'] ?? ''),
             orgNamespace: trim(self::asString($plugin['orgNamespace'] ?? ''), '\\'),
             version: self::asString($plugin['version'] ?? '1.0.0'),
             description: self::asString($plugin['description'] ?? ''),
@@ -167,7 +167,7 @@ final class PluginModel
             'target'       => $this->target,
             'plugin'       => [
                 'group'            => $this->group,
-                'systemName'       => $this->systemName,
+                'name'             => $this->name,
                 'orgNamespace'     => $this->orgNamespace,
                 'version'          => $this->version,
                 'description'      => $this->description,
@@ -211,7 +211,7 @@ final class PluginModel
      */
     public function extensionName(): string
     {
-        return 'plg_' . $this->group . '_' . $this->systemName;
+        return 'plg_' . $this->group . '_' . $this->elementName();
     }
 
     /**
@@ -227,10 +227,13 @@ final class PluginModel
     }
 
     /**
-     * The plugin class name, for example "Recipes".
+     * The plugin class name, for example "ArticleUpdateNotification".
      *
-     * Derived from the system name, which is why the form no longer asks for
-     * it: the two can then never disagree.
+     * The name in PascalCase. Only letters and digits survive, each word
+     * capitalised: "Article update notification", "article-update-notification"
+     * and "Article Update Notification" all arrive here as the same class.
+     * Capitals already inside a word are kept, so "HTML cleaner" gives
+     * "HTMLCleaner" rather than "HtmlCleaner".
      *
      * @return  string  The class name.
      *
@@ -238,7 +241,26 @@ final class PluginModel
      */
     public function className(): string
     {
-        return ucfirst($this->systemName);
+        $words = preg_split('/[^A-Za-z0-9]+/', $this->name, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        return implode('', array_map(static fn(string $word): string => ucfirst($word), $words));
+    }
+
+    /**
+     * The plugin element, for example "articleupdatenotification".
+     *
+     * What Joomla calls the element: the folder under plugins/<group>/, the
+     * element column in #__extensions, and the tail of the language key. Joomla
+     * writes these in lowercase and without separators, which is the class name
+     * with its capitals dropped.
+     *
+     * @return  string  The element name.
+     *
+     * @since   0.4.2
+     */
+    public function elementName(): string
+    {
+        return strtolower($this->className());
     }
 
     /**
@@ -246,7 +268,7 @@ final class PluginModel
      *
      * Derived, never asked for: Joomla fixes every part of it but the
      * organisation. A plugin whose namespace disagrees with its group or its
-     * system name does not autoload, and that is a wrong answer no form should
+     * name does not autoload, and that is a wrong answer no form should
      * be able to give.
      *
      * @return  string  The namespace, without leading backslash.
@@ -355,9 +377,12 @@ final class PluginModel
     /**
      * Bring a 1.0 plugin block up to the current format.
      *
-     * Three keys changed when the form stopped asking for what it could work
-     * out: "element" became "systemName", while "namespace" and "className"
-     * went away because both follow from the system name and the group. The
+     * The form stopped asking for what it could work out. Where 1.0 stored an
+     * element, a class name and a namespace, there is now one human readable
+     * name that all three are derived from - so the class name is what to keep,
+     * split back into words, since it is the only one of the three that still
+     * carries them. "namespace" went away because it follows from the name and
+     * the group. The
      * organisation is what stood before "\Plugin\" in the old namespace, or its
      * first segment when that namespace did not follow the convention.
      *
@@ -369,7 +394,16 @@ final class PluginModel
      */
     private static function upgradeFrom10(array $plugin): array
     {
-        $plugin['systemName'] = self::asString($plugin['systemName'] ?? $plugin['element'] ?? '');
+        $source = self::asString(
+            $plugin['className'] ?? ucfirst((string) ($plugin['element'] ?? ''))
+        );
+
+        // PascalCase back into words: the capitals were the word boundaries. A
+        // run of capitals stays one word, so "HTMLCleaner" is "HTML Cleaner"
+        // and not four words.
+        $plugin['name'] = trim(
+            (string) preg_replace('/(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ' ', $source)
+        );
 
         if (!isset($plugin['orgNamespace'])) {
             $namespace = trim(self::asString($plugin['namespace'] ?? ''), '\\');

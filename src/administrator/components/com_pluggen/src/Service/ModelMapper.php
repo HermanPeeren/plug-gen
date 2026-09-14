@@ -61,10 +61,10 @@ final class ModelMapper
             'target'       => (string) ($data['target'] ?? 'joomla-6.0'),
             'plugin'       => [
                 'group'            => $this->group($typeId),
-                // Lowercased here rather than in the model: this is the edge the
-                // user's typing arrives at, and normalising it further in would
-                // mean the model quietly accepted what the validator forbids.
-                'systemName'       => strtolower(trim((string) ($data['system_name'] ?? ''))),
+                // The one name the user writes. The class name, the element,
+                // the folder and the language keys are all derived from it, so
+                // only the spacing is tidied here.
+                'name'             => trim((string) ($data['name'] ?? '')),
                 'orgNamespace'     => trim((string) ($data['org_namespace'] ?? ''), '\\ '),
                 'version'          => (string) ($data['version'] ?? '1.0.0'),
                 'description'      => (string) ($data['description'] ?? ''),
@@ -105,7 +105,7 @@ final class ModelMapper
 
         $data = [
             'target'           => (string) ($model['target'] ?? 'joomla-6.0'),
-            'system_name'      => (string) ($plugin['systemName'] ?? ''),
+            'name'             => (string) ($plugin['name'] ?? ''),
             'org_namespace'    => (string) ($plugin['orgNamespace'] ?? ''),
             'version'          => (string) ($plugin['version'] ?? '1.0.0'),
             'description'      => (string) ($plugin['description'] ?? ''),

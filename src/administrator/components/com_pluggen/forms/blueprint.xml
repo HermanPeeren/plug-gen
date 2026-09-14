@@ -8,6 +8,13 @@
 <form>
 	<field name="id" type="number" label="JGLOBAL_FIELD_ID_LABEL" default="0" class="readonly" readonly="true"/>
 
+	<!--
+		The plugin's name, written the way a person would write it. Everything
+		the code needs is derived from it: the class name is this in PascalCase,
+		the folder, the element and the language keys are that lowercased, and
+		the namespace follows from it and from the group. So there is one name to
+		get right, and no second field that can disagree with it.
+	-->
 	<field
 		name="name"
 		type="text"
@@ -48,23 +55,6 @@
 		<option value="joomla-6.0">Joomla 6</option>
 		<option value="joomla-5.0">Joomla 5</option>
 	</field>
-
-	<!--
-		The system name is one lowercase word, because it has to serve at once as
-		a folder name, the plugin element, the tail of every language key and,
-		capitalised, the class name. The class name and the full namespace are
-		derived from it and from the group, so the form does not ask: a value the
-		user could set wrong is a value that can disagree with the one Joomla
-		will look for.
-	-->
-	<field
-		name="system_name"
-		type="text"
-		label="COM_PLUGGEN_FIELD_SYSTEM_NAME_LABEL"
-		description="COM_PLUGGEN_FIELD_SYSTEM_NAME_DESC"
-		hint="recipes"
-		required="true"
-		/>
 
 	<field
 		name="org_namespace"

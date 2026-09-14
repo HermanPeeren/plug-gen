@@ -117,12 +117,10 @@ final class SecurityTest extends TestCase
     public function testHostileModelValuesAreRejected(): void
     {
         $cases = [
-            'system name traversal'  => ['systemName' => '../../evil'],
-            'system name with slash' => ['systemName' => 'a/b'],
-            'uppercase system name'  => ['systemName' => 'Recipes'],
-            'system name with space' => ['systemName' => 'my recipes'],
-            'system name underscore' => ['systemName' => 'my_recipes'],
-            'system name hyphen'     => ['systemName' => 'my-recipes'],
+            'name of separators'     => ['name' => '../../'],
+            'empty name'             => ['name' => '   '],
+            'name of punctuation'    => ['name' => '- - -'],
+            'name starting a digit'  => ['name' => '3 blind mice'],
             'unknown group'          => ['group' => 'evil'],
             'group traversal'        => ['group' => '../finder'],
             'namespace with code'    => ['orgNamespace' => 'Acme; echo 1'],
@@ -151,12 +149,12 @@ final class SecurityTest extends TestCase
     {
         $plugin = array_merge([
             'group'        => 'finder',
-            'systemName'   => 'recipes',
+            'name'         => 'Recipes',
             'orgNamespace' => 'Acme',
             'version'      => '1.0.0',
         ], array_intersect_key(
             $override,
-            array_flip(['group', 'systemName', 'orgNamespace', 'version', 'customServices'])
+            array_flip(['group', 'name', 'orgNamespace', 'version', 'customServices'])
         ));
 
         if (isset($override['authorUrl'])) {

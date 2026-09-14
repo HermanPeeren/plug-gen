@@ -29,13 +29,6 @@
 		>
 		<form>
 			<field
-				name="context"
-				type="text"
-				label="COM_PLUGGEN_FINDER_FIELD_CONTEXT_LABEL"
-				description="COM_PLUGGEN_FINDER_FIELD_CONTEXT_DESC"
-				/>
-
-			<field
 				name="extension"
 				type="text"
 				label="COM_PLUGGEN_FINDER_FIELD_EXTENSION_LABEL"

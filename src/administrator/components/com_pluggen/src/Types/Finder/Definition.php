@@ -144,21 +144,6 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
     {
         $errors = [];
 
-        $context = (string) $model->config('context', '');
-
-        if (!preg_match('/^[A-Za-z][A-Za-z0-9_]*$/', $context)) {
-            $errors[] = 'The finder context must be a plain identifier, for example "Recipes".';
-        } elseif (strtolower($context) !== $model->systemName) {
-            // pluginDisable() matches getPluginType($id) against strtolower($context),
-            // so a context that does not match the element silently never fires.
-            $errors[] = \sprintf(
-                'The finder context "%s" must match the plugin element "%s" apart from capitals, '
-                . 'otherwise un-indexing on disable will not work.',
-                $context,
-                $model->systemName
-            );
-        }
-
         if (!preg_match('/^com_[a-z][a-z0-9_]*$/', (string) $model->config('extension', ''))) {
             $errors[] = 'The indexed extension must be a component name such as "com_recipes".';
         }

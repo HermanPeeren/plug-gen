@@ -350,7 +350,7 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
         // recipes plugin would advertise PLG_TASK_RECIPES_RECIPES_CLEANUP.
         $segments = explode('.', $id);
 
-        if (\count($segments) > 1 && strcasecmp($segments[0], $model->systemName) === 0) {
+        if (\count($segments) > 1 && strcasecmp($segments[0], $model->elementName()) === 0) {
             array_shift($segments);
         }
 

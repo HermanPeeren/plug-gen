@@ -165,7 +165,7 @@ final class ServiceProviderGenerator implements GeneratorInterface
         }
 
         $body[] = $indent . '$plugin = new ' . $class . '(';
-        $body[] = $indent . '    (array) PluginHelper::getPlugin(' . Php::string($model->group) . ', ' . Php::string($model->systemName) . ')';
+        $body[] = $indent . '    (array) PluginHelper::getPlugin(' . Php::string($model->group) . ', ' . Php::string($model->elementName()) . ')';
         $body[] = $indent . ');';
 
         foreach ($setters as $setter) {

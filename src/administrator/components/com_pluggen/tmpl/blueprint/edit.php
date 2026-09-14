@@ -44,7 +44,6 @@ foreach ($this->form->getFieldset() as $field) {
 				<?php echo $this->form->renderField('name'); ?>
 				<?php echo $this->form->renderField('plugin_type'); ?>
 				<?php echo $this->form->renderField('target'); ?>
-				<?php echo $this->form->renderField('system_name'); ?>
 				<?php echo $this->form->renderField('org_namespace'); ?>
 				<?php echo $this->form->renderField('version'); ?>
 			</div>

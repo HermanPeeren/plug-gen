@@ -9,11 +9,11 @@
  * @var callable $region  render a protected region, pre-filled from the model slot
  */
 
-$context       = (string) $m->config('context');
+$context       = $m->className();
 $extension     = (string) $m->config('extension');
 $table         = (string) $m->config('table');
-$layout        = (string) $m->config('layout', strtolower($m->systemName));
-$typeTitle     = (string) $m->config('typeTitle', ucfirst($m->systemName));
+$layout        = (string) $m->config('layout', $m->elementName());
+$typeTitle     = (string) $m->config('typeTitle', $m->name);
 $stateField    = (string) $m->config('stateField', 'state');
 $hasCategories = (bool) $m->config('hasCategories', false);
 // The context is <extension>.<model name>, and the model name is the component's,

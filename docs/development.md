@@ -95,23 +95,41 @@ underscore: `jform_config_finder__context`. The Cypress specs select on those.
 
 ### What the form asks for, and what it works out
 
-The system name is one lowercase word - no spaces, underscores or hyphens. It
-has to be at once a folder name, the plugin element, the tail of every language
-key, and capitalised a class name, and that is the only spelling legal in all
-four at once.
+The form asks for the plugin's **name**, written the way anyone would write it:
+`Article Update Notification`. Everything the code needs is derived from it,
+each in the shape that consumer wants:
 
-From it and the plugin group, the model derives the class name
-(`PluginModel::className()`) and the whole namespace
-(`rootNamespace()`: `Acme\Plugin\Finder\Recipes`, group studly-cased as Joomla
-does it). The form asks only for the organisation. A field the user can set is a
-field they can set wrong, and a plugin whose namespace disagrees with its group
-does not autoload - a failure with no message attached.
+| | |
+|---|---|
+| `className()` | `ArticleUpdateNotification` - also the namespace segment, and the finder adapter's `$context` |
+| `elementName()` | `articleupdatenotification` - the folder under `plugins/<group>/`, the `element` column, the tail of the language key |
+| the name itself | the readable half of `PLG_FINDER_... = "Finder - Article Update Notification"` |
 
-Answers that repeat across every plugin one organisation writes - the
-organisation, the author, the copyright, whether to autoload the language file -
-are component options, copied into a blueprint when it is created. Only then: a
-saved blueprint owns its values, so editing an option later cannot change what
-an existing blueprint generates.
+The conversion keeps letters and digits, capitalises each word and drops
+everything else, so `article update notification`, `Article-Update-Notification`
+and `Article Update Notification` are the same plugin. Capitals already inside a
+word survive, so `HTML cleaner` gives `HTMLCleaner` and not `HtmlCleaner`.
+What is validated is the *result*: a name has to yield a legal PHP identifier.
+
+This is also why nothing in the model can name a path any more. The element is
+letters and digits by construction, so there is no spelling of a name that
+escapes the output directory - what used to be a rule enforced on a field the
+user typed is now a property of the derivation, and a Cypress spec says so.
+
+The whole namespace follows as well (`rootNamespace()`:
+`Acme\Plugin\Finder\ArticleUpdateNotification`, group studly-cased as Joomla
+does it), so the form asks only for the organisation. A field the user can set
+is a field they can set wrong, and a plugin whose namespace disagrees with its
+group does not autoload - a failure with no message attached.
+
+The same reasoning removed the finder type's `context` field. It is the string
+Smart Search matches in `pluginDisable()`, and the type's own validation
+required it to equal the element apart from capitals - so it could never be
+anything but the class name, and it is now derived rather than asked for.
+
+Note that the fixtures cannot show any of this: every one of them is called
+`Recipes`, one word, where the three forms differ only in capitals.
+`ModelFormatTest` carries the multi-word cases.
 
 ### Injected services
 
@@ -125,9 +143,11 @@ parse and the user meets that as a white page on their own site.
 
 ## The stored format
 
-The model JSON carries `modelVersion`. It is at **1.1**, which renamed
-`plugin.element` to `plugin.systemName` and replaced `plugin.namespace` and
-`plugin.className` with `plugin.orgNamespace`.
+The model JSON carries `modelVersion`. It is at **1.1**, which replaced `plugin.element`, `plugin.namespace` and
+`plugin.className` with `plugin.name` and `plugin.orgNamespace`. Reading a 1.0
+model, the class name is the one of the three that still carries the word
+boundaries, so it is split back into a name: `ArticleUpdateNotification` becomes
+`Article Update Notification`, which derives all three again identically.
 
 `PluginModel::fromArray()` reads a 1.0 model and upgrades it on the way in, so a
 blueprint saved before the change still opens; the upgraded model is written

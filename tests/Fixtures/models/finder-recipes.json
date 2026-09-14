@@ -3,7 +3,7 @@
 	"target": "joomla-6.0",
 	"plugin": {
 		"group": "finder",
-		"systemName": "recipes",
+		"name": "Recipes",
 		"orgNamespace": "Acme",
 		"version": "1.0.0",
 		"description": "Smart Search adapter that indexes com_recipes recipes.",
@@ -42,7 +42,6 @@
 	"type": {
 		"id": "finder",
 		"config": {
-			"context": "Recipes",
 			"extension": "com_recipes",
 			"itemName": "recipe",
 			"table": "#__recipes",
