@@ -125,15 +125,19 @@ class BlueprintController extends FormController implements ZipWriterAwareInterf
         $item = $model->getItem($id);
 
         // The model has just passed validation inside generate(), so its own
-        // extensionName() is a checked value; it is stripped again here anyway,
-        // because this string becomes a file name and a download header.
+        // packageName() is built from checked values; it is stripped again here
+        // anyway, because this string becomes a file name and a download header.
         // Deriving it from the model rather than re-reading the stored JSON also
         // means the name cannot drift from what the manifest inside the archive
         // says.
+        //
+        // The version puts dots in the name, which are the one character worth
+        // a second thought in a path: any run of them is collapsed, so no
+        // stripped remainder can ever spell a parent directory.
         $name = preg_replace(
-            '/[^a-z0-9_]/',
-            '',
-            PluginModel::fromJson((string) $item->model)->extensionName()
+            ['/[^a-z0-9_.-]/', '/\.{2,}/'],
+            ['', '.'],
+            strtolower(PluginModel::fromJson((string) $item->model)->packageName())
         );
 
         $directory = rtrim($app->get('tmp_path'), '/\\') . \DIRECTORY_SEPARATOR . 'pluggen'

@@ -215,6 +215,23 @@ final class PluginModel
     }
 
     /**
+     * The package file name, for example "plg_finder_recipes-1.0.0".
+     *
+     * The version belongs in the name for the same reason it does in Plug-gen's
+     * own releases: a downloads folder full of plg_finder_recipes.zip files
+     * says nothing about which is which, and the one that matters is usually
+     * not the newest by timestamp.
+     *
+     * @return  string  The package name, without an extension.
+     *
+     * @since   0.4.3
+     */
+    public function packageName(): string
+    {
+        return $this->extensionName() . '-' . $this->version;
+    }
+
+    /**
      * The language key prefix, for example "PLG_FINDER_RECIPES".
      *
      * @return  string  The prefix.

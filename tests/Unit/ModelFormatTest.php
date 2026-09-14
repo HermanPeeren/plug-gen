@@ -113,6 +113,33 @@ final class ModelFormatTest extends TestCase
         }
     }
 
+    /** The package is named after the plugin and the version it is. */
+    public function testThePackageNameCarriesTheVersion(): void
+    {
+        $data = $this->version10();
+
+        $data['modelVersion']      = PluginModel::CURRENT_VERSION;
+        $data['plugin']['name']    = 'Article Update Notification';
+        $data['plugin']['version'] = '2.1.0';
+
+        $this->assertSame(
+            'plg_finder_articleupdatenotification-2.1.0',
+            PluginModel::fromArray($data)->packageName()
+        );
+    }
+
+    /** A prerelease version is a version, and survives into the name intact. */
+    public function testAPrereleaseVersionIsKeptWholeInThePackageName(): void
+    {
+        $data = $this->version10();
+
+        $data['modelVersion']      = PluginModel::CURRENT_VERSION;
+        $data['plugin']['name']    = 'Recipes';
+        $data['plugin']['version'] = '1.0.0-beta.2';
+
+        $this->assertSame('plg_finder_recipes-1.0.0-beta.2', PluginModel::fromArray($data)->packageName());
+    }
+
     /** A version this code does not know is left alone, so the validator can refuse it. */
     public function testAnUnknownVersionIsNotSilentlyUpgraded(): void
     {

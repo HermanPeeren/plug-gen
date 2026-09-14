@@ -167,9 +167,9 @@ describe('Plug-gen blueprint editing', () => {
           // The name carries the test marker, and the element is derived from
           // the whole name - so "[cypress] Recipes finder" really does generate
           // plg_finder_cypressrecipesfinder. That is the derivation working,
-          // not the test cheating.
+          // not the test cheating. The version is the form's default.
           expect(response.headers['content-disposition'])
-            .to.contain('plg_finder_cypressrecipesfinder.zip');
+            .to.contain('plg_finder_cypressrecipesfinder-1.0.0.zip');
           // PK: the archive really is an archive.
           expect(response.body.slice(0, 2)).to.eq('PK');
         });
@@ -210,7 +210,7 @@ describe('Plug-gen blueprint editing', () => {
         cy.request(absolute).then((response) => {
           const disposition = response.headers['content-disposition'];
 
-          expect(disposition).to.contain('plg_finder_cypressevil.zip');
+          expect(disposition).to.contain('plg_finder_cypressevil-1.0.0.zip');
           expect(disposition).to.not.contain('..');
           expect(disposition).to.not.contain('/');
         });

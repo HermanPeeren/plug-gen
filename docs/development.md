@@ -131,6 +131,20 @@ Note that the fixtures cannot show any of this: every one of them is called
 `Recipes`, one word, where the three forms differ only in capitals.
 `ModelFormatTest` carries the multi-word cases.
 
+### The generated package
+
+The archive a blueprint generates is named `plg_<group>_<element>-<version>.zip`
+- `plg_finder_articleupdatenotification-1.0.0.zip` - from `packageName()` on the
+model. The version is in the name for the same reason it is in Plug-gen's own
+releases: a downloads folder full of identically named archives says nothing
+about which is which, and the one that matters is usually not the newest by
+timestamp.
+
+The controller strips the name again before it becomes a path and a download
+header, even though the model it came from has just passed validation. The
+version puts dots in a file name, so any run of them is collapsed to one: no
+stripped remainder can spell a parent directory.
+
 ### Injected services
 
 Beside the fixed list of stock services, a blueprint can declare any number of
