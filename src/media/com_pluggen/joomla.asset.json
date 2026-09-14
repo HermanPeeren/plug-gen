@@ -1,0 +1,22 @@
+{
+	"$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+	"name": "com_pluggen",
+	"version": "0.4.4",
+	"description": "Plug-gen administrator assets",
+	"license": "GPL-3.0-or-later",
+	"assets": [
+		{
+			"name": "com_pluggen.admin",
+			"type": "style",
+			"uri": "com_pluggen/admin.css"
+		},
+		{
+			"name": "com_pluggen.descriptions",
+			"type": "script",
+			"uri": "com_pluggen/descriptions.js",
+			"attributes": {
+				"defer": true
+			}
+		}
+	]
+}

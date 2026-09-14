@@ -38,15 +38,15 @@ src/                                            the installable component
     src/{Controller,Model,View,Table,Extension}/
     forms/ language/ services/ sql/ tmpl/
   components/com_pluggen/                       site code, when there is any
-  media/com_pluggen/                            css and js, when there is any
+  media/com_pluggen/                            css, js and joomla.asset.json
 tests/                                          unit tests + golden fixtures
 cypress/                                        end-to-end specs
 build/build.php                                 assembles the installable zip
 ```
 
-The last two are not there yet; the manifest carries the blocks they will need
-as a comment. The build script copies whatever is under `src/`, so adding them
-is a matter of writing files and uncommenting.
+The site folder is not there yet; the manifest carries the block it will need as
+a comment. The build script copies whatever is under `src/`, so adding it is a
+matter of writing files and uncommenting.
 
 ## Plugin types and plugin groups
 
@@ -130,6 +130,32 @@ anything but the class name, and it is now derived rather than asked for.
 Note that the fixtures cannot show any of this: every one of them is called
 `Recipes`, one word, where the three forms differ only in capitals.
 `ModelFormatTest` carries the multi-word cases.
+
+### Field descriptions
+
+Every field on the blueprint form carries a description, which is useful the
+first few times and clutter after that. A toolbar button shows and hides them,
+and the state it starts in is a component option - on by default, because the
+descriptions are the documentation.
+
+Joomla core has the same button, and this does not use it. Core's
+`ToolbarHelper::inlinehelp()` toggles a class that `layouts/joomla/form/`
+`renderfield.php` puts on each description, and only when the form's XML carries
+`<config><inlinehelp button="show"/></config>`. A subform builds a child Form
+from the `<form>` element inside the field, which has no `<config>` of its own,
+so the class never reaches a subform's children - and on this form the type
+settings and the custom code are subforms. Core's button would toggle the
+descriptions on the General tab and leave the rest alone.
+
+What is toggled instead is one class on the `<form>`, with a CSS rule matching
+`div[id$="-desc"]` - the id Joomla gives every description container, subform or
+not. The starting state is rendered server-side, so the page never shows
+descriptions the user asked not to see and then removes them once a script runs.
+`media/com_pluggen/js/descriptions.js` flips that class and, as core does, keeps
+`aria-describedby` in step: a control should not claim to be described by
+something that is not on screen. Both halves have a Cypress spec, one of them
+asserting on a field inside a subform, which is the case that motivated all of
+this.
 
 ### The generated package
 
@@ -277,8 +303,8 @@ disagrees with it.
 
 1. Edit `<version>` in `src/pluggen.xml` (and `package.json`, which is cosmetic
    but easier to keep in step than to explain later).
-2. Run `php build/update-xml.php`, which rewrites `updates.xml` from the
-   manifest.
+2. Run `php build/update-xml.php`, which rewrites `updates.xml` and the version
+   in `media/com_pluggen/joomla.asset.json` from the manifest.
 3. Commit both.
 4. Create the tag `v<version>` and push it with the tag included. In PhpStorm:
    **Git > New Tag...**, then **Git > Push...** with *Push Tags* ticked.
@@ -292,6 +318,10 @@ To build locally without releasing: `composer build`, or run `build/build.php`
 from the Composer tool window in PhpStorm.
 
 ### The update server
+
+The media asset manifest carries the version Joomla appends to every asset URL,
+so a stale one serves a cached stylesheet after an upgrade. It is written by the
+same script as `updates.xml` and checked by the same workflow step.
 
 An installed site learns about a new version from `updates.xml` in the root of
 this repository, served raw by GitHub and pointed at by `<updateservers>` in the

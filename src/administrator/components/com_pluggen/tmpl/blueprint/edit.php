@@ -33,8 +33,16 @@ foreach ($this->form->getFieldset() as $field) {
     }
 }
 ?>
+<?php
+// The starting state of the field descriptions comes from the component
+// options and is rendered as a class, so the page never shows descriptions the
+// user asked not to see and then hides them once a script has loaded. The data
+// attribute is what descriptions.js looks for.
+$descriptionClass = $this->showDescriptions ? '' : ' pluggen-descriptions-hidden';
+?>
 <form action="<?php echo Route::_('index.php?option=com_pluggen&layout=edit&id=' . (int) $this->item->id); ?>"
-	method="post" name="adminForm" id="blueprint-form" class="form-validate">
+	method="post" name="adminForm" id="blueprint-form"
+	class="form-validate<?php echo $descriptionClass; ?>" data-pluggen-descriptions="">
 
 	<?php echo HTMLHelper::_('uitab.startTabSet', 'blueprintTab', ['active' => 'general', 'recall' => true]); ?>
 

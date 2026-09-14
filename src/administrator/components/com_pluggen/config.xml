@@ -58,6 +58,27 @@
 		</field>
 	</fieldset>
 
+	<!--
+		How the edit form starts out. Not a default that is copied into a
+		blueprint: this one describes the screen rather than the plugin, so it
+		applies every time the form is opened and the toolbar button overrides it
+		for as long as the page is open.
+	-->
+	<fieldset name="interface" label="COM_PLUGGEN_CONFIG_INTERFACE_LABEL" description="COM_PLUGGEN_CONFIG_INTERFACE_DESC">
+		<field
+			name="show_descriptions"
+			type="radio"
+			layout="joomla.form.field.radio.switcher"
+			label="COM_PLUGGEN_CONFIG_SHOW_DESCRIPTIONS_LABEL"
+			description="COM_PLUGGEN_CONFIG_SHOW_DESCRIPTIONS_DESC"
+			default="1"
+			filter="integer"
+			>
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+	</fieldset>
+
 	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
 		<field
 			name="rules"

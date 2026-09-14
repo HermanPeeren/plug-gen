@@ -6,7 +6,7 @@
 	<copyright>(C) 2026 Herman Peeren</copyright>
 	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
 	<authorUrl>https://yepr.nl</authorUrl>
-	<version>0.4.3</version>
+	<version>0.4.4</version>
 	<description>COM_PLUGGEN_XML_DESCRIPTION</description>
 	<namespace path="src">Yepr\Component\Pluggen</namespace>
 
@@ -59,21 +59,22 @@
 	</updateservers>
 
 	<!--
-		The site and media folders exist in the repository layout but carry no
-		files yet. Declaring an empty folder makes the installer copy nothing and
-		report a missing source, so the blocks are written out here rather than
-		left to be re-derived:
+		The site folder exists in the repository layout but carries no files yet.
+		Declaring an empty folder makes the installer copy nothing and report a
+		missing source, so the block is written out here rather than left to be
+		re-derived:
 
 		<files folder="components/com_pluggen">
 			<folder>src</folder>
 			<folder>tmpl</folder>
 		</files>
-		<media destination="com_pluggen" folder="media/com_pluggen">
-			<folder>css</folder>
-			<folder>js</folder>
-		</media>
 
-		The site <files> block goes before <administration>, the <media> block
-		after it; both are children of <extension>.
+		It goes before <administration>, as a child of <extension>.
 	-->
+
+	<media destination="com_pluggen" folder="media/com_pluggen">
+		<folder>css</folder>
+		<folder>js</folder>
+		<filename>joomla.asset.json</filename>
+	</media>
 </extension>

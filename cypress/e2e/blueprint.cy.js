@@ -118,6 +118,44 @@ describe('Plug-gen blueprint editing', () => {
     cy.get('#jform_config_finder__itemName').should('have.value', 'recipe');
   });
 
+  // Descriptions start visible because the component option says so, and the
+  // toolbar button hides them. Core's own inline help button toggles a class
+  // that its field layout puts on each description, which never reaches a
+  // subform's children - and most of this form is subforms, so the assertions
+  // below deliberately look at a field inside one.
+  it('shows field descriptions and lets the toolbar hide them', () => {
+    cy.visit(NEW_BLUEPRINT);
+
+    cy.get('#jform_name-desc').should('be.visible');
+
+    cy.get('#jform_plugin_type').select('finder');
+    openTab('Type Settings');
+    cy.get('#jform_config_finder__extension-desc').should('be.visible');
+
+    cy.get('.button-descriptions').click();
+
+    cy.get('#jform_config_finder__extension-desc').should('not.be.visible');
+    openTab('General');
+    cy.get('#jform_name-desc').should('not.be.visible');
+
+    cy.get('.button-descriptions').click();
+    cy.get('#jform_name-desc').should('be.visible');
+  });
+
+  // The control should not claim to be described by something that is not on
+  // screen, which is the one part of this a class on the form cannot do alone.
+  it('keeps aria-describedby in step with what is visible', () => {
+    cy.visit(NEW_BLUEPRINT);
+
+    cy.get('#jform_name').should('have.attr', 'aria-describedby', 'jform_name-desc');
+
+    cy.get('.button-descriptions').click();
+    cy.get('#jform_name').should('not.have.attr', 'aria-describedby');
+
+    cy.get('.button-descriptions').click();
+    cy.get('#jform_name').should('have.attr', 'aria-describedby', 'jform_name-desc');
+  });
+
   // A repeatable subform posts rows under keys the layout invents, so the only
   // way to know the mapper reads them is to let a browser post one. The row has
   // to survive the trip out to the stored model and back into the form.

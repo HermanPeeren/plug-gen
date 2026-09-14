@@ -13,6 +13,8 @@ use Joomla\CMS\Document\HtmlDocument;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\Registry\Registry;
+use Yepr\Component\Pluggen\Administrator\Contract\ComponentParamsAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Model\BlueprintModel;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -24,7 +26,7 @@ use Yepr\Component\Pluggen\Administrator\Model\BlueprintModel;
  *
  * @since  0.1.0
  */
-class HtmlView extends BaseHtmlView
+class HtmlView extends BaseHtmlView implements ComponentParamsAwareInterface
 {
     /**
      * The edit form.
@@ -49,6 +51,38 @@ class HtmlView extends BaseHtmlView
      * @since  0.1.0
      */
     protected $state;
+
+    /**
+     * Whether the field descriptions start out visible.
+     *
+     * Read by the layout, which puts the starting state on the form as a class.
+     *
+     * @var    boolean
+     * @since  0.4.4
+     */
+    protected $showDescriptions = true;
+
+    /**
+     * The component's own options.
+     *
+     * @var    Registry
+     * @since  0.4.4
+     */
+    private Registry $params;
+
+    /**
+     * Set the component options.
+     *
+     * @param   Registry  $params  The component options.
+     *
+     * @return  void
+     *
+     * @since   0.4.4
+     */
+    public function setComponentParams(Registry $params): void
+    {
+        $this->params = $params;
+    }
 
     /**
      * Display the edit form.
@@ -76,6 +110,8 @@ class HtmlView extends BaseHtmlView
         $this->item  = $model->getItem();
         $this->state = $model->getState();
 
+        $this->showDescriptions = (bool) $this->params->get('show_descriptions', 1);
+
         $this->addToolbar();
 
         parent::display($tpl);
@@ -98,7 +134,11 @@ class HtmlView extends BaseHtmlView
             return;
         }
 
-        $document->getWebAssetManager()->useScript('keepalive')->useScript('form.validate');
+        $document->getWebAssetManager()
+            ->useScript('keepalive')
+            ->useScript('form.validate')
+            ->useStyle('com_pluggen.admin')
+            ->useScript('com_pluggen.descriptions');
 
         $toolbar = $document->getToolbar();
 
@@ -122,6 +162,14 @@ class HtmlView extends BaseHtmlView
             $toolbar->standardButton('download', Text::_('COM_PLUGGEN_TOOLBAR_GENERATE'), 'blueprint.generate')
                 ->icon('icon-download');
         }
+
+        // No task: the script bound to the class does the work, the way core's
+        // own inline help button does. The class is set here rather than left to
+        // the button's name, so nothing depends on how core happens to build it.
+        $toolbar->basicButton('descriptions')
+            ->text(Text::_('COM_PLUGGEN_TOOLBAR_DESCRIPTIONS'))
+            ->icon('icon-info-circle')
+            ->buttonClass('btn btn-info button-descriptions');
 
         $toolbar->cancel('blueprint.cancel', $isNew ? 'JTOOLBAR_CANCEL' : 'JTOOLBAR_CLOSE');
     }

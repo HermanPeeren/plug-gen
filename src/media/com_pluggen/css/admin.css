@@ -1,0 +1,14 @@
+/**
+ * One rule, and it is the initial state.
+ *
+ * Every field description Joomla renders sits in a div whose id ends in "-desc"
+ * - including the ones inside subforms, which is why this is a descendant rule
+ * on the form rather than a class on each description: a subform renders its
+ * children itself and passes none of the options the outer layout was given.
+ *
+ * Hiding them in CSS rather than after load means there is no moment where the
+ * page shows descriptions the user asked not to see.
+ */
+.pluggen-descriptions-hidden div[id$="-desc"] {
+	display: none;
+}

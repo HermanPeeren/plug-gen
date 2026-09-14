@@ -37,13 +37,15 @@ jobs:
       # updates.xml is what an installed site reads to learn a new version
       # exists, and it points at a release asset by name. A stale one either
       # hides this release or offers a download that 404s, and neither shows up
-      # in any test - so regenerate it and fail if the committed file differs.
-      - name: The update server must match the manifest
+      # in any test. The media asset manifest carries the version too, and a
+      # stale one serves a cached stylesheet after an upgrade. Both are written
+      # by one script from the manifest, so regenerate and fail on a difference.
+      - name: The generated version files must match the manifest
         run: |
           php build/update-xml.php
-          if ! git diff --quiet -- updates.xml; then
-            echo "::error::updates.xml is out of date. Run php build/update-xml.php, commit the result, and re-tag."
-            git --no-pager diff -- updates.xml
+          if ! git diff --quiet; then
+            echo "::error::Generated version files are out of date. Run php build/update-xml.php, commit the result, and re-tag."
+            git --no-pager diff
             exit 1
           fi
 

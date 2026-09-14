@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Writes updates.xml from the manifest.
+ * Writes the files that repeat the version, from the manifest.
  *
  * The update server is a static file in this repository, served by
  * raw.githubusercontent.com and read by Joomla's updater. Everything in it is
@@ -10,8 +10,11 @@
  * exactly the kind of thing that is wrong six months later, and a wrong one
  * offers users an update that does not exist.
  *
- * Run it after bumping the version; the release workflow fails if the file on
- * disk is not what this script would write.
+ * The same goes for the version in the media asset manifest, which Joomla uses
+ * to bust caches: one more copy of a number that is already written down.
+ *
+ * Run it after bumping the version; the release workflow fails if either file
+ * on disk is not what this script would write.
  */
 
 declare(strict_types=1);
