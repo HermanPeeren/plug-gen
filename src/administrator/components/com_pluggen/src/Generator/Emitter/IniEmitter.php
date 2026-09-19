@@ -17,6 +17,10 @@ namespace Yepr\Component\Pluggen\Administrator\Generator\Emitter;
  * breaks the whole file - and a broken language file fails silently, showing raw
  * keys in the interface, which is a miserable thing to debug.
  *
+ * An embedded quote is written as a backslash escape, matching how core writes
+ * its own files since 4.0 and the single str_replace('\"', '"') that
+ * LanguageHelper::parseIniFile() applies after parsing.
+ *
  * @since  0.1.0
  */
 final class IniEmitter
@@ -72,8 +76,15 @@ final class IniEmitter
         // Collapse newlines: an ini value is a single line.
         $value = preg_replace('/\R+/', ' ', $value) ?? '';
 
-        // A double quote inside a double quoted ini value is written as "_QQ_".
-        $value = str_replace('"', '"_QQ_"', $value);
+        // A double quote is written as a backslash escape, which is what Joomla
+        // has read since 4.0: the file is parsed in RAW mode and the one
+        // postprocess in LanguageHelper::parseIniFile() is str_replace('\\"', '"').
+        // The older "_QQ_" is not merely legacy - nothing replaces it any more, so
+        // it would reach the interface literally.
+        //
+        // Only the quote is escaped. RAW mode processes no escapes, so doubling a
+        // backslash would leave it doubled on screen.
+        $value = str_replace('"', '\\"', $value);
 
         // Strip control characters that would corrupt the file.
         return preg_replace('/[\x00-\x1F\x7F]/u', '', $value) ?? '';

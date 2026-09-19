@@ -109,7 +109,7 @@ final class SecurityTest extends TestCase
     /** A quote in a translation would otherwise break the whole language file. */
     public function testIniValuesAreEscaped(): void
     {
-        $this->assertSame('KEY="a"_QQ_"b"', IniEmitter::line('key', 'a"b'));
+        $this->assertSame('KEY="a\\"b"', IniEmitter::line('key', 'a"b'));
         $this->assertSame('KEY="one two"', IniEmitter::line('key', "one\ntwo"));
     }
 
