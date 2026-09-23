@@ -41,11 +41,16 @@
 	</rule>
 
 	<!--
-		The test base class declares a shim class alongside itself when PHPUnit
-		is absent. That is the point of the file.
+		Joomla loads an install script by including the file and instantiating
+		the one class in it by name - Com_<Name>InstallerScript, global, with an
+		underscore. Nothing autoloads it, so a namespace would be ceremony and
+		PascalCase is not available: the name is a protocol, not a choice.
 	-->
-	<rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
-		<exclude-pattern>tests/TestCase.php</exclude-pattern>
+	<rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+		<exclude-pattern>src/script.php</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Classes.ValidClassName">
+		<exclude-pattern>src/script.php</exclude-pattern>
 	</rule>
 
 	<rule ref="Generic.Files.LineLength">

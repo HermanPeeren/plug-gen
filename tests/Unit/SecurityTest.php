@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Yepr\Component\Pluggen\Tests\Unit;
 
-use Yepr\Component\Pluggen\Administrator\Generator\Emitter\IniEmitter;
-use Yepr\Component\Pluggen\Administrator\Generator\Emitter\PhpEmitter;
-use Yepr\Component\Pluggen\Administrator\Generator\Emitter\XmlEmitter;
+use Yepr\Gen\Core\Emitter\IniEmitter;
+use Yepr\Gen\Core\Emitter\PhpEmitter;
+use Yepr\Gen\Core\Emitter\XmlEmitter;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\ModelValidator;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
+use Yepr\Gen\Core\Output\FileCollection;
 use Yepr\Component\Pluggen\Tests\TestCase;
 
 /**
@@ -36,7 +36,9 @@ final class SecurityTest extends TestCase
                 (new FileCollection())->add($path, '<?php');
                 $this->fail('Path was accepted but should have been rejected: ' . $path);
             } catch (\InvalidArgumentException) {
-                $this->assertTrue(true);
+                // Reaching here is the assertion. assertTrue(true) said the
+                // same thing and said it to a static analyser as a tautology.
+                $this->addToAssertionCount(1);
             }
         }
     }
@@ -94,7 +96,9 @@ final class SecurityTest extends TestCase
                 PhpEmitter::identifier($bad);
                 $this->fail('Identifier was accepted but should have been rejected: ' . $bad);
             } catch (\InvalidArgumentException) {
-                $this->assertTrue(true);
+                // Reaching here is the assertion. assertTrue(true) said the
+                // same thing and said it to a static analyser as a tautology.
+                $this->addToAssertionCount(1);
             }
         }
     }

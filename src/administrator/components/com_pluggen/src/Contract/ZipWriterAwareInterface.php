@@ -9,7 +9,7 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Contract;
 
-use Yepr\Component\Pluggen\Administrator\Generator\Output\ZipWriter;
+use Yepr\Gen\Core\Output\ZipWriter;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;

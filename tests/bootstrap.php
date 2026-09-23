@@ -3,12 +3,27 @@
 /**
  * Test bootstrap.
  *
- * Registers a PSR-4 autoloader for the generator core only. Nothing here loads
+ * Registers a PSR-4 autoloader for this component only. Nothing here loads
  * Joomla: if a test ever needs the CMS, that is a signal the code under test has
  * drifted out of the framework-agnostic core.
+ *
+ * The generation engine is not this component's any more. 4.1 replaced the
+ * private copy with `yepr/generator-core`, so it comes from composer - which is
+ * also what retired `tests/run.php`, a runner written for a machine with no
+ * composer on it. There is no longer anything for such a machine to run: the
+ * classes under test refer to a library only composer puts on disk.
  */
 
 declare(strict_types=1);
+
+$autoload = \dirname(__DIR__) . '/vendor/autoload.php';
+
+if (!is_file($autoload)) {
+    fwrite(STDERR, 'Run composer install first: the tests need yepr/generator-core.' . PHP_EOL);
+    exit(1);
+}
+
+require_once $autoload;
 
 if (!\defined('PLUGGEN_TEST_ROOT')) {
     \define('PLUGGEN_TEST_ROOT', __DIR__);

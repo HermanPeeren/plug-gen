@@ -21,6 +21,40 @@ tested without bootstrapping the CMS. `tests/Unit/NoJoomlaDependencyTest.php` en
 Generators never touch the filesystem. They write into an in-memory `FileCollection`;
 a separate writer turns that into a ZIP. This is what makes the whole core testable.
 
+### The engine is not this component's
+
+`FileCollection`, `ZipWriter`, `ProtectedRegionMerger`, the three emitters, the
+renderer, `Pipeline`, `GeneratorInterface` and `ValidationException` were all
+written here, and none of them live here any more. They are
+[`yepr/generator-core`](https://github.com/HermanPeeren/generator-core), shared
+with Exten-gen, Meta-gen and Gen-gen, under `Yepr\Gen\Core`.
+
+That was always the plan - the library was extracted from this component at
+stage 0 of the family's rework plan - and this component went on running its own
+copy until 4.1. The two turned out not to have drifted: swapping them changed
+the golden output by nothing at all. `tests/Unit/SharedEngineTest.php` is what
+keeps it that way, and its first rule is the important one. A copy does not come
+back by somebody deciding to fork the library; it comes back by somebody adding
+`Generator/Output/FileCollection.php` because that is where it used to be, and
+every test still passing because the class they wrote does what the library's
+does.
+
+What stayed is what is about plugins: the metamodel, the model, the four
+generators, the type bundles. What arrived is `Generator/Target/PluginTarget.php`
+- which generators run, in what order, and what a model must satisfy first. The
+library's `Pipeline` takes a model and a target, where the private one took a
+model and knew the rest; naming the target is what the difference buys.
+
+`PluginTypeGenerator` is the one bridge. A target's generator list is fixed and
+which plugin type runs is a property of the model, so the dispatch lives in a
+generator of its own - and `PluginTypeInterface` keeps the signature it always
+had, so nothing a type author writes had to learn about the shared library.
+
+**"Target" now means two things here.** A model carries a `target` saying which
+Joomla it is generated *for*, which is what the section below is about. A
+`TargetInterface` is the library's sense: the kind of artefact produced. Plugins
+for Joomla 5 and 6 come out of the same one.
+
 ## Layout
 
 `src/` mirrors the folder layout of a Joomla installation, so every file sits at
@@ -33,7 +67,7 @@ rather than a decision.
 src/                                            the installable component
   pluggen.xml                                   manifest
   administrator/components/com_pluggen/
-    src/Generator/                              framework-agnostic generator core
+    src/Generator/                              what is about plugins; the engine is the library's
     src/Types/<Type>/                           one self-contained bundle per plugin type
     src/{Controller,Model,View,Table,Extension}/
     forms/ language/ services/ sql/ tmpl/
@@ -252,7 +286,24 @@ composer cs-fix-dry       # php-cs-fixer, dry run with a diff
 php build/build.php       # -> build/com_pluggen.zip
 ```
 
-If PHPUnit is not installed, `php tests/run.php` runs the same test classes with a zero-dependency runner.
+`composer install` is not optional any more. The generation engine is
+`yepr/generator-core`, so the classes under test refer to a library only
+composer puts on disk - which is what retired `tests/run.php`, a runner written
+for a machine that had none. There is no longer a suite for such a machine to
+run, and the shim in `tests/TestCase.php` that went with it is gone too.
+
+The package a site installs carries the library under `library/`, and
+`src/script.php` installs it when the site has none or an older one. Joomla has
+no way for a manifest to declare a dependency on a library, so every extension
+in this family that needs one ships it; the version bundled is read out of
+`script.php`, so the build cannot produce a package whose own install script
+refuses the library inside it.
+
+```
+php build/build.php                     the newest local build, else the release
+php build/build.php --library=one.zip   that one
+php build/build.php --no-library        none, for a site that already has it
+```
 
 ### Joomla as reference material
 

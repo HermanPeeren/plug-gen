@@ -9,6 +9,8 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Generator\Template;
 
+use Yepr\Gen\Core\Template\RendererInterface;
+
 /**
  * Implemented by plugin type definitions that render templates.
  *
@@ -22,11 +24,11 @@ interface RendererAwareInterface
     /**
      * Set the template renderer.
      *
-     * @param   Renderer  $renderer  The renderer for template files.
+     * @param   RendererInterface  $renderer  The renderer for template files.
      *
      * @return  void
      *
      * @since   0.1.0
      */
-    public function setRenderer(Renderer $renderer): void;
+    public function setRenderer(RendererInterface $renderer): void;
 }

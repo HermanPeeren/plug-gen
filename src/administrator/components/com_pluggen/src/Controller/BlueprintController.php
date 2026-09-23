@@ -14,8 +14,8 @@ use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\Router\Route;
 use Yepr\Component\Pluggen\Administrator\Contract\ZipWriterAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Model\ValidationException;
-use Yepr\Component\Pluggen\Administrator\Generator\Output\ZipWriter;
+use Yepr\Gen\Core\Model\ValidationException;
+use Yepr\Gen\Core\Output\ZipWriter;
 use Yepr\Component\Pluggen\Administrator\Model\BlueprintModel;
 
 // phpcs:disable PSR1.Files.SideEffects

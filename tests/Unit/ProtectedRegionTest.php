@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Yepr\Component\Pluggen\Tests\Unit;
 
-use Yepr\Component\Pluggen\Administrator\Generator\Output\ProtectedRegionMerger;
+use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\PluginTypeInterface;
+use Yepr\Gen\Core\Output\ProtectedRegionMerger;
 use Yepr\Component\Pluggen\Tests\TestCase;
 
 /**
@@ -47,7 +48,7 @@ final class ProtectedRegionTest extends TestCase
             }
             PHP;
 
-        $merged = (new ProtectedRegionMerger())->merge($edited, $regenerated);
+        $merged = (new ProtectedRegionMerger(PluginTypeInterface::REGION_TAG))->merge($edited, $regenerated);
 
         $this->assertStringContainsString("\$item->addTaxonomy('Cuisine', \$item->cuisine);", $merged);
         $this->assertStringContainsString("protected \$layout = 'new';", $merged);
@@ -59,7 +60,7 @@ final class ProtectedRegionTest extends TestCase
         $edited = "// <pluggen id=\"gone\">\n\$keepMe = 1;\n// </pluggen>\n";
         $fresh  = "// <pluggen id=\"other\">\n// </pluggen>\n";
 
-        $merger = new ProtectedRegionMerger();
+        $merger = new ProtectedRegionMerger(PluginTypeInterface::REGION_TAG);
         $merger->merge($edited, $fresh);
 
         $this->assertSame(['gone'], $merger->orphanedRegions());
@@ -70,13 +71,13 @@ final class ProtectedRegionTest extends TestCase
         $existing = "// <pluggen id=\"a\">\n// </pluggen>\n";
         $fresh    = "// <pluggen id=\"a\">\n\$generated = 1;\n// </pluggen>\n";
 
-        $this->assertSame($fresh, (new ProtectedRegionMerger())->merge($existing, $fresh));
+        $this->assertSame($fresh, (new ProtectedRegionMerger(PluginTypeInterface::REGION_TAG))->merge($existing, $fresh));
     }
 
     public function testFirstGenerationNeedsNoExistingFile(): void
     {
         $fresh = "// <pluggen id=\"a\">\n// </pluggen>\n";
 
-        $this->assertSame($fresh, (new ProtectedRegionMerger())->merge('', $fresh));
+        $this->assertSame($fresh, (new ProtectedRegionMerger(PluginTypeInterface::REGION_TAG))->merge('', $fresh));
     }
 }

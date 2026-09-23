@@ -9,7 +9,8 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Generator\Metamodel;
 
-use Yepr\Component\Pluggen\Administrator\Generator\Template\Renderer;
+use Yepr\Gen\Core\Template\PhpRenderer;
+use Yepr\Gen\Core\Template\RendererInterface;
 use Yepr\Component\Pluggen\Administrator\Generator\Template\RendererAwareInterface;
 
 /**
@@ -44,14 +45,14 @@ final class TypeRegistry
      *
      * @param   string     $typesPath      Absolute path of the folder holding the type bundles.
      * @param   string     $baseNamespace  The namespace the bundle classes live in.
-     * @param   ?Renderer  $renderer       The renderer handed to bundles that render templates.
+     * @param   ?RendererInterface  $renderer       The renderer handed to bundles that render templates.
      *
      * @since   0.1.0
      */
     public function __construct(
         private readonly string $typesPath,
         private readonly string $baseNamespace = __NAMESPACE__,
-        private readonly ?Renderer $renderer = null
+        private readonly ?RendererInterface $renderer = null
     ) {
     }
 
@@ -71,7 +72,7 @@ final class TypeRegistry
         return new self(
             \dirname(__DIR__, 2) . \DIRECTORY_SEPARATOR . 'Types',
             'Yepr\\Component\\Pluggen\\Administrator\\Types',
-            new Renderer()
+            new PhpRenderer()
         );
     }
 

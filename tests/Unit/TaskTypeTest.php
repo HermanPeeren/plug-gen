@@ -6,7 +6,8 @@ namespace Yepr\Component\Pluggen\Tests\Unit;
 
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Pipeline;
+use Yepr\Gen\Core\Pipeline;
+use Yepr\Component\Pluggen\Administrator\Generator\Target\PluginTarget;
 use Yepr\Component\Pluggen\Tests\TestCase;
 
 /**
@@ -100,7 +101,7 @@ final class TaskTypeTest extends TestCase
     {
         $files = $this->pipeline()->run(PluginModel::fromArray($this->model([
             ['id' => 'recipes.ping', 'method' => 'ping'],
-        ])));
+        ])), PluginTarget::default());
 
         $this->assertFalse($files->has('forms/ping.xml'));
         $this->assertStringNotContainsString("'form'", $files->get('src/Extension/Recipes.php'));
@@ -168,12 +169,12 @@ final class TaskTypeTest extends TestCase
     {
         $json = (string) file_get_contents(PLUGGEN_TEST_ROOT . '/Fixtures/models/task-recipes.json');
 
-        return $this->pipeline()->run(PluginModel::fromJson($json));
+        return $this->pipeline()->run(PluginModel::fromJson($json), PluginTarget::default());
     }
 
     private function pipeline(): Pipeline
     {
-        return Pipeline::default();
+        return new Pipeline();
     }
 
     /** @param array<int, array<string, mixed>> $routines */

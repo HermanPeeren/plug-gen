@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Yepr\Component\Pluggen\Tests\Unit;
 
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Pipeline;
+use Yepr\Gen\Core\Pipeline;
+use Yepr\Component\Pluggen\Administrator\Generator\Target\PluginTarget;
 use Yepr\Component\Pluggen\Tests\TestCase;
 
 /**
@@ -113,7 +114,7 @@ final class GoldenOutputTest extends TestCase
     {
         $json = (string) file_get_contents(PLUGGEN_TEST_ROOT . '/Fixtures/models/' . $fixture . '.json');
 
-        return Pipeline::default()->run(PluginModel::fromJson($json));
+        return (new Pipeline())->run(PluginModel::fromJson($json), PluginTarget::default());
     }
 
     /** @return string[] */

@@ -9,9 +9,11 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Generator\Generators;
 
-use Yepr\Component\Pluggen\Administrator\Generator\Emitter\XmlEmitter as Xml;
+use Yepr\Gen\Core\GeneratorInterface;
+use Yepr\Gen\Core\Model\ModelInterface;
+use Yepr\Gen\Core\Emitter\XmlEmitter as Xml;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
+use Yepr\Gen\Core\Output\FileCollection;
 
 /**
  * The plugin manifest: <element>.xml at the root of the package.
@@ -23,15 +25,15 @@ final class ManifestGenerator implements GeneratorInterface
     /**
      * Every plugin needs a manifest.
      *
-     * @param   PluginModel  $model  The plugin model.
+     * @param   ModelInterface  $model  The plugin model.
      *
      * @return  boolean  Always true.
      *
      * @since   0.1.0
      */
-    public function supports(PluginModel $model): bool
+    public function supports(ModelInterface $model): bool
     {
-        return true;
+        return $model instanceof PluginModel;
     }
 
     /**
@@ -44,8 +46,16 @@ final class ManifestGenerator implements GeneratorInterface
      *
      * @since   0.1.0
      */
-    public function generate(PluginModel $model, FileCollection $files): void
+    public function generate(ModelInterface $model, FileCollection $files): void
     {
+        // Narrowed here rather than in the signature. The shared interface takes
+        // a ModelInterface and an implementation may not ask for less, so the
+        // type this generator actually reads is asserted in the body - which
+        // `supports()` has already answered for the only caller there is.
+        if (!$model instanceof PluginModel) {
+            return;
+        }
+
         $prefix = $model->languagePrefix();
 
         $lines   = [];
@@ -140,7 +150,7 @@ final class ManifestGenerator implements GeneratorInterface
     /**
      * Render the <config> block holding the plugin's own parameters.
      *
-     * @param   PluginModel  $model  The plugin model.
+     * @param   PluginModel     $model  The plugin model.
      *
      * @return  string[]  The lines of the config block.
      *

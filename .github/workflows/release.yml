@@ -53,13 +53,75 @@ jobs:
             exit 1
           fi
 
-      # The unit suite runs with no dependencies at all, so there is no reason
-      # not to gate a release on it.
-      - name: Unit tests
-        run: php tests/run.php
+      # 4.1 gave this repository a dependency: the generation engine is
+      # yepr/generator-core now rather than a private copy. So the suite needs
+      # composer, which is what retired tests/run.php - a runner written for a
+      # machine with none, and there is no longer anything for such a machine to
+      # run.
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
 
+      - name: Unit tests
+        run: composer test
+
+      - name: Static analysis
+        run: composer analyse
+
+      - name: Coding standards
+        run: composer cs
+
+      # No --no-library. There is no sibling checkout on a runner, so the build
+      # fetches the library release script.php insists on - which is the point:
+      # what ships is the artefact that was published, and a release needing a
+      # library nobody published fails here rather than on somebody's site.
       - name: Build the package
         run: php build/build.php
+
+      # The package is what people install, so its contents are asserted once
+      # rather than the build script being trusted forever.
+      - name: The package must carry the library and nothing it should not
+        run: |
+          php -r '
+            $zip = new ZipArchive();
+            $zip->open(glob("build/com_pluggen-*.zip")[0]);
+
+            $names = [];
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $names[] = $zip->getNameIndex($i);
+            }
+
+            // Windows separators unzip on a server as one long filename.
+            $bad = array_values(array_filter($names, static fn (string $n): bool =>
+                str_contains($n, "node_modules/") || str_contains($n, "\\")));
+
+            if ($bad !== []) {
+                fwrite(STDERR, "Package contains files it should not:\n  " . implode("\n  ", $bad) . "\n");
+                exit(1);
+            }
+
+            // What Joomla needs before it can install anything at all.
+            foreach (["pluggen.xml", "script.php"] as $required) {
+                if (!in_array($required, $names, true)) {
+                    fwrite(STDERR, "Package has no {$required}.\n");
+                    exit(1);
+                }
+            }
+
+            // And the library, without which an installed component fatals on
+            // the first screen that generates anything. script.php installs it
+            // from exactly here.
+            $library = array_filter(
+                $names,
+                static fn (string $n): bool => str_starts_with($n, "library/") && str_ends_with($n, ".zip")
+            );
+
+            if ($library === []) {
+                fwrite(STDERR, "Package carries no library. A site installing this could not generate.\n");
+                exit(1);
+            }
+
+            echo "package holds " . count($names) . " files, none of them unwanted\n";
+          '
 
       - name: Publish the release
         env:

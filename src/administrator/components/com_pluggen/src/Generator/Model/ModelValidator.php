@@ -9,6 +9,9 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Generator\Model;
 
+use Yepr\Gen\Core\Model\ModelInterface;
+use Yepr\Gen\Core\Model\ValidationException;
+use Yepr\Gen\Core\Model\ValidatorInterface;
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\PluginGroups;
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
 
@@ -22,7 +25,7 @@ use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
  *
  * @since  0.1.0
  */
-final class ModelValidator
+final class ModelValidator implements ValidatorInterface
 {
     // The name is checked through what it becomes. Users write a name the way
     // they would write it anywhere - "Article update notification" - and the
@@ -53,7 +56,7 @@ final class ModelValidator
      * All problems are reported at once rather than failing on the first, so the
      * user can fix a form in one pass.
      *
-     * @param   PluginModel  $model  The model to check.
+     * @param   PluginModel     $model  The model to check.
      *
      * @return  string[]  The problems found; an empty array means the model is usable.
      *
@@ -124,7 +127,7 @@ final class ModelValidator
      * produce a provider that does not parse, and the user would meet that as
      * a white page on their own site rather than as a message here.
      *
-     * @param   PluginModel  $model  The model to check.
+     * @param   PluginModel     $model  The model to check.
      *
      * @return  string[]  The problems found.
      *
@@ -171,7 +174,7 @@ final class ModelValidator
     /**
      * Check a model and throw when it cannot be generated from.
      *
-     * @param   PluginModel  $model  The model to check.
+     * @param   ModelInterface  $model  The model to check.
      *
      * @return  void
      *
@@ -179,8 +182,16 @@ final class ModelValidator
      *
      * @since   0.1.0
      */
-    public function assertValid(PluginModel $model): void
+    public function assertValid(ModelInterface $model): void
     {
+        // The shared interface takes a ModelInterface and an implementation may
+        // not ask for less. A model of another kind is not "valid by default":
+        // it is the wrong thing entirely, and saying so here beats generating a
+        // plugin out of it.
+        if (!$model instanceof PluginModel) {
+            throw new ValidationException(['This is not a plugin model.']);
+        }
+
         $errors = $this->validate($model);
 
         if ($errors !== []) {
@@ -191,7 +202,7 @@ final class ModelValidator
     /**
      * Check the chosen plugin type, and hand over to the type's own validation.
      *
-     * @param   PluginModel  $model  The model to check.
+     * @param   PluginModel     $model  The model to check.
      *
      * @return  string[]  The problems found.
      *

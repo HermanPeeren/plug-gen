@@ -9,13 +9,13 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Types\Workflow;
 
-use Yepr\Component\Pluggen\Administrator\Generator\Emitter\PhpEmitter as Php;
-use Yepr\Component\Pluggen\Administrator\Generator\Emitter\XmlEmitter as Xml;
+use Yepr\Gen\Core\Emitter\PhpEmitter as Php;
+use Yepr\Gen\Core\Emitter\XmlEmitter as Xml;
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\PluginTypeInterface;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
-use Yepr\Component\Pluggen\Administrator\Generator\Output\ProtectedRegionMerger;
-use Yepr\Component\Pluggen\Administrator\Generator\Template\Renderer;
+use Yepr\Gen\Core\Output\FileCollection;
+use Yepr\Gen\Core\Output\ProtectedRegionMerger;
+use Yepr\Gen\Core\Template\RendererInterface;
 use Yepr\Component\Pluggen\Administrator\Generator\Template\RendererAwareInterface;
 
 /**
@@ -41,21 +41,21 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
     /**
      * The renderer for this bundle's templates.
      *
-     * @var    Renderer
+     * @var    RendererInterface
      * @since  0.1.0
      */
-    private Renderer $renderer;
+    private RendererInterface $renderer;
 
     /**
      * Set the template renderer.
      *
-     * @param   Renderer  $renderer  The renderer for template files.
+     * @param   RendererInterface  $renderer  The renderer for template files.
      *
      * @return  void
      *
      * @since   0.1.0
      */
-    public function setRenderer(Renderer $renderer): void
+    public function setRenderer(RendererInterface $renderer): void
     {
         $this->renderer = $renderer;
     }
@@ -238,6 +238,11 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
      */
     public function generate(PluginModel $model, FileCollection $files): void
     {
+        // The marker tag is this component's, so a file generated here never
+        // carries another tool's. The library's merger takes it rather than
+        // hard-coding one, which is the whole of what moving it out changed.
+        $merger = new ProtectedRegionMerger(self::REGION_TAG);
+
         $actions = [];
 
         foreach ($this->actions($model) as $action) {
@@ -255,7 +260,7 @@ final class Definition implements PluginTypeInterface, RendererAwareInterface
                 'arr'      => static fn(array $value, int $indent = 0): string => Php::arrayLiteral($value, $indent),
                 'id'       => static fn(string $value): string => Php::identifier($value),
                 'region'   => static fn(string $slot, int $levels = 2): string
-                    => ProtectedRegionMerger::region($slot, Php::indentBlock($model->slot($slot), $levels), $levels),
+                    => $merger->region($slot, Php::indentBlock($model->slot($slot), $levels), $levels),
                 'slot'     => static fn(string $slot): string => $model->slot($slot),
             ])
         );

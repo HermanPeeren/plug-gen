@@ -6,7 +6,8 @@ namespace Yepr\Component\Pluggen\Tests\Unit;
 
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Pipeline;
+use Yepr\Gen\Core\Pipeline;
+use Yepr\Component\Pluggen\Administrator\Generator\Target\PluginTarget;
 use Yepr\Component\Pluggen\Tests\TestCase;
 
 /**
@@ -94,8 +95,10 @@ final class WorkflowTypeTest extends TestCase
         $this->assertStringContainsString("'onWorkflowBeforeTransition' => 'onWorkflowBeforeTransition',", $withBefore);
         $this->assertStringContainsString('$event->setStopTransition();', $withBefore);
 
-        $without = Pipeline::default()
-            ->run(PluginModel::fromArray($this->model(['handleBeforeTransition' => false])))
+        $without = (new Pipeline())->run(
+            PluginModel::fromArray($this->model(['handleBeforeTransition' => false])),
+            PluginTarget::default()
+        )
             ->get('src/Extension/Recipes.php');
 
         $this->assertStringNotContainsString('onWorkflowBeforeTransition', $without);
@@ -134,7 +137,7 @@ final class WorkflowTypeTest extends TestCase
     {
         $json = (string) file_get_contents(PLUGGEN_TEST_ROOT . '/Fixtures/models/workflow-recipes.json');
 
-        return Pipeline::default()->run(PluginModel::fromJson($json));
+        return (new Pipeline())->run(PluginModel::fromJson($json), PluginTarget::default());
     }
 
     /** @param array<string, mixed> $override */

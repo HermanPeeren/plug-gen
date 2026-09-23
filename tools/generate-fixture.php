@@ -14,8 +14,9 @@ declare(strict_types=1);
 require __DIR__ . '/../tests/bootstrap.php';
 
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Model\ValidationException;
-use Yepr\Component\Pluggen\Administrator\Generator\Pipeline;
+use Yepr\Gen\Core\Model\ValidationException;
+use Yepr\Gen\Core\Pipeline;
+use Yepr\Component\Pluggen\Administrator\Generator\Target\PluginTarget;
 
 $name = $argv[1] ?? 'finder-recipes';
 
@@ -29,7 +30,7 @@ if (!is_file($modelFile)) {
 
 try {
     $model = PluginModel::fromJson((string) file_get_contents($modelFile));
-    $files = Pipeline::default()->run($model);
+    $files = (new Pipeline())->run($model, PluginTarget::default());
 } catch (ValidationException $e) {
     fwrite(STDERR, "The model is not valid:\n - " . implode("\n - ", $e->getErrors()) . "\n");
     exit(1);

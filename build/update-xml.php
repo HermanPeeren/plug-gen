@@ -79,3 +79,43 @@ XML;
 file_put_contents($root . '/updates.xml', $out);
 
 printf("updates.xml: %s -> %s\n", $version, $download);
+
+// The other copy of the number, which this file has claimed to write since
+// it was written and did not. Joomla appends it to every asset URL to bust
+// caches, so a stale one serves the previous release's stylesheet to
+// everybody who already had the component - the one upgrade problem that
+// looks like nothing is wrong at all. It sat at 0.4.4 while 4.1 was being
+// prepared, and the release workflow would not have caught it either: it
+// regenerates and diffs, and this script wrote nothing to diff.
+$assets = $root . '/src/media/com_pluggen/joomla.asset.json';
+
+if (!is_file($assets)) {
+    fwrite(STDERR, "No asset manifest at {$assets}.\n");
+    exit(1);
+}
+
+$json = json_decode((string) file_get_contents($assets), true);
+
+if (!\is_array($json) || !isset($json['version'])) {
+    fwrite(STDERR, "The asset manifest has no version to update.\n");
+    exit(1);
+}
+
+$was = (string) $json['version'];
+
+if ($was !== $version) {
+    // Rewritten in place rather than re-encoded: json_encode would reformat
+    // the whole file, and a generated diff nobody can read is a generated
+    // diff nobody checks.
+    file_put_contents(
+        $assets,
+        (string) preg_replace(
+            '/("version"\s*:\s*")' . preg_quote($was, '/') . '(")/',
+            '${1}' . $version . '${2}',
+            (string) file_get_contents($assets),
+            1
+        )
+    );
+}
+
+printf("joomla.asset.json: %s -> %s\n", $was, $version);

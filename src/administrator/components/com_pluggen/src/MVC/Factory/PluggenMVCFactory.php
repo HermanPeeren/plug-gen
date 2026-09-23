@@ -18,13 +18,15 @@ use Yepr\Component\Pluggen\Administrator\Contract\ComponentParamsAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\ModelMapperAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\ModelValidatorAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\PipelineAwareInterface;
+use Yepr\Component\Pluggen\Administrator\Contract\TargetAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\TypeRegistryAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\UserStateAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\ZipWriterAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\ModelValidator;
-use Yepr\Component\Pluggen\Administrator\Generator\Output\ZipWriter;
-use Yepr\Component\Pluggen\Administrator\Generator\Pipeline;
+use Yepr\Gen\Core\Output\ZipWriter;
+use Yepr\Gen\Core\Pipeline;
+use Yepr\Gen\Core\Target\TargetInterface;
 use Yepr\Component\Pluggen\Administrator\Service\ModelMapper;
 use Yepr\Component\Pluggen\Administrator\Service\UserStateInterface;
 
@@ -61,6 +63,7 @@ final class PluggenMVCFactory extends MVCFactory
      * @param   TypeRegistry         $types       The registry of plugin types.
      * @param   ModelMapper          $mapper      The mapper between form data and model.
      * @param   Pipeline             $pipeline    The generation pipeline.
+     * @param   TargetInterface      $target      What a model is generated into.
      * @param   ModelValidator       $validator   The model validator.
      * @param   ZipWriter            $zipWriter   The writer that persists a file set.
      * @param   UserStateInterface   $userState   The per-user state store.
@@ -74,6 +77,7 @@ final class PluggenMVCFactory extends MVCFactory
         private readonly TypeRegistry $types,
         private readonly ModelMapper $mapper,
         private readonly Pipeline $pipeline,
+        private readonly TargetInterface $target,
         private readonly ModelValidator $validator,
         private readonly ZipWriter $zipWriter,
         private readonly UserStateInterface $userState,
@@ -178,6 +182,10 @@ final class PluggenMVCFactory extends MVCFactory
 
         if ($object instanceof PipelineAwareInterface) {
             $object->setPipeline($this->pipeline);
+        }
+
+        if ($object instanceof TargetAwareInterface) {
+            $object->setTarget($this->target);
         }
 
         if ($object instanceof ModelValidatorAwareInterface) {

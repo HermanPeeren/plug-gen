@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Yepr\Component\Pluggen\Tests\Unit;
 
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Pipeline;
+use Yepr\Gen\Core\Pipeline;
+use Yepr\Component\Pluggen\Administrator\Generator\Target\PluginTarget;
 use Yepr\Component\Pluggen\Tests\TestCase;
 
 /**
@@ -94,6 +95,6 @@ final class TargetTest extends TestCase
     /** The generated services/provider.php for one target. */
     private function provider(string $target): string
     {
-        return Pipeline::default()->run($this->model($target))->all()['services/provider.php'];
+        return (new Pipeline())->run($this->model($target), PluginTarget::default())->all()['services/provider.php'];
     }
 }

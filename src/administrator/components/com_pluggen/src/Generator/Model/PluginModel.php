@@ -9,15 +9,22 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Generator\Model;
 
+use Yepr\Gen\Core\Model\ModelInterface;
+
 /**
  * An immutable description of one plugin: the model from which code is generated.
  *
  * This is the only input to generation. Nothing in the generators may read from
  * the request, the database, the filesystem or global state.
  *
+ * `ModelInterface` is empty on purpose and this implements it anyway: the
+ * shared engine never looks inside a model, so what the marker buys is a named
+ * boundary - a generator declares that it takes a model rather than any object,
+ * and this component can still be checked statically against its own type.
+ *
  * @since  0.1.0
  */
-final class PluginModel
+final class PluginModel implements ModelInterface
 {
     /**
      * The model format this generator reads and writes.

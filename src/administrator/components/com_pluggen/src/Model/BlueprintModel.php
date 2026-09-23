@@ -17,14 +17,16 @@ use Yepr\Component\Pluggen\Administrator\Contract\ComponentParamsAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\ModelMapperAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\ModelValidatorAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\PipelineAwareInterface;
+use Yepr\Component\Pluggen\Administrator\Contract\TargetAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\TypeRegistryAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Contract\UserStateAwareInterface;
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\PluginGroups;
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\ModelValidator;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
-use Yepr\Component\Pluggen\Administrator\Generator\Pipeline;
+use Yepr\Gen\Core\Output\FileCollection;
+use Yepr\Gen\Core\Pipeline;
+use Yepr\Gen\Core\Target\TargetInterface;
 use Yepr\Component\Pluggen\Administrator\Service\ModelMapper;
 use Yepr\Component\Pluggen\Administrator\Service\UserStateInterface;
 
@@ -46,6 +48,7 @@ class BlueprintModel extends AdminModel implements
     ComponentParamsAwareInterface,
     ModelMapperAwareInterface,
     PipelineAwareInterface,
+    TargetAwareInterface,
     ModelValidatorAwareInterface,
     UserStateAwareInterface
 {
@@ -80,6 +83,14 @@ class BlueprintModel extends AdminModel implements
      * @since  0.1.0
      */
     private Pipeline $pipeline;
+
+    /**
+     * What a model is generated into.
+     *
+     * @var    TargetInterface
+     * @since  0.5.0
+     */
+    private TargetInterface $target;
 
     /**
      * The model validator.
@@ -145,6 +156,20 @@ class BlueprintModel extends AdminModel implements
     public function setPipeline(Pipeline $pipeline): void
     {
         $this->pipeline = $pipeline;
+    }
+
+    /**
+     * Set the target a model is generated into.
+     *
+     * @param   TargetInterface  $target  Which generators run, in what order.
+     *
+     * @return  void
+     *
+     * @since   0.5.0
+     */
+    public function setTarget(TargetInterface $target): void
+    {
+        $this->target = $target;
     }
 
     /**
@@ -368,7 +393,7 @@ class BlueprintModel extends AdminModel implements
      * @return  FileCollection  The generated files.
      *
      * @throws  \RuntimeException  When the blueprint has no model yet.
-     * @throws  \Yepr\Component\Pluggen\Administrator\Generator\Model\ValidationException  When the model is not valid.
+     * @throws  \Yepr\Gen\Core\Model\ValidationException  When the model is not valid.
      *
      * @since   0.1.0
      */
@@ -380,7 +405,7 @@ class BlueprintModel extends AdminModel implements
             throw new \RuntimeException(Text::_('COM_PLUGGEN_ERR_NO_MODEL'));
         }
 
-        return $this->pipeline->run(PluginModel::fromJson((string) $item->model));
+        return $this->pipeline->run(PluginModel::fromJson((string) $item->model), $this->target);
     }
 
     /**

@@ -29,9 +29,11 @@ use Joomla\Event\DispatcherInterface;
 use Yepr\Component\Pluggen\Administrator\Extension\PluggenComponent;
 use Yepr\Component\Pluggen\Administrator\Generator\Metamodel\TypeRegistry;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\ModelValidator;
-use Yepr\Component\Pluggen\Administrator\Generator\Output\ZipWriter;
-use Yepr\Component\Pluggen\Administrator\Generator\Pipeline;
-use Yepr\Component\Pluggen\Administrator\Generator\Template\Renderer;
+use Yepr\Gen\Core\Output\ZipWriter;
+use Yepr\Gen\Core\Pipeline;
+use Yepr\Component\Pluggen\Administrator\Generator\Target\PluginTarget;
+use Yepr\Gen\Core\Target\TargetInterface;
+use Yepr\Gen\Core\Template\PhpRenderer;
 use Yepr\Component\Pluggen\Administrator\MVC\Factory\PluggenMVCFactory;
 use Yepr\Component\Pluggen\Administrator\Service\ApplicationUserState;
 use Yepr\Component\Pluggen\Administrator\Service\ModelMapper;
@@ -93,9 +95,9 @@ return new class () implements ServiceProviderInterface {
     private function registerGeneratorServices(Container $container): void
     {
         $container->share(
-            Renderer::class,
+            PhpRenderer::class,
             function (Container $container) {
-                return new Renderer();
+                return new PhpRenderer();
             }
         );
 
@@ -105,7 +107,7 @@ return new class () implements ServiceProviderInterface {
                 return new TypeRegistry(
                     JPATH_ADMINISTRATOR . '/components/com_pluggen/src/Types',
                     'Yepr\\Component\\Pluggen\\Administrator\\Types',
-                    $container->get(Renderer::class)
+                    $container->get(PhpRenderer::class)
                 );
             }
         );
@@ -117,10 +119,21 @@ return new class () implements ServiceProviderInterface {
             }
         );
 
+        // The pipeline is the library's loop and holds nothing. What used to be
+        // its constructor arguments are the target's, because "which generators
+        // run and what a model must satisfy" is a property of the thing being
+        // generated rather than of the machinery that runs it.
         $container->share(
             Pipeline::class,
             function (Container $container) {
-                return new Pipeline(
+                return new Pipeline();
+            }
+        );
+
+        $container->share(
+            TargetInterface::class,
+            function (Container $container) {
+                return new PluginTarget(
                     $container->get(TypeRegistry::class),
                     $container->get(ModelValidator::class)
                 );
@@ -182,6 +195,7 @@ return new class () implements ServiceProviderInterface {
                     $container->get(TypeRegistry::class),
                     $container->get(ModelMapper::class),
                     $container->get(Pipeline::class),
+                    $container->get(TargetInterface::class),
                     $container->get(ModelValidator::class),
                     $container->get(ZipWriter::class),
                     $container->get(UserStateInterface::class),

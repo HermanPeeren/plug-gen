@@ -9,9 +9,11 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Generator\Generators;
 
-use Yepr\Component\Pluggen\Administrator\Generator\Emitter\PhpEmitter as Php;
+use Yepr\Gen\Core\GeneratorInterface;
+use Yepr\Gen\Core\Model\ModelInterface;
+use Yepr\Gen\Core\Emitter\PhpEmitter as Php;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
-use Yepr\Component\Pluggen\Administrator\Generator\Output\FileCollection;
+use Yepr\Gen\Core\Output\FileCollection;
 
 /**
  * services/provider.php - the DI wiring.
@@ -55,15 +57,15 @@ final class ServiceProviderGenerator implements GeneratorInterface
     /**
      * Every plugin needs a service provider.
      *
-     * @param   PluginModel  $model  The plugin model.
+     * @param   ModelInterface  $model  The plugin model.
      *
      * @return  boolean  Always true.
      *
      * @since   0.1.0
      */
-    public function supports(PluginModel $model): bool
+    public function supports(ModelInterface $model): bool
     {
-        return true;
+        return $model instanceof PluginModel;
     }
 
     /**
@@ -76,8 +78,16 @@ final class ServiceProviderGenerator implements GeneratorInterface
      *
      * @since   0.1.0
      */
-    public function generate(PluginModel $model, FileCollection $files): void
+    public function generate(ModelInterface $model, FileCollection $files): void
     {
+        // Narrowed here rather than in the signature. The shared interface takes
+        // a ModelInterface and an implementation may not ask for less, so the
+        // type this generator actually reads is asserted in the body - which
+        // `supports()` has already answered for the only caller there is.
+        if (!$model instanceof PluginModel) {
+            return;
+        }
+
         $class     = Php::identifier($model->className());
         $namespace = Php::namespaceName($model->extensionNamespace());
 

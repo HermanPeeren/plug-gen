@@ -9,7 +9,7 @@
 
 namespace Yepr\Component\Pluggen\Administrator\Contract;
 
-use Yepr\Component\Pluggen\Administrator\Generator\Pipeline;
+use Yepr\Gen\Core\Pipeline;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
