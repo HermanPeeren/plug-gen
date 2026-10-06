@@ -382,6 +382,15 @@ installed site or offers a download that 404s, and nothing else in the build
 would notice, so the release workflow regenerates the file and fails when the
 committed one differs.
 
+Once the release is published, the workflow writes the download's SHA-512 into
+`updates.xml` with `php build/update-xml.php --checksum` and commits that to
+`main` itself. Joomla checks a downloaded update against it and warns when
+there is none. It has to come from the workflow because a zip built on another
+machine has different timestamps and line endings, so its hash does not match.
+Pull `main` after a release, before the next version bump. Without `--checksum`
+the script keeps a committed checksum while the download stays the same, and
+drops it when the version changes.
+
 `targetplatform` is a regular expression anchored at the start of the Joomla
 version. It reads `6\.[0-9]+`, which offers the update on any Joomla 6 and on
 nothing older: Plug-gen is written against Joomla 6, whatever version a
