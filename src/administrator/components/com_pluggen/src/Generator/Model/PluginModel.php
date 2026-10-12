@@ -10,6 +10,7 @@
 namespace Yepr\Component\Pluggen\Administrator\Generator\Model;
 
 use Yepr\Gen\Core\Model\ModelInterface;
+use Yepr\Gen\Core\Model\ValidationException;
 
 /**
  * An immutable description of one plugin: the model from which code is generated.

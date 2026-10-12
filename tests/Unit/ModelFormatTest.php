@@ -7,6 +7,7 @@ namespace Yepr\Component\Pluggen\Tests\Unit;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\ModelValidator;
 use Yepr\Component\Pluggen\Administrator\Generator\Model\PluginModel;
 use Yepr\Component\Pluggen\Tests\TestCase;
+use Yepr\Gen\Core\Model\ValidationException;
 
 /**
  * The stored format, and what happens to models written in the older one.
@@ -160,6 +161,14 @@ final class ModelFormatTest extends TestCase
         $again = PluginModel::fromJson($model->toJson());
 
         $this->assertSame($model->toArray(), $again->toArray());
+    }
+
+    /** A stored model that is not JSON is refused with a message, not a fatal error. */
+    public function testAModelThatIsNotJsonIsRefusedWithAMessage(): void
+    {
+        $this->expectException(ValidationException::class);
+
+        PluginModel::fromJson('{not json');
     }
 
     private function version10(): array
