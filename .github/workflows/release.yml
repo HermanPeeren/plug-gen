@@ -61,6 +61,18 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
+      # PHPStan resolves the component's base classes against a real Joomla:
+      # phpstan.neon scans /joomla, and without it the analysis stops before it
+      # starts. /joomla is git-ignored, so CI fetches its own.
+      - name: Fetch Joomla
+        run: |
+          url="https://github.com/joomla/joomla-cms/releases/download/${JOOMLA_VERSION}/Joomla_${JOOMLA_VERSION}-Stable-Full_Package.tar.gz"
+          curl -sSL -o joomla.tar.gz "$url"
+          mkdir -p joomla
+          tar -xzf joomla.tar.gz -C joomla
+        env:
+          JOOMLA_VERSION: 6.1.4
+
       - name: Unit tests
         run: composer test
 
