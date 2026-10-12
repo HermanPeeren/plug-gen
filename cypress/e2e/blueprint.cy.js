@@ -183,6 +183,52 @@ describe('Plug-gen blueprint editing', () => {
       .first().should('have.value', 'cacheControllerFactory');
   });
 
+  // A routine is a subform row holding a subform of its own, and some of its
+  // fields share a name with a top-level field of the blueprint form - id,
+  // description, params, and a parameter's name. On Joomla 6.1.4 merging the
+  // type forms with Form::load() dropped exactly those, so the routine rendered
+  // without them and the next save lost their values while reporting success.
+  it('keeps a task routine with its id, description and parameters through two saves', () => {
+    const routine = 'jform[config_task][routines]';
+    const routineField = (name) => cy.get(`[name^="${routine}"][name$="[${name}]"]:not([name*="[params]"])`).first();
+    const paramField = (name) => cy.get(`[name^="${routine}"][name*="[params]"][name$="[${name}]"]`).first();
+
+    cy.visit(NEW_BLUEPRINT);
+
+    cy.get('#jform_name').clear().type(`${MARKER}Balloon flights`);
+    cy.get('#jform_plugin_type').select('task');
+    cy.get('#jform_org_namespace').clear().type('Acme');
+
+    openTab('Type Settings');
+    cy.get(`joomla-field-subform[name="${routine}"] .group-add`).first().click();
+
+    routineField('id').clear().type('launch.window');
+    routineField('method').clear().type('launchWindow');
+    routineField('label').clear().type('Launch windows');
+    routineField('description').clear().type('Reports the flight windows.');
+    routineField('code').clear().type('$this->logTask((string) $params->window_hours);', { parseSpecialCharSequences: false });
+
+    cy.get(`joomla-field-subform[name^="${routine}"][name$="[params]"] .group-add`).first().click();
+    paramField('name').clear().type('window_hours');
+    paramField('type').clear().type('number');
+    paramField('label').clear().type('Flight window (hours)');
+    paramField('default').clear().type('2');
+
+    cy.get('joomla-toolbar-button[task="blueprint.apply"] button').click();
+    cy.get('#system-message-container').should('contain', 'saved');
+
+    // The second save is the one that used to be refused: by then the stored
+    // routine had no id, and a task plugin without routines is not valid.
+    cy.get('joomla-toolbar-button[task="blueprint.apply"] button').click();
+    cy.get('#system-message-container').should('contain', 'saved');
+
+    openTab('Type Settings');
+    routineField('id').should('have.value', 'launch.window');
+    routineField('description').should('have.value', 'Reports the flight windows.');
+    paramField('name').should('have.value', 'window_hours');
+    paramField('default').should('have.value', '2');
+  });
+
   // The list view links to Generate with a GET request, while the edit toolbar
   // posts the form. Both have to pass the token check, and only a real request
   // shows whether they do: this one came back as an HTML error page until the

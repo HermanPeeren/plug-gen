@@ -2,7 +2,7 @@
 <!--
 	The general form: everything that is the same for every plugin type.
 
-	The type-specific fieldsets are appended at runtime by BlueprintModel::getForm()
+	The type-specific fields are added at runtime by BlueprintModel::preprocessForm()
 	from the registered type bundles, and shown with showon="plugin_type:<id>".
 -->
 <form>

@@ -230,9 +230,9 @@ class BlueprintModel extends AdminModel implements
      * Build the edit form.
      *
      * The general fields come from forms/blueprint.xml; every registered type
-     * then appends its own fieldsets. Their fields carry showon="type_id:<id>",
-     * so Joomla shows only the fieldset belonging to the selected type - no
-     * reload task and no custom JavaScript.
+     * then adds its own fields, in preprocessForm(). They carry
+     * showon="plugin_type:<id>", so Joomla shows only the ones belonging to the
+     * selected type - no reload task and no custom JavaScript.
      *
      * @param   array    $data      Data for the form.
      * @param   boolean  $loadData  True to load the data from the model state.
@@ -426,19 +426,20 @@ class BlueprintModel extends AdminModel implements
      */
     protected function preprocessForm(Form $form, $data, $group = 'content')
     {
-        // The type fieldsets are loaded here rather than in getForm() because
+        // The type fields are added here rather than in getForm() because
         // Joomla binds the data straight after this method returns, and
         // Form::bindLevel() silently drops a scalar whose field does not exist
-        // yet. Loading them afterwards left every type-specific field empty when
+        // yet. Adding them afterwards left every type-specific field empty when
         // a saved blueprint was reopened - the fields were there, the values
         // were in the model, and nothing complained.
-        foreach ($this->types->all() as $type) {
-            $formPath = $type->formPath();
+        //
+        // They are set field by field rather than with Form::loadFile(), which
+        // since Joomla 6.1.4 drops every nested field whose name is also a
+        // top-level field of this form: a task routine rendered without its id,
+        // description and parameters, and saving lost them.
+        $typeFields = $this->types->formFields();
 
-            if ($formPath !== null && is_file($formPath)) {
-                $form->loadFile($formPath, false);
-            }
-        }
+        $form->setFields($typeFields, null, false);
 
         $availability = $this->types->availability();
 

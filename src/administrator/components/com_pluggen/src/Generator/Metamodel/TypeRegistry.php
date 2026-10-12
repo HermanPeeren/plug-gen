@@ -164,6 +164,46 @@ final class TypeRegistry
     }
 
     /**
+     * The fields every registered type adds to the blueprint form.
+     *
+     * Each type form holds top-level fields only - a settings subform and a
+     * custom-code subform - and each is returned whole, nested subforms
+     * included. They are meant for Form::setFields(), which looks at the
+     * top-level name alone. Form::load() looks at every descendant field
+     * instead, and since Joomla 6.1.4 it drops a nested one whose name is also
+     * a top-level field of the blueprint form: a task routine lost its id,
+     * description and parameters that way, and the next save lost their values.
+     *
+     * @return  list<\SimpleXMLElement>  The fields, in type id order.
+     *
+     * @since   0.5.1
+     */
+    public function formFields(): array
+    {
+        $fields = [];
+
+        foreach ($this->all() as $type) {
+            $formPath = $type->formPath();
+
+            if ($formPath === null || !is_file($formPath)) {
+                continue;
+            }
+
+            $form = simplexml_load_file($formPath);
+
+            if ($form === false) {
+                continue;
+            }
+
+            foreach ($form->field as $field) {
+                $fields[] = $field;
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
      * The registered types indexed by the plugin group they generate into.
      *
      * Today every group has at most one type, which is why the interface can
