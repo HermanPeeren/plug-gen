@@ -19,6 +19,7 @@
 		<downloads>
 			<downloadurl type="full" format="zip">https://github.com/HermanPeeren/plug-gen/releases/download/v0.5.2/com_pluggen-0.5.2.zip</downloadurl>
 		</downloads>
+		<sha512>3ceb9ec95f4555cb3df789c4da9da6833276f39fc7f368f467e6e9af39681cb189b00193d17a903110b17888679b23af70f5e4d82843f837d0bbb2cef369ed61</sha512>
 		<tags>
 			<tag>stable</tag>
 		</tags>
