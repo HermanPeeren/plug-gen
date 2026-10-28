@@ -48,7 +48,11 @@ class Com_PluggenInstallerScript
     /**
      * The oldest library release that has everything this version calls.
      *
-     * 0.10.0 because that is where the engine stood when 4.1 replaced this
+     * 0.19.1 for the uninstall guard: the library refuses to be uninstalled
+     * while this component is installed, so a site cannot lose it from under
+     * this one and fail on the next page with a missing class.
+     *
+     * Before that, 0.10.0 because that is where the engine stood when 4.1 replaced this
      * component's private copy of it. The classes themselves - FileCollection,
      * the emitters, Pipeline, the renderer - have been there since 0.2.0, when
      * they were extracted from here, so the floor is a choice rather than a
@@ -59,7 +63,7 @@ class Com_PluggenInstallerScript
      * what says the two agree. Let them drift and a site is handed a library
      * older than the code that was tested.
      */
-    private const LIBRARY_MINIMUM = '0.10.0';
+    private const LIBRARY_MINIMUM = '0.19.1';
 
     /**
      * The oldest Joomla this runs on.

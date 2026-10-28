@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f49bece52f4e8961a80a3ac45529f3f",
+    "content-hash": "d12c6e9e41caad1ac37cd784ddc3dcd0",
     "packages": [
         {
             "name": "symfony/deprecation-contracts",
@@ -327,16 +327,16 @@
         },
         {
             "name": "yepr/generator-core",
-            "version": "v0.10.0",
+            "version": "v0.19.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/HermanPeeren/generator-core.git",
-                "reference": "59e8b7ec4a291c0e981e2b86b898a7da71dc3069"
+                "url": "git@github.com:HermanPeeren/generator-core.git",
+                "reference": "a74d28e7c2151fa6545f60ed8240a9ceac176a2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/HermanPeeren/generator-core/zipball/59e8b7ec4a291c0e981e2b86b898a7da71dc3069",
-                "reference": "59e8b7ec4a291c0e981e2b86b898a7da71dc3069",
+                "url": "https://api.github.com/repos/HermanPeeren/generator-core/zipball/a74d28e7c2151fa6545f60ed8240a9ceac176a2d",
+                "reference": "a74d28e7c2151fa6545f60ed8240a9ceac176a2d",
                 "shasum": ""
             },
             "require": {
@@ -399,11 +399,7 @@
                 }
             ],
             "description": "A framework-agnostic code generation engine: model in, file set out.",
-            "support": {
-                "source": "https://github.com/HermanPeeren/generator-core/tree/v0.10.0",
-                "issues": "https://github.com/HermanPeeren/generator-core/issues"
-            },
-            "time": "2026-09-23T13:03:54+00:00"
+            "time": "2026-10-28T16:39:49+00:00"
         }
     ],
     "packages-dev": [
