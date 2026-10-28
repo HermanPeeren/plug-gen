@@ -14,12 +14,11 @@
 		<description>Generates Joomla plugins from a saved model.</description>
 		<element>com_pluggen</element>
 		<type>component</type>
-		<version>0.5.1</version>
+		<version>0.5.2</version>
 		<infourl title="Plug-gen">https://github.com/HermanPeeren/plug-gen</infourl>
 		<downloads>
-			<downloadurl type="full" format="zip">https://github.com/HermanPeeren/plug-gen/releases/download/v0.5.1/com_pluggen-0.5.1.zip</downloadurl>
+			<downloadurl type="full" format="zip">https://github.com/HermanPeeren/plug-gen/releases/download/v0.5.2/com_pluggen-0.5.2.zip</downloadurl>
 		</downloads>
-		<sha512>209e6452ced7ba50f8a47b039cbe74aff0854e5ab542fa40bc01f2ecebfe02175ba0353e634a1ebafabd78c6aad8fb2b832c30bb36b0ced084b576914036bbe8</sha512>
 		<tags>
 			<tag>stable</tag>
 		</tags>
